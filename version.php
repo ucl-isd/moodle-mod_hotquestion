@@ -24,14 +24,15 @@
  *
  * @package   mod_hotquestion
  * @copyright 2011 Sun Zhigang
+ * @copyright 2016 onwards AL Rachels drachels@drachels.com
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$module->version   = 2013081200;  // The current module version (Date: YYYYMMDDXX)
-$module->requires  = 2010112400;  // Requires this Moodle version
+$module->version   = 2016031100;  // The current module version (Date: YYYYMMDDXX)
+$module->requires  = 2014051200;  // Requires this Moodle version 
 $module->cron      = 0;           // Period for cron to check this module (secs)
 
-$module->maturity  = MATURITY_BETA;
-$module->release   = "2.1 beta"; // User-friendly version number
+$module->maturity  = MATURITY_STABLE;
+$module->release   = "2.7 (Build: 20160311)"; // User-friendly version number
