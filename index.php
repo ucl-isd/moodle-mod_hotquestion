@@ -15,87 +15,142 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-
 /**
- * This is a one-line short description of the file
- *
- * You can have a rather longer description of the file as well,
- * if you like, and it can span multiple lines.
+ * This page lists all the instances of hot question in a particular course
  *
  * @package   mod_hotquestion
  * @copyright 2011 Sun Zhigang
+ * @copyright 2016 onwards AL Rachels drachels@drachels.com
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-
-require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
-require_once(dirname(__FILE__).'/lib.php');
+//require_once(__DIR__ . "/../../config.php");
+require_once("../../config.php");
+require_once("lib.php");
 
 $id = required_param('id', PARAM_INT);   // course
 
-if (! $course = $DB->get_record('course', array('id' => $id))) {
-    error('Course ID is incorrect');
+if (! $course = $DB->get_record("course", array("id" => $id))) {
+    print_error("Course ID is incorrect");
 }
 
 require_course_login($course);
 
-add_to_log($course->id, 'hotquestion', 'view all', "index.php?id=$course->id", '');
-
-/// Print the header
-
-$PAGE->set_url('/mod/hotquestion/view.php', array('id' => $id));
-$PAGE->set_title($course->fullname);
-$PAGE->set_heading($course->shortname);
+// Header
+$strhotquestions = get_string("modulenameplural", "hotquestion");
+$PAGE->set_pagelayout('incourse');
+$PAGE->set_url('/mod/hotquestion/index.php', array('id' => $id));
+$PAGE->navbar->add($strhotquestions);
+$PAGE->set_title($strhotquestions);
+$PAGE->set_heading($course->fullname);
 
 echo $OUTPUT->header();
+echo $OUTPUT->heading($strhotquestions);
 
-/// Get all the appropriate data
-
-if (! $hotquestions = get_all_instances_in_course('hotquestion', $course)) {
-    echo $OUTPUT->heading(get_string('nohotquestion', 'hotquestion'), 2);
-    echo $OUTPUT->continue_button("view.php?id=$course->id");
-    echo $OUTPUT->footer();
-    die();
+if (! $hotquestions = get_all_instances_in_course("hotquestion", $course)) {
+    notice(get_string('thereareno', 'moodle', get_string("modulenameplural", "hotquestion")), "../../course/view.php?id=$course->id");
+    die;
 }
 
-/// Print the list of instances (your module will probably extend this)
-
-$timenow  = time();
-$strname  = get_string('name');
-$strweek  = get_string('week');
-$strtopic = get_string('topic');
-
-if ($course->format == 'weeks') {
-    $table->head  = array ($strweek, $strname);
-    $table->align = array ('center', 'left');
-} else if ($course->format == 'topics') {
-    $table->head  = array ($strtopic, $strname);
-    $table->align = array ('center', 'left', 'left', 'left');
-} else {
-    $table->head  = array ($strname);
-    $table->align = array ('left', 'left', 'left');
+// Sections
+$usesections = course_format_uses_sections($course->format);
+if ($usesections) {
+	$modinfo = get_fast_modinfo($course);
+	$sections = $modinfo->get_section_info_all();
 }
 
+$timenow = time();
+
+// Table data
+$table = new html_table();
+
+$table->head = array();
+$table->align = array();
+
+if ($usesections) {
+    $table->head[] = get_string('sectionname', 'format_'.$course->format);
+    $table->align[] = 'center';
+}
+
+$table->head[] = get_string('name');
+$table->align[] = 'left';
+$table->head[] = get_string('description');
+$table->align[] = 'left';
+
+$currentsection = '';
+$i = 0;
 foreach ($hotquestions as $hotquestion) {
+
+    $context = context_module::instance($hotquestion->coursemodule);
+    $entriesmanager = has_capability('mod/hotquestion:manageentries', $context);
+
+    // Section
+    $printsection = '';
+    if ($hotquestion->section !== $currentsection) {
+        if ($hotquestion->section) {
+            $printsection = get_section_name($course, $sections[$hotquestion->section]);
+        }
+        if ($currentsection !== '') {
+            $table->data[$i] = 'hr';
+            $i++;
+        }
+        $currentsection = $hotquestion->section;
+    }
+    if ($usesections) {
+        $table->data[$i][] = $printsection;
+    }
+
+    // Link to Hot Question activities.
     if (!$hotquestion->visible) {
         //Show dimmed if the mod is hidden
-        $link = '<a class="dimmed" href="view.php?id='.$hotquestion->coursemodule.'">'.format_string($hotquestion->name).'</a>';
+        $table->data[$i][] = "<a class=\"dimmed\" href=\"view.php?id=$hotquestion->coursemodule\">".format_string($hotquestion->name,true)."</a>";
     } else {
         //Show normal if the mod is visible
-        $link = '<a href="view.php?id='.$hotquestion->coursemodule.'">'.format_string($hotquestion->name).'</a>';
+        $table->data[$i][] = "<a href=\"view.php?id=$hotquestion->coursemodule\">".format_string($hotquestion->name,true)."</a>";
     }
 
-    if ($course->format == 'weeks' or $course->format == 'topics') {
-        $table->data[] = array ($hotquestion->section, $link);
-    } else {
-        $table->data[] = array ($link);
-    }
+    // Description of the Hot Question activity.
+    $table->data[$i][] = format_text($hotquestion->intro,  $hotquestion->introformat);
+
+    // Questions info
+//    if ($entriesmanager) {
+//
+        // Display the report.php col only if is a entries manager in some CONTEXT_MODULE
+//        if (empty($managersomewhere)) {
+//            $table->head[] = get_string('viewentries', 'hotquestion');
+//            $table->align[] = 'left';
+//            $managersomewhere = true;
+//
+//            // Fill the previous col cells
+//            $manageentriescell = count($table->head) - 1;
+//            for ($j = 0; $j < $i; $j++) {
+//                if (is_array($table->data[$j])) {
+//                    $table->data[$j][$manageentriescell] = '';
+//                }
+//            }
+//        }
+//		
+//        //$entrycount = hotquestion_count_entries($hotquestion, get_current_group($course->id));
+//		//$entrycount = hotquestion_count_entries($hotquestion, groups_get_all_groups($course->id, $USER->id));
+//        $table->data[$i][] = "<a href=\"report.php?id=$hotquestion->coursemodule\">".get_string("viewallentries","hotquestion", $entrycount)."</a>";
+//    } else if (!empty($managersomewhere)) {
+//
+//        $table->data[$i][] = "";
+//    }
+	
+    $i++;
 }
 
-echo $OUTPUT->heading(get_string('modulenameplural', 'hotquestion'), 2);
-print_table($table);
-//echo html_writer::table($table);
+echo "<br />";
 
-/// Finish the page
+echo html_writer::table($table);
+
+// Trigger course module instance list event.
+$params = array(
+    'context' => context_course::instance($course->id)
+);
+$event = \mod_hotquestion\event\course_module_instance_list_viewed::create($params);
+$event->add_record_snapshot('course', $course);
+$event->trigger();
 
 echo $OUTPUT->footer();
