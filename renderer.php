@@ -20,7 +20,6 @@
  *
  * @package   mod_hotquestion
  * @copyright 2012 Zhang Anzhen
- * @copyright 2016 onwards AL Rachels drachels@drachels.com
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die();
@@ -107,8 +106,9 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
     public function questions($allow_vote = true) {
         global $DB, $CFG, $USER;
         $output = '';
-		$formatoptions = new stdClass();
-		$a = new stdClass();
+		$formatoptions = new StdClass();
+		$a = new StdClass();
+
         // Search questions in current round
         $questions = $this->hotquestion->get_questions();
         if ($questions) {
@@ -130,7 +130,7 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
                 } else {
                     $a->user = '<a href="' . $CFG->wwwroot . '/user/view.php?id=' . $user->id . '&amp;course=' . $this->hotquestion->course->id . '">' . fullname($user) . '</a>';
                 }
-                $a->time = userdate($question->time).'&nbsp('.get_string('ago', 'hotquestion', format_time(time() - $question->time)) . ')';
+                $a->time = userdate($question->time).'&nbsp('.get_string('early', 'assignment', format_time(time() - $question->time)) . ')';
                 $info = '<div class="author">'.get_string('authorinfo', 'hotquestion', $a).'</div>';
                 $line[] = $content.$info;
                 $heat = $question->votecount;
