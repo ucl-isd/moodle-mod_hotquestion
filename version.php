@@ -35,4 +35,4 @@ $module->requires  = 2014051200;  // Requires this Moodle version
 $module->cron      = 0;           // Period for cron to check this module (secs)
 
 $module->maturity  = MATURITY_STABLE;
-$module->release   = "2.7 (Build: 20160311)"; // User-friendly version number
+$module->release   = "2.8 (Build: 20160311)"; // User-friendly version number
