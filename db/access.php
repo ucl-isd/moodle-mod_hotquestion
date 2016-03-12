@@ -49,6 +49,17 @@
 defined('MOODLE_INTERNAL') || die();
 
 $capabilities = array(
+
+    'mod/hotquestion:manageentries' => array(
+
+        'captype' => 'write',
+        'contextlevel' => CONTEXT_MODULE,
+        'archetypes' => array(
+            'teacher' => CAP_ALLOW,
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW
+        )
+    ),
     
     'mod/hotquestion:addinstance' => array(
         'riskbitmask' => RISK_XSS,

@@ -17,25 +17,31 @@
 
 
 /**
- * English strings for hotquestion
+ * English strings for hotquestion.
  *
  * @package   mod_hotquestion
  * @copyright 2011 Sun Zhigang
+ * @copyright 2016 onwards AL Rachels
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
-
+$string['hotquestion:addinstance'] = 'Can add new Hot Question';
+$string['ago'] = '{$a} ago';
 $string['allowanonymouspost'] = 'Allow post question as anonymous';
 $string['anonymous'] = 'Anonymous';
 $string['authorinfo'] = 'Posted by {$a->user} at {$a->time}';
 $string['connectionerror'] = 'Connection error';
 $string['displayasanonymous'] = 'Display as anonymous';
+$string['eventaddquestion'] = 'Added a question';
+$string['eventaddround'] = 'Opened a new round';
+$string['eventupdatevote'] = 'Updated vote';
 $string['heat'] = 'Heat';
 $string['hotquestionintro'] = 'Topic';
 $string['hotquestionname'] = 'Activity Name';
 $string['hotquestion:ask'] = 'Ask questions';
 $string['hotquestion:manage'] = 'Manage questions';
+$string['hotquestion:manageentries'] = 'View list of activities';
 $string['hotquestion:view'] = 'View questions';
 $string['hotquestion:vote'] = 'Vote on questions';
 $string['inputquestion'] = 'Submit your question here:';
@@ -46,7 +52,7 @@ $string['modulenameplural'] = 'Hot Questions';
 $string['newround'] = 'Open a new round';
 $string['newroundconfirm'] = 'Are you sure? (Existing questions and votes will be archived)';
 $string['nextround'] = 'Next round';
-$string['noquestions'] = 'No question now.';
+$string['noquestions'] = 'No questions yet.';
 $string['pluginadministration'] = 'Hot question administration';
 $string['pluginname'] = 'Hot Question';
 $string['previousround'] = 'Previous round';
@@ -55,3 +61,4 @@ $string['questionsubmitted'] = 'Your question has been submitted successfully.';
 $string['resethotquestion'] = 'Delete all questions and votes';
 $string['round'] = 'Round {$a}';
 $string['vote'] = 'Vote';
+$string['viewentries'] = 'Number of questions';

@@ -24,6 +24,7 @@
  *
  * @package   mod_hotquestion
  * @copyright 2011 Sun Zhigang
+ * @copyright 2016 onwards AL Rachels drachels@drachels.com
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -71,10 +72,12 @@ class mod_hotquestion {
      */
     public function add_new_question($fromform) {
         global $USER, $CFG, $DB;
+		$data = new StdClass();
         $data->hotquestion = $this->instance->id;
         $data->content = trim($fromform->question);
         $data->userid = $USER->id;
         $data->time = time();
+		$context = context_module::instance($this->cm->id);	//Modified by AL Rachels for Moodle 2.6 and above.
         if (isset($fromform->anonymous) && $fromform->anonymous && $this->instance->anonymouspost) {
             $data->anonymous = $fromform->anonymous;
             // Assume this user is guest
@@ -82,7 +85,17 @@ class mod_hotquestion {
         }
         if (!empty($data->content)) {
             $DB->insert_record('hotquestion_questions', $data);
-            add_to_log($this->course->id, "hotquestion", "add question", "view.php?id={$this->cm->id}", $data->content, $this->cm->id);
+			
+			if ($CFG->version > 2014051200) { // Moodle 2.7+
+				$params = array(       
+					'objectid' => $this->cm->id,
+					'context' => $context,
+			);	
+				$event = \mod_hotquestion\event\add_question::create($params);
+				$event->trigger();
+			} else {
+				add_to_log($this->course->id, "hotquestion", "add question", "view.php?id={$this->cm->id}", $data->content, $this->cm->id);
+			}
             return true;
         } else {
             return false;
@@ -97,10 +110,24 @@ class mod_hotquestion {
      * @param int $question the question id
      */
     public function vote_on($question) {
-        global $DB, $USER;
+        global $CFG, $DB, $USER;
+		$votes = new StdClass();
+		$context = context_module::instance($this->cm->id);	//Modified by AL Rachels for Moodle 2.6 and above.
         $question = $DB->get_record('hotquestion_questions', array('id'=>$question));
         if ($question && $this->can_vote_on($question)) {
-            add_to_log($this->course->id, 'hotquestion', 'update vote', "view.php?id={$this->cm->id}", $question->id, $this->cm->id);
+
+			if ($CFG->version > 2014051200) { // Moodle 2.7+
+				$params = array(       
+					'objectid' => $this->cm->id,
+					'context' => $context,
+			);
+				
+				$event = \mod_hotquestion\event\update_vote::create($params);
+				$event->trigger();
+			} else {
+				add_to_log($this->course->id, 'hotquestion', 'update vote', "view.php?id={$this->cm->id}", $question->id, $this->cm->id);
+			}		
+
             if (!$this->has_voted($question->id)) {
                 $votes->question = $question->id;
                 $votes->voter = $USER->id;
@@ -141,17 +168,33 @@ class mod_hotquestion {
      * @global object
      */
     public function add_new_round() {
-        global $DB;
+        global $USER,$CFG,$DB;
+		
         // Close the latest round
-        $old = array_pop($DB->get_records('hotquestion_rounds', array('hotquestion'=>$this->instance->id), 'id DESC', '*', 0, 1));
+		$rounds = $DB->get_records('hotquestion_rounds', array('hotquestion' => $this->instance->id), 'id DESC', '*', 0, 1);
+		$old = array_pop($rounds);
         $old->endtime = time();
-        $DB->update_record('hotquestion_rounds', $old);
+		$DB->update_record('hotquestion_rounds', $old);
+		
         // Open a new round
+		$new = new StdClass();
         $new->hotquestion = $this->instance->id;
         $new->starttime = time();
         $new->endtime = 0;
+		$context = context_module::instance($this->cm->id);	//Modified by AL Rachels for Moodle 2.6 and above.
         $rid = $DB->insert_record('hotquestion_rounds', $new);
-        add_to_log($this->course->id, 'hotquestion', 'add round', "view.php?id={$this->cm->id}&round=$rid", $rid, $this->cm->id);
+		
+			if ($CFG->version > 2014051200) { // Moodle 2.7+
+				$params = array(       
+					'objectid' => $this->cm->id,
+					'context' => $context,
+			);
+				
+				$event = \mod_hotquestion\event\add_round::create($params);
+				$event->trigger();
+			} else {
+				add_to_log($this->course->id, 'hotquestion', 'add round', "view.php?id={$this->cm->id}&round=$rid", $rid, $this->cm->id);
+			}		
     }
 
     /**
@@ -166,6 +209,7 @@ class mod_hotquestion {
         $rounds = $DB->get_records('hotquestion_rounds', array('hotquestion' => $this->instance->id), 'id ASC');
         if (empty($rounds)) {
             // Create the first round
+			$round = new StdClass();
             $round->starttime = time();
             $round->endtime = 0;
             $round->hotquestion = $this->instance->id;
