@@ -23,69 +23,33 @@
  *
  * @package   mod_hotquestion
  * @copyright 2011 Sun Zhigang
- * @copyright 2016 onwards AL Rachels drachels@drachels.com
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once("../../config.php");
-require_once("lib.php");
-require_once("locallib.php");
-require_once("mod_form.php");
+require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
+require_once(dirname(__FILE__).'/lib.php');
+require_once(dirname(__FILE__).'/locallib.php');
+require_once(dirname(__FILE__).'/mod_form.php');
 
-$id = required_param('id', PARAM_INT); 					// Course_module ID.
-$ajax = optional_param('ajax', 0, PARAM_BOOL); 			// Asychronous form request.
-$action  = optional_param('action', '', PARAM_ACTION);  // Action(vote, newround).
-$roundid = optional_param('round', -1, PARAM_INT);  	// Round id.
+$id = required_param('id', PARAM_INT); // course_module ID
+$ajax = optional_param('ajax', 0, PARAM_BOOL); // asychronous form request
+$action  = optional_param('action', '', PARAM_ACTION);  //action(vote,newround)
+$roundid = optional_param('round', -1, PARAM_INT);  //round id
 
-if (! $cm = get_coursemodule_from_id('hotquestion', $id)) {
-    print_error("Course Module ID was incorrect");
-}
-if (! $course = $DB->get_record("course", array('id' => $cm->course))) {
-    print_error("Course is misconfigured");
-}
-
-// Construct hotquestion instance.
+// Construct hotquestion instance
 $hq = new mod_hotquestion($id, $roundid);
 
-// Confirm login.
+// Confirm login
 require_login($hq->course, true, $hq->cm);
-
-$context = context_module::instance($hq->cm->id);	// Modified for Moodle 2.6 and above.
-
-$entriesmanager = has_capability('mod/hotquestion:manageentries', $context);
-$canask = has_capability('mod/hotquestion:ask', $context);
-
-if (!$entriesmanager && !$canask) {
-    print_error('accessdenied', 'hotquestion');
-}
-
-if (! $hotquestion = $DB->get_record("hotquestion", array("id" => $cm->instance))) {
-    print_error("Course module is incorrect");
-}
-
-if (! $cw = $DB->get_record("course_sections", array("id" => $cm->section))) {
-    print_error("Course module is incorrect");
-}
-
-// Trigger module viewed event.
-if ($CFG->version > 2014051200) { // Moodle 2.7+
-    $params = array(       
-        'objectid' => $hq->cm->id,
-		'context' => $context,
-    );
-	$event = \mod_hotquestion\event\course_module_viewed::create($params);
-	$event->trigger();
-} else {
-	add_to_log($hq->course->id, 'hotquestion', 'view', "view.php?id={$hq->cm->id}", $hq->instance->name, $hq->cm->id);
-}
+add_to_log($hq->course->id, 'hotquestion', 'view', "view.php?id={$hq->cm->id}", $hq->instance->name, $hq->cm->id);
+$context = get_context_instance(CONTEXT_MODULE, $hq->cm->id);
 
 // Set page
 if (!$ajax) {
     $PAGE->set_url('/mod/hotquestion/view.php', array('id' => $hq->cm->id));
     $PAGE->set_title($hq->instance->name);
     $PAGE->set_heading($hq->course->shortname);
-	// Newer version of Moodle no longer use the Update this.... button on the navbar.
-    //$PAGE->set_button(update_module_button($hq->cm->id, $hq->course->id, get_string('modulename', 'hotquestion')));
+    $PAGE->set_button(update_module_button($hq->cm->id, $hq->course->id, get_string('modulename', 'hotquestion')));
     $PAGE->set_context($context);
     $PAGE->set_cm($hq->cm);
     $PAGE->add_body_class('hotquestion');
@@ -98,17 +62,17 @@ if (!$ajax) {
             array('connectionerror', 'hotquestion')
         )
     );
-    //$PAGE->requires->js_init_call('M.mod_hotquestion.init', null, false, $jsmodule);
-	$PAGE->requires->js_init_call('M.mod_hotquestion.init', null, true, $jsmodule);
+	//$PAGE->requires->js_init_call('M.mod_hotquestion.init', null, false, $jsmodule);
+    $PAGE->requires->js_init_call('M.mod_hotquestion.init', null, true, $jsmodule);
 }
 
 require_capability('mod/hotquestion:view', $context);
 
-// Get local renderer.
+// Get local renderer
 $output = $PAGE->get_renderer('mod_hotquestion');
 $output->init($hq);
 
-// Process submited question.
+// Process submited question
 if (has_capability('mod/hotquestion:ask', $context)) {
     $mform = new hotquestion_form(null, array($hq->instance->anonymouspost, $hq->cm));
     if ($fromform=$mform->get_data()) {
@@ -121,7 +85,7 @@ if (has_capability('mod/hotquestion:ask', $context)) {
     }
 }
 
-// Handle vote and newround.
+// Handle vote and newround
 if (!empty($action)) {
     switch ($action) {
         case 'vote':
@@ -138,28 +102,28 @@ if (!empty($action)) {
     }
 }
 
-// Start print page.
+// Start print page
 if (!$ajax){
     echo $output->header();
-    // Print hotquestion description.
+    // Print hotquestion description
     echo $output->introduction();
-    // Print ask form.
+    // Print ask form
     if (has_capability('mod/hotquestion:ask', $context)) {
         $mform->display();
     }
 }
 
 echo $output->container_start(null, 'questions_list');
-// Print toolbar.
+// Print toolbar
 echo $output->container_start("toolbar");
 echo $output->toolbar(has_capability('mod/hotquestion:manage', $context));
 echo $output->container_end();
 
-// Print questions list.
+// Print questions list
 echo $output->questions(has_capability('mod/hotquestion:vote', $context));
 echo $output->container_end();
 
-// Finish the page.
+// Finish the page
 if (!$ajax){
     echo $output->footer();
 }

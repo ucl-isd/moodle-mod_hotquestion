@@ -24,7 +24,6 @@
  *
  * @package   mod_hotquestion
  * @copyright 2011 Sun Zhigang
- * @copyright 2016 onwards AL Rachels drachels@drachels.com
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -40,10 +39,10 @@ class mod_hotquestion_mod_form extends moodleform_mod {
         $mform =& $this->_form;
 
 //-------------------------------------------------------------------------------
-    //  Adding the "general" fieldset, where all the common settings are showed
+    /// Adding the "general" fieldset, where all the common settings are showed
         $mform->addElement('header', 'general', get_string('general', 'form'));
 
-    //  Adding the standard "name" field
+    /// Adding the standard "name" field
         $mform->addElement('text', 'name', get_string('hotquestionname', 'hotquestion'), array('size'=>'64'));
         if (!empty($CFG->formatstringstriptags)) {
             $mform->setType('name', PARAM_TEXT);
@@ -53,13 +52,13 @@ class mod_hotquestion_mod_form extends moodleform_mod {
         $mform->addRule('name', null, 'required', null, 'client');
         $mform->addRule('name', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
 
-    //  Adding the standard "intro" and "introformat" fields
+    /// Adding the standard "intro" and "introformat" fields
         $this->add_intro_editor();
 
 //-------------------------------------------------------------------------------
-    //  Adding the rest of hotquestion settings, spreading all them into this fieldset
-    //  or adding more fieldsets ('header' elements) if needed for better logic
-        //  Adding 'anonymouspost' field
+    /// Adding the rest of hotquestion settings, spreeading all them into this fieldset
+    /// or adding more fieldsets ('header' elements) if needed for better logic
+        /// Adding 'anonymouspost' field
         $mform->addElement('selectyesno', 'anonymouspost', get_string('allowanonymouspost', 'hotquestion'));
         $mform->setDefault('anonymouspost', '1');
 
@@ -85,7 +84,6 @@ class hotquestion_form extends moodleform {
         $mform->addElement('textarea', 'question', get_string('inputquestion', 'hotquestion'), 'wrap="virtual" rows="3" cols="50"');
         $mform->setType('question', PARAM_TEXT);
         $mform->addElement('hidden', 'id', $cm->id, 'id="hotquestion_courseid"');
-		$mform->setType('id', PARAM_INT);
 
         $submitgroup = array();
         $submitgroup[] =& $mform->createElement('submit', 'submitbutton', get_string('post'));
