@@ -17,7 +17,7 @@
 
 
 /**
- * Defines the version of newmodule
+ * Defines the version of hotquestion.
  *
  * This code fragment is called by moodle_needs_upgrading() and
  * /admin/index.php
@@ -30,9 +30,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$module->version   = 2016032200;  // The current module version (Date: YYYYMMDDXX)
-$module->requires  = 2014111000;  // Requires this Moodle version 
-$module->cron      = 0;           // Period for cron to check this module (secs)
-
-$module->maturity  = MATURITY_STABLE;
-$module->release   = "2.8 (Build: 2016032200)"; // User-friendly version number
+$plugin->version   = 2016032300;  // The current module version (Date: YYYYMMDDXX)
+$plugin->requires  = 2014051200;  // Requires Moodle 2.7 version 
+$plugin->cron      = 0;           // Period for cron to check this module (secs)
+$plugin->component = 'mod_hotquestion';
+$plugin->maturity  = MATURITY_STABLE;
+$plugin->release   = "2.8 (Build: 2016032300)"; // User-friendly version number
