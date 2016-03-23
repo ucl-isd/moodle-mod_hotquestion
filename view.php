@@ -133,6 +133,8 @@ if (!empty($action)) {
         case 'newround':
             if (has_capability('mod/hotquestion:manage', $context)) {
                 $hq->add_new_round();
+				// Added to make new empty round start without having to click the Reload icon.
+				redirect('view.php?id='.$hq->cm->id, get_string('newround', 'hotquestion'));
             }
             break;
     }

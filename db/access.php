@@ -43,6 +43,7 @@
  *
  * @package   mod_hotquestion
  * @copyright 2011 Sun Zhigang
+ * @copyright 2016 onwards AL Rachels (drachels@drachels.com)
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
