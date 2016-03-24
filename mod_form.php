@@ -54,7 +54,7 @@ class mod_hotquestion_mod_form extends moodleform_mod {
         $mform->addRule('name', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
 
     //  Adding the standard "intro" and "introformat" fields
-        $this->add_intro_editor();
+        $this->standard_intro_elements();
 
 //-------------------------------------------------------------------------------
     //  Adding the rest of hotquestion settings, spreading all them into this fieldset
