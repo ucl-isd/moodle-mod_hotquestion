@@ -23,7 +23,7 @@
  *
  * @package   mod_hotquestion
  * @copyright 2011 Sun Zhigang
- * @copyright 2016 onwards AL Rachels drachels@drachels.com
+ * @copyright 2016 onwards AL Rachels (drachels@drachels.com)
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -50,7 +50,7 @@ $hq = new mod_hotquestion($id, $roundid);
 // Confirm login.
 require_login($hq->course, true, $hq->cm);
 
-$context = context_module::instance($hq->cm->id);	// Modified for Moodle 2.6 and above.
+$context = context_module::instance($hq->cm->id);
 
 $entriesmanager = has_capability('mod/hotquestion:manageentries', $context);
 $canask = has_capability('mod/hotquestion:ask', $context);
@@ -79,7 +79,7 @@ if ($CFG->version > 2014051200) { // Moodle 2.7+
 	add_to_log($hq->course->id, 'hotquestion', 'view', "view.php?id={$hq->cm->id}", $hq->instance->name, $hq->cm->id);
 }
 
-// Set page
+// Set page.
 if (!$ajax) {
     $PAGE->set_url('/mod/hotquestion/view.php', array('id' => $hq->cm->id));
     $PAGE->set_title($hq->instance->name);
@@ -126,7 +126,7 @@ if (!empty($action)) {
     switch ($action) {
         case 'vote':
             if (has_capability('mod/hotquestion:vote', $context)) {
-                $q = required_param('q',  PARAM_INT);  //question id to vote
+                $q = required_param('q',  PARAM_INT);  // Question id to vote.
                 $hq->vote_on($q);
             }
             break;
@@ -135,6 +135,31 @@ if (!empty($action)) {
                 $hq->add_new_round();
 				// Added to make new empty round start without having to click the Reload icon.
 				redirect('view.php?id='.$hq->cm->id, get_string('newround', 'hotquestion'));
+            }
+            break;
+		case 'remove':
+			if (has_capability('mod/hotquestion:manageentries', $context)) {
+				$q = required_param('q',  PARAM_INT);  // Question id to remove.
+				// Call remove function in locallib.
+				$hq->remove_question($q);
+				// Need redirect that goes to the round where removing question.
+				// Does work without it as it just defaults to current round.
+				// Trigger remove_question event.
+				$event = \mod_hotquestion\event\remove_question::create(array(
+					'objectid' => $hotquestion->id,
+					'context' => $context
+				));
+				$event->add_record_snapshot('course_modules', $cm);
+				$event->add_record_snapshot('course', $course);
+				$event->add_record_snapshot('hotquestion', $hotquestion);
+				$event->trigger();
+			}
+			break;
+		case 'download':
+            if (has_capability('mod/hotquestion:manageentries', $context)) {
+				$q = $cm->instance; // Course module to download questions from.
+				// Call download question function in locallib.
+				$hq->download_questions($q);
             }
             break;
     }
@@ -154,7 +179,7 @@ if (!$ajax){
 echo $output->container_start(null, 'questions_list');
 // Print toolbar.
 echo $output->container_start("toolbar");
-echo $output->toolbar(has_capability('mod/hotquestion:manage', $context));
+echo $output->toolbar(has_capability('mod/hotquestion:manageentries', $context));
 echo $output->container_end();
 
 // Print questions list.
