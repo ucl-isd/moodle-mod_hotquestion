@@ -2,19 +2,20 @@
 The first moodle activity for physical classroom. The idea comes from
 Purdue University's hotseat.
 
-Inside or outside classroom, students post questions into Hot Question
-activity from notebook, netbook, android, iPhone, iPod and other devices
+Inside or outside classroom, students post questions into a Hot Question
+activity from notebook, netbook, android, iPhone, iPod or any other device
 which can access the moodle site. Students can also vote on others' 
-questions, so that the hottest questions will be popped up. Teachers 
-can make oral comments on selected questions in classroom.
+questions, so that the hottest questions will be popped up to the top of
+the list. Teachers can make oral comments on selected questions in classroom.
 
 New capability added 3/29/2016 that allows admin, teachers, and managers to download
-questions. Admin downloads ALL questions. Teachers and managers only download questions 
-from the current Hot Question activity.
+a csv file of the questions in the current Hot Question activity. An admin can
+also download questions and their download will include ALL questions from the Moodle
+site. 
 
-New capability added 3/29/2016 that allows teachers and managers to delete
+New capability added 3/29/2016 that allows admin, teachers, and managers to delete
 any question in the current Hot Question activity if they deem the question
-is inappropriate. 
+as inappropriate or not applicable to the subject. 
 
 NOTE: If you plan on disciplinary action for any inappropriate question,
 you should download the evidence BEFORE you remove questions, as once removed, 
