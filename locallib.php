@@ -331,14 +331,14 @@ class mod_hotquestion {
 		// Add filename details based on course and HQ activity name.
 		if (is_siteadmin($USER->id)){
 			$whichhqs = ('AND hq.hotquestion > 0');
-			$filename = ('All_Site');
+			$filename = get_string('exportfilenamep1', 'hotquestion');
 		} else {
 			$whichhqs = ('AND hq.hotquestion = ');
 			$whichhqs .= ($this->instance->id);
 			$filename = ($this->course->shortname).'_';
 			$filename .= ($this->instance->name);
 		}
-		$filename .= '_HQ_Questions_Exported_On_'.gmdate("Ymd_Hi").'GMT.csv';
+		$filename .= get_string('exportfilenamep2', 'hotquestion').gmdate("Ymd_Hi").'GMT.csv';
 
 		$params = array();
 
