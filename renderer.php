@@ -60,8 +60,12 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
     public function toolbar($show_new = true) {
         $output = '';
         $toolbuttons = array();
+		$roundp = new stdClass();
+		$round = '';
+		$roundn = '';
+		$roundp = '';
 
-		// Export to .csv file message and link.
+		// Print export to .csv file toolbutton.
 		if ($show_new) {
 			$options = array();
             $options['id'] = $this->hotquestion->cm->id;
@@ -70,21 +74,27 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
 			$toolbuttons[] = html_writer::link($url, $this->pix_icon('a/download_all', get_string('csvexport','hotquestion')), array('class' => 'toolbutton'));	
 		}
 
-        // Print next/prev round bar.
+        // Print prev/next round toolbuttons.
         if ($this->hotquestion->get_prev_round() != null) {
-            $url = new moodle_url('/mod/hotquestion/view.php', array('id'=>$this->hotquestion->cm->id, 'round'=>$this->hotquestion->get_prev_round()->id));
+			$roundp = $this->hotquestion->get_prev_round()->id;
+			$roundn ='';
+            //$url = new moodle_url('/mod/hotquestion/view.php', array('id'=>$this->hotquestion->cm->id, 'round'=>$this->hotquestion->get_prev_round()->id));
+			$url = new moodle_url('/mod/hotquestion/view.php', array('id'=>$this->hotquestion->cm->id, 'round'=>$roundp));
             $toolbuttons[] = html_writer::link($url, $this->pix_icon('t/collapsed_rtl', get_string('previousround', 'hotquestion')), array('class' => 'toolbutton'));
         } else {
             $toolbuttons[] = html_writer::tag('span', $this->pix_icon('t/collapsed_empty_rtl', ''), array('class' => 'dis_toolbutton'));
         }
         if ($this->hotquestion->get_next_round() != null) {
-            $url = new moodle_url('/mod/hotquestion/view.php', array('id'=>$this->hotquestion->cm->id, 'round'=>$this->hotquestion->get_next_round()->id));
+			$roundn = $this->hotquestion->get_next_round()->id;
+			$roundp = '';
+            //$url = new moodle_url('/mod/hotquestion/view.php', array('id'=>$this->hotquestion->cm->id, 'round'=>$this->hotquestion->get_next_round()->id));
+			$url = new moodle_url('/mod/hotquestion/view.php', array('id'=>$this->hotquestion->cm->id, 'round'=>$roundn));
             $toolbuttons[] = html_writer::link($url, $this->pix_icon('t/collapsed', get_string('nextround', 'hotquestion')), array('class' => 'toolbutton'));
         } else {
             $toolbuttons[] = html_writer::tag('span', $this->pix_icon('t/collapsed_empty', ''), array('class' => 'dis_toolbutton'));
         }
 
-        // Print new round bar.
+        // Print new round toolbutton.
         if ($show_new) {
             $options = array();
             $options['id'] = $this->hotquestion->cm->id;
@@ -92,8 +102,18 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
             $url = new moodle_url('/mod/hotquestion/view.php', $options);
             $toolbuttons[] = html_writer::link($url, $this->pix_icon('t/add', get_string('newround', 'hotquestion')), array('class' => 'toolbutton'));
         }
+		
+        // Print remove round toolbutton.
+        if ($show_new) {
+            $options = array();
+            $options['id'] = $this->hotquestion->cm->id;
+            $options['action'] = 'removeround';
+			$options['round'] = $this->hotquestion->get_current_round()->id;
+            $url = new moodle_url('/mod/hotquestion/view.php', $options);
+            $toolbuttons[] = html_writer::link($url, $this->pix_icon('t/less', get_string('removeround', 'hotquestion')), array('class' => 'toolbutton'));
+        }		
 
-        // Print refresh button.
+        // Print refresh toolbutton.
         $url = new moodle_url('/mod/hotquestion/view.php', array('id'=>$this->hotquestion->cm->id));
         $toolbuttons[] = html_writer::link($url, $this->pix_icon('t/reload', get_string('reload')), array('class' => 'toolbutton'));
 	

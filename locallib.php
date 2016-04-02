@@ -240,6 +240,7 @@ class mod_hotquestion {
             $this->prev_round = array_pop($rounds);
             $this->next_round = null;
         }
+		return $roundid;
     }
 
     /**
@@ -311,9 +312,30 @@ class mod_hotquestion {
     }
 	
 	 /**
+     * Remove the round currently being viewed,  
+     * any questions in the current round,
+	 * and any votes for each question.
+     * @return nothing
+     */
+    public function remove_round() {
+		global $CFG, $DB;
+		if(isset($_GET['round'])){
+			debugging('============In function remove round in if isset getting $roundID===============');
+			$roundID = $_GET['round'];
+			print_object($roundID);
+			$round = $DB->get_record('hotquestion_rounds', array('id' => $roundID));
+			print_object($round);
+		}
+			
+
+
+		return $this->current_round;
+    }
+	
+	 /**
      * Download questions.
      * 
-     * @return object
+     * @return nothing
      */
     public function download_questions($array, $filename = "export.csv", $delimiter=";") {
 		global $CFG, $DB, $USER;

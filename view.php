@@ -137,6 +137,13 @@ if (!empty($action)) {
 				redirect('view.php?id='.$hq->cm->id, get_string('newround', 'hotquestion'));
             }
             break;
+		case 'removeround':
+            if (has_capability('mod/hotquestion:manage', $context)) {
+				$hq->remove_round();
+				// Added to show round has been removed.
+				redirect('view.php?id='.$hq->cm->id, get_string('removeround', 'hotquestion'));
+            }
+            break;
 		case 'remove':
 			if (has_capability('mod/hotquestion:manageentries', $context)) {
 				$q = required_param('q',  PARAM_INT);  // Question id to remove.
