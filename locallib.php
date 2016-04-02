@@ -312,23 +312,62 @@ class mod_hotquestion {
     }
 	
 	 /**
-     * Remove the round currently being viewed,  
-     * any questions in the current round,
-	 * and any votes for each question.
+	 * If the currently being viewed round is empty, delete it.
+     * Otherwise, remove any questions in the round currently being viewed,  
+     * remove any votes for each question being removed,
+	 * then remove the currently being viewed round.
      * @return nothing
      */
     public function remove_round() {
-		global $CFG, $DB;
-		if(isset($_GET['round'])){
-			debugging('============In function remove round in if isset getting $roundID===============');
+		global $DB;
+		
+		$data = new StdClass();
+		$data->hotquestion = $this->instance->id;
+		$context = context_module::instance($this->cm->id);
+		// Trigger remove_round event.
+		$event = \mod_hotquestion\event\remove_round::create(array(
+			'objectid' => $data->hotquestion,
+			'context' => $context
+		));
+		$event->trigger();
+		
+		//if(isset($_GET['round'])){
 			$roundID = $_GET['round'];
-			print_object($roundID);
-			$round = $DB->get_record('hotquestion_rounds', array('id' => $roundID));
-			print_object($round);
+		//	$round = $DB->get_record('hotquestion_rounds', array('id' => $roundID));
+		//}
+		// Get any questions that belong to this round.
+		if ($this->current_round->endtime == 0) {
+            $this->current_round->endtime = 0xFFFFFFFF;  //Hack
+        }
+        $params = array($this->instance->id, $this->current_round->starttime, $this->current_round->endtime);
+        $questions = $DB->get_records_sql('SELECT q.*, count(v.voter) as votecount
+                                     FROM {hotquestion_questions} q
+                                         LEFT JOIN {hotquestion_votes} v
+                                         ON v.question = q.id
+                                     WHERE q.hotquestion = ?
+                                        AND q.time >= ?
+                                        AND q.time <= ?
+                                     GROUP BY q.id
+                                     ORDER BY votecount DESC, q.time DESC', $params);
+
+
+		if ($questions){
+			foreach($questions as $q){
+				$questionID = $q->id; // Get id of first question on the page to delete.
+				$db_question = $DB->get_record('hotquestion_questions', array('id' => $questionID));
+				$DB->delete_records('hotquestion_questions', array('id'=>$db_question->id));
+				// Get an array of all votes on the question that was just deleted, then delete them.
+				$db_vote = $DB->get_records('hotquestion_votes', array('question' => $questionID));
+				$DB->delete_records('hotquestion_votes', array('question'=>$db_question->id));
+				}
+				// Now that all questions and votes are gone, remove the round.
+				$db_round = $DB->get_record('hotquestion_rounds', array('id' => $roundID));
+				$DB->delete_records('hotquestion_rounds', array('id'=>$db_round->id));
+		} else {
+			// This round is empty so delete without having to remove questions and votes.
+			$db_round = $DB->get_record('hotquestion_rounds', array('id' => $roundID));
+			$DB->delete_records('hotquestion_rounds', array('id'=>$db_round->id));
 		}
-			
-
-
 		return $this->current_round;
     }
 	
