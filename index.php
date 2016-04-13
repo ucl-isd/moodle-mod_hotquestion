@@ -24,9 +24,13 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-//require_once(__DIR__ . "/../../config.php");
-require_once("../../config.php");
-require_once("lib.php");
+require(__DIR__ . "/../../config.php");
+require_once(__DIR__ . '/locallib.php');
+//require_once(__DIR__ . '/lib.php');
+//require_once("../../config.php");
+//require_once(dirname(__FILE__).'/locallib.php');
+//require_once($CFG->dirroot.'/mod/hotquestion/locallib.php');
+//require_once("lib.php");
 
 $id = required_param('id', PARAM_INT);   // course
 
@@ -64,17 +68,17 @@ $timenow = time();
 // Table data.
 $table = new html_table();
 
-$table->head = array();
+$table->head  = array();
 $table->align = array();
 
 if ($usesections) {
-    $table->head[] = get_string('sectionname', 'format_'.$course->format);
+    $table->head[]  = get_string('sectionname', 'format_'.$course->format);
     $table->align[] = 'center';
 }
 
-$table->head[] = get_string('name');
+$table->head[]  = get_string('name');
 $table->align[] = 'left';
-$table->head[] = get_string('description');
+$table->head[]  = get_string('description');
 $table->align[] = 'left';
 
 $currentsection = '';
@@ -82,7 +86,7 @@ $i = 0;
 foreach ($hotquestions as $hotquestion) {
 
     $context = context_module::instance($hotquestion->coursemodule);
-    $entriesmanager = has_capability('mod/hotquestion:manageentries', $context);
+    $entriesmanager = has_capability('mod/hotquestion:ask', $context);
 
     // Section.
     $printsection = '';
@@ -112,31 +116,35 @@ foreach ($hotquestions as $hotquestion) {
     // Description of the Hot Question activity.
     $table->data[$i][] = format_text($hotquestion->intro,  $hotquestion->introformat);
 
-    // Questions info
-//    if ($entriesmanager) {
-//
-        // Display the report.php col only if is a entries manager in some CONTEXT_MODULE
-//        if (empty($managersomewhere)) {
-//            $table->head[] = get_string('viewentries', 'hotquestion');
-//            $table->align[] = 'left';
-//            $managersomewhere = true;
-//
-//            // Fill the previous col cells
-//            $manageentriescell = count($table->head) - 1;
-//            for ($j = 0; $j < $i; $j++) {
-//                if (is_array($table->data[$j])) {
-//                    $table->data[$j][$manageentriescell] = '';
-//                }
-//            }
-//        }
-//		
-//        //$entrycount = hotquestion_count_entries($hotquestion, get_current_group($course->id));
-//		//$entrycount = hotquestion_count_entries($hotquestion, groups_get_all_groups($course->id, $USER->id));
-//        $table->data[$i][] = "<a href=\"report.php?id=$hotquestion->coursemodule\">".get_string("viewallentries","hotquestion", $entrycount)."</a>";
-//    } else if (!empty($managersomewhere)) {
-//
-//        $table->data[$i][] = "";
-//    }
+    // Questions in current round info
+    if ($entriesmanager) {
+
+        // Display the view.php col only if is a entries manager in some CONTEXT_MODULE
+        if (empty($managersomewhere)) {
+            $table->head[] = get_string('viewentries', 'hotquestion');
+            $table->align[] = 'left';
+            $managersomewhere = true;
+
+            // Fill the previous col cells
+            $manageentriescell = count($table->head) - 1;
+            for ($j = 0; $j < $i; $j++) {
+                if (is_array($table->data[$j])) {
+                    $table->data[$j][$manageentriescell] = '';
+                }
+            }
+        }
+
+		$entrycount = hotquestion_count_entries($hotquestion, groups_get_all_groups($course->id, $USER->id));
+		// Need to figure out how to pass two items, users count and questions count so I can display both.
+		//$ucount=$entrycount[$i]->userid;
+		//$qcount=count($hotquestions->content);
+		//debugging('In the index file now.');
+		//print_object($entrycount);
+        $table->data[$i][] = "<a href=\"view.php?id=$hotquestion->coursemodule\">".get_string("viewallentries","hotquestion", $entrycount)."</a>";
+    } else if (!empty($managersomewhere)) {
+
+        $table->data[$i][] = "";
+    }
 	
     $i++;
 }

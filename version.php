@@ -30,9 +30,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2016040100;  // The current module version (Date: YYYYMMDDXX)
+$plugin->version   = 2016041300;  // The current module version (Date: YYYYMMDDXX)
 $plugin->requires  = 2015051100;  // Requires Moodle 2.9 version 
 $plugin->cron      = 0;           // Period for cron to check this module (secs)
 $plugin->component = 'mod_hotquestion';
-$plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = "3.0.2 (Build: 2016040100)"; // User-friendly version number
+$plugin->maturity  = MATURITY_BETA;
+$plugin->release   = "3.0.3 (Build: 2016041300)"; // User-friendly version number

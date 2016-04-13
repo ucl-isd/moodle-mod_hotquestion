@@ -345,8 +345,8 @@ class mod_hotquestion {
                                          LEFT JOIN {hotquestion_votes} v
                                          ON v.question = q.id
                                      WHERE q.hotquestion = ?
-                                        AND q.time >= ?
-                                        AND q.time <= ?
+                                         AND q.time >= ?
+                                         AND q.time <= ?
                                      GROUP BY q.id
                                      ORDER BY votecount DESC, q.time DESC', $params);
 
@@ -441,4 +441,72 @@ class mod_hotquestion {
 		fclose($file);
 		exit;
     }
+}
+
+/**
+ * Count questions in current rounds.
+ * Counts all the hotquestion entries (optionally in a given group)
+ * @return nothing
+ */
+function hotquestion_count_entries($hotquestion, $groupid = 0) {
+
+	global $DB;
+
+	$cm = hotquestion_get_coursemodule($hotquestion->id);
+	$context = context_module::instance($cm->id);
+
+	if ($groupid) {     /// How many in a particular group?
+
+		$sql = "SELECT DISTINCT u.id FROM {hotquestion_questions} hq
+				JOIN {groups_members} g ON g.userid = hq.userid
+				JOIN {user} u ON u.id = g.userid
+				WHERE hq.hotquestion = $hotquestion->id AND g.groupid = '$groupid'";
+		$hotquestions = $DB->get_records_sql($sql);
+
+	} else { /// Count all the entries from the whole course
+
+		$sql = "SELECT DISTINCT hq.content AS qcount FROM {hotquestion_questions} hq
+				JOIN {user} u ON u.id = hq.userid
+				LEFT JOIN {hotquestion_rounds} hr ON hr.hotquestion=hq.hotquestion
+				WHERE hq.hotquestion = '$hotquestion->id' 
+				    AND hr.endtime=0 
+					AND hq.time>=hr.starttime 
+					AND hq.userid>0";
+		$hotquestions = $DB->get_records_sql($sql);
+	}
+
+	if (!$hotquestions) {
+		return 0;
+	}
+	
+	//$users=count($hotquestions->userid);
+	//$questions=count($hotquestions->content);
+	
+	//$canadd = get_users_by_capability($context, 'mod/hotquestion:ask', 'u.id');
+	//$entriesmanager = get_users_by_capability($context, 'mod/hotquestion:manageentries', 'u.id');
+
+	// remove unenrolled participants
+	//foreach ($hotquestions as $userid => $notused) {
+
+	//	if (!isset($entriesmanager[$userid]) && !isset($canadd[$userid])) {
+	//		unset($hotquestions[$userid]);
+	//	}
+	//}
+//print_object($hotquestions);
+	return count($hotquestions);
+}
+
+/**
+ * Returns the hotquestion instance course_module id
+ *
+ * @param integer $hotquestion
+ * @return object
+ */
+function hotquestion_get_coursemodule($hotquestionid) {
+
+	global $DB;
+
+	return $DB->get_record_sql("SELECT cm.id FROM {course_modules} cm
+								JOIN {modules} m ON m.id = cm.module
+								WHERE cm.instance = '$hotquestionid' AND m.name = 'hotquestion'");
 }
