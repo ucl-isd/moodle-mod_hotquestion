@@ -77,5 +77,5 @@ $string['round'] = 'Round {$a}';
 $string['time'] = 'Time';
 $string['userid'] = 'Userid';
 $string['vote'] = 'Vote';
-$string['viewallentries'] = 'Question count is {$a} in this HQ activity.';
-$string['viewentries'] = 'Questions in current round';
+$string['viewallentries'] = '{$a->ucount} user(s) posted {$a->qcount} question(s).';
+$string['viewentries'] = 'Participation in current round';

@@ -454,7 +454,7 @@ function hotquestion_count_entries($hotquestion, $groupid = 0) {
 
 	$cm = hotquestion_get_coursemodule($hotquestion->id);
 	$context = context_module::instance($cm->id);
-
+// Currently, groups are not being used by Hot Question.
 	if ($groupid) {     /// How many in a particular group?
 
 		$sql = "SELECT DISTINCT u.id FROM {hotquestion_questions} hq
@@ -465,13 +465,15 @@ function hotquestion_count_entries($hotquestion, $groupid = 0) {
 
 	} else { /// Count all the entries from the whole course
 
-		$sql = "SELECT DISTINCT hq.content AS qcount FROM {hotquestion_questions} hq
+		$sql = "SELECT COUNT(DISTINCT hq.userid) AS ucount, COUNT(DISTINCT hq.content) AS qcount FROM {hotquestion_questions} hq
 				JOIN {user} u ON u.id = hq.userid
 				LEFT JOIN {hotquestion_rounds} hr ON hr.hotquestion=hq.hotquestion
 				WHERE hq.hotquestion = '$hotquestion->id' 
 				    AND hr.endtime=0 
 					AND hq.time>=hr.starttime 
 					AND hq.userid>0";
+					
+
 		$hotquestions = $DB->get_records_sql($sql);
 	}
 
@@ -479,21 +481,10 @@ function hotquestion_count_entries($hotquestion, $groupid = 0) {
 		return 0;
 	}
 	
-	//$users=count($hotquestions->userid);
-	//$questions=count($hotquestions->content);
-	
-	//$canadd = get_users_by_capability($context, 'mod/hotquestion:ask', 'u.id');
-	//$entriesmanager = get_users_by_capability($context, 'mod/hotquestion:manageentries', 'u.id');
+	$canadd = get_users_by_capability($context, 'mod/hotquestion:ask', 'u.id');
+	$entriesmanager = get_users_by_capability($context, 'mod/hotquestion:manageentries', 'u.id');
 
-	// remove unenrolled participants
-	//foreach ($hotquestions as $userid => $notused) {
-
-	//	if (!isset($entriesmanager[$userid]) && !isset($canadd[$userid])) {
-	//		unset($hotquestions[$userid]);
-	//	}
-	//}
-//print_object($hotquestions);
-	return count($hotquestions);
+	return ($hotquestions);
 }
 
 /**

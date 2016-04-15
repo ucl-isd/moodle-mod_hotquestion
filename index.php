@@ -86,7 +86,7 @@ $i = 0;
 foreach ($hotquestions as $hotquestion) {
 
     $context = context_module::instance($hotquestion->coursemodule);
-    $entriesmanager = has_capability('mod/hotquestion:ask', $context);
+    $entriesmanager = has_capability('mod/hotquestion:view', $context);
 
     // Section.
     $printsection = '';
@@ -119,13 +119,13 @@ foreach ($hotquestions as $hotquestion) {
     // Questions in current round info
     if ($entriesmanager) {
 
-        // Display the view.php col only if is a entries manager in some CONTEXT_MODULE
+        // Display the participation column if the user can view questions.
         if (empty($managersomewhere)) {
             $table->head[] = get_string('viewentries', 'hotquestion');
             $table->align[] = 'left';
             $managersomewhere = true;
 
-            // Fill the previous col cells
+            // Fill the previous col cells.
             $manageentriescell = count($table->head) - 1;
             for ($j = 0; $j < $i; $j++) {
                 if (is_array($table->data[$j])) {
@@ -133,14 +133,12 @@ foreach ($hotquestions as $hotquestion) {
                 }
             }
         }
-
+		// Go count the users and questions in the current round.
 		$entrycount = hotquestion_count_entries($hotquestion, groups_get_all_groups($course->id, $USER->id));
-		// Need to figure out how to pass two items, users count and questions count so I can display both.
-		//$ucount=$entrycount[$i]->userid;
-		//$qcount=count($hotquestions->content);
-		//debugging('In the index file now.');
-		//print_object($entrycount);
-        $table->data[$i][] = "<a href=\"view.php?id=$hotquestion->coursemodule\">".get_string("viewallentries","hotquestion", $entrycount)."</a>";
+		// Extract the number of users and questions into the participation column.
+		foreach($entrycount as $ec){
+			$table->data[$i][] = "<a href=\"view.php?id=$hotquestion->coursemodule\">".get_string("viewallentries","hotquestion", $ec)."</a>";
+		}
     } else if (!empty($managersomewhere)) {
 
         $table->data[$i][] = "";
