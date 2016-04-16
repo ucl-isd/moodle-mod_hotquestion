@@ -368,6 +368,32 @@ class mod_hotquestion {
 			$db_round = $DB->get_record('hotquestion_rounds', array('id' => $roundID));
 			$DB->delete_records('hotquestion_rounds', array('id'=>$db_round->id));
 		}
+		// Now we need to see if we need a new round or have one we can still use.
+		$rounds = $DB->get_records('hotquestion_rounds', array('hotquestion' => $this->instance->id), 'id DESC');
+		//print_object($rounds);
+		
+		foreach ($rounds as $rnd){
+			if ($rnd->endtime == 0) {
+				//debugging('Endtime was 0');
+				//print_object($rnd->endtime);
+				// Deleted a closed round so just return.
+				return;
+			} else {
+				//debugging('Endtime was NOT 0');
+				//print_object($rnd->endtime);
+				// Deleted our open round so create a new round.
+				$round = new StdClass();
+				$round->starttime = time();
+				$round->endtime = 0;
+				$round->hotquestion = $this->instance->id;
+				$round->id = $DB->insert_record('hotquestion_rounds', $round);
+				$rounds[] = $round;
+				return;
+			}
+		}
+        //if (empty($rounds)) {
+
+        //}
 		return $this->current_round;
     }
 	
