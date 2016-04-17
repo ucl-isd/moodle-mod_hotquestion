@@ -36,7 +36,7 @@ class mod_hotquestion_mod_form extends moodleform_mod {
 
     function definition() {
 
-        global $COURSE;
+        global $COURSE, $CFG;
         $mform =& $this->_form;
 
 //-------------------------------------------------------------------------------
@@ -53,8 +53,12 @@ class mod_hotquestion_mod_form extends moodleform_mod {
         $mform->addRule('name', null, 'required', null, 'client');
         $mform->addRule('name', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
 
-		// Adding the standard "intro" and "introformat" fields.
-        $this->standard_intro_elements();
+		// Adding the standard "intro" fields based on Moodle version.
+		if ($CFG->branch < 29) {
+            $this->add_intro_editor(true, get_string('description'));
+        } else {
+            $this->standard_intro_elements();
+        }
 
 //-------------------------------------------------------------------------------
 		// Adding the rest of hotquestion settings, spreading them into this fieldset
