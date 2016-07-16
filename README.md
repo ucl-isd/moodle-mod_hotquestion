@@ -8,6 +8,9 @@ which can access the moodle site. Students can also vote on others'
 questions, so that the hottest questions will be popped up to the top of
 the list. Teachers can make oral comments on selected questions in classroom.
 
+New capability added 7/15/2016 that places an entry with link in the 
+Recent Activity block when anyone posts an entry in a Hot Question acitivity.
+
 New capability added 4/01/2016 that allows admin, teachers, and managers to delete
 any round in the current Hot Question activity if they deem all the questions in the
 round are no longer needed, or if the round is empty. Can also be used to reset
