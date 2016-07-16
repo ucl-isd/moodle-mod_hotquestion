@@ -17,22 +17,14 @@
 /**
  * The mod_hotquestion add round event.
  *
- * @package 	mod_hotquestion
- * @copyright  	2014 AL Rachels drachels@drachels.com
+ * @package     mod_hotquestion
+ * @copyright   2014 AL Rachels drachels@drachels.com
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace mod_hotquestion\event;
 defined('MOODLE_INTERNAL') || die();
 
-/**
- * The mod_hotquestion add question class.
- *
- * @package    mod_hotquestion
- * @since      Moodle 2.7
- * @copyright  2014 drachels@drachels.com
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
 class update_vote extends \core\event\base {
 
     /**
@@ -40,7 +32,7 @@ class update_vote extends \core\event\base {
      */
     protected function init() {
         $this->data['crud'] = 'u';
-        $this->data['edulevel'] = self::LEVEL_PARTICIPATING ;
+        $this->data['edulevel'] = self::LEVEL_PARTICIPATING;
         $this->data['objecttable'] = 'hotquestion';
     }
 
@@ -72,7 +64,7 @@ class update_vote extends \core\event\base {
     }
 
     /**
-     * replace add_to_log() statement.
+     * Replace add_to_log() statement.
      *
      * @return array of parameters to be passed to legacy add_to_log() function.
      */

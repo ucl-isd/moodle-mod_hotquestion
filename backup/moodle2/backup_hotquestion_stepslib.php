@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -33,10 +32,10 @@ class backup_hotquestion_activity_structure_step extends backup_activity_structu
 
     protected function define_structure() {
 
-        // To know if we are including userinfo
+        // To know if we are including userinfo.
         $userinfo = $this->get_setting_value('userinfo');
 
-        // Define each element separated
+        // Define each element separated.
         $hotquestion = new backup_nested_element('hotquestion', array('id'), array(
             'name', 'intro', 'introformat', 'timecreated',
             'timemodified', 'anonymouspost'));
@@ -55,7 +54,7 @@ class backup_hotquestion_activity_structure_step extends backup_activity_structu
 
         $vote = new backup_nested_element('vote', array('id'), array('voter'));
 
-        // Build the tree
+        // Build the tree.
         $hotquestion->add_child($questions);
         $questions->add_child($question);
 
@@ -65,24 +64,24 @@ class backup_hotquestion_activity_structure_step extends backup_activity_structu
         $question->add_child($votes);
         $votes->add_child($vote);
 
-        // Define sources
+        // Define sources.
         $hotquestion->set_source_table('hotquestion', array('id' => backup::VAR_ACTIVITYID));
 
-        // All the rest of elements only happen if we are including user info
+        // All the rest of elements only happen if we are including user info.
         if ($userinfo) {
             $question->set_source_table('hotquestion_questions', array('hotquestion' => backup::VAR_PARENTID));
             $round->set_source_table('hotquestion_rounds', array('hotquestion' => backup::VAR_PARENTID));
             $vote->set_source_table('hotquestion_votes', array('question' => backup::VAR_PARENTID));
         }
 
-        // Define id annotations
+        // Define id annotations.
         $question->annotate_ids('user', 'userid');
         $vote->annotate_ids('user', 'voter');
 
-        // Define file annotations
-        $hotquestion->annotate_files('mod_hotquestion', 'intro', null); // This file area hasn't itemid
+        // Define file annotations.
+        $hotquestion->annotate_files('mod_hotquestion', 'intro', null); // This file area hasn't itemid.
 
-        // Return the root element (hotquestion), wrapped into standard activity structure
+        // Return the root element (hotquestion), wrapped into standard activity structure.
         return $this->prepare_activity_structure($hotquestion);
     }
 }

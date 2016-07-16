@@ -17,8 +17,8 @@
 /**
  * The mod_hotquestion download questions event.
  *
- * @package 	mod_hotquestion
- * @copyright  	2016 AL Rachels (drachels@drachels.com)
+ * @package     mod_hotquestion
+ * @copyright   2016 AL Rachels (drachels@drachels.com)
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -32,7 +32,7 @@ class download_questions extends \core\event\base {
      */
     protected function init() {
         $this->data['crud'] = 'u';
-        $this->data['edulevel'] = self::LEVEL_PARTICIPATING ;
+        $this->data['edulevel'] = self::LEVEL_PARTICIPATING;
         $this->data['objecttable'] = 'hotquestion';
     }
 

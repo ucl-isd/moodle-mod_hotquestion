@@ -18,7 +18,7 @@
  * The mod_hotquestion instance list viewed event.
  *
  * @package    mod_hotquestion
- * @copyright  
+ * @copyright  2014 drachels@drachels.com
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -26,14 +26,6 @@ namespace mod_hotquestion\event;
 
 defined('MOODLE_INTERNAL') || die();
 
-/**
- * The mod_hotquestion instance list viewed event class.
- *
- * @package    mod_hotquestion
- * @since      Moodle 2.7
- * @copyright  
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
 class course_module_instance_list_viewed extends \core\event\course_module_instance_list_viewed {
     // No need for any code here as everything is handled by the parent class.
 }

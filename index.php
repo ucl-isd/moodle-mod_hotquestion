@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -26,13 +25,8 @@
 
 require(__DIR__ . "/../../config.php");
 require_once(__DIR__ . '/locallib.php');
-//require_once(__DIR__ . '/lib.php');
-//require_once("../../config.php");
-//require_once(dirname(__FILE__).'/locallib.php');
-//require_once($CFG->dirroot.'/mod/hotquestion/locallib.php');
-//require_once("lib.php");
 
-$id = required_param('id', PARAM_INT);   // course
+$id = required_param('id', PARAM_INT);   // Course.
 
 if (! $course = $DB->get_record("course", array("id" => $id))) {
     print_error("Course ID is incorrect");
@@ -52,15 +46,17 @@ echo $OUTPUT->header();
 echo $OUTPUT->heading($strhotquestions);
 
 if (! $hotquestions = get_all_instances_in_course("hotquestion", $course)) {
-    notice(get_string('thereareno', 'moodle', get_string("modulenameplural", "hotquestion")), "../../course/view.php?id=$course->id");
+    notice(get_string('thereareno', 'moodle',
+    get_string("modulenameplural", "hotquestion")),
+    "../../course/view.php?id=$course->id");
     die;
 }
 
 // Sections.
 $usesections = course_format_uses_sections($course->format);
 if ($usesections) {
-	$modinfo = get_fast_modinfo($course);
-	$sections = $modinfo->get_section_info_all();
+    $modinfo = get_fast_modinfo($course);
+    $sections = $modinfo->get_section_info_all();
 }
 
 $timenow = time();
@@ -106,17 +102,18 @@ foreach ($hotquestions as $hotquestion) {
 
     // Link to Hot Question activities.
     if (!$hotquestion->visible) {
-        //Show dimmed if the mod is hidden
-        $table->data[$i][] = "<a class=\"dimmed\" href=\"view.php?id=$hotquestion->coursemodule\">".format_string($hotquestion->name,true)."</a>";
+        // Show dimmed if the mod is hidden.
+        $table->data[$i][] = "<a class=\"dimmed\" href=\"view.php?id=$hotquestion->coursemodule\">"
+                             .format_string($hotquestion->name, true)."</a>";
     } else {
-        //Show normal if the mod is visible
-        $table->data[$i][] = "<a href=\"view.php?id=$hotquestion->coursemodule\">".format_string($hotquestion->name,true)."</a>";
+        // Show normal if the mod is visible.
+        $table->data[$i][] = "<a href=\"view.php?id=$hotquestion->coursemodule\">".format_string($hotquestion->name, true)."</a>";
     }
 
     // Description of the Hot Question activity.
     $table->data[$i][] = format_text($hotquestion->intro,  $hotquestion->introformat);
 
-    // Questions in current round info
+    // Questions in current round info.
     if ($entriesmanager) {
 
         // Display the participation column if the user can view questions.
@@ -133,17 +130,18 @@ foreach ($hotquestions as $hotquestion) {
                 }
             }
         }
-		// Go count the users and questions in the current round.
-		$entrycount = hotquestion_count_entries($hotquestion, groups_get_all_groups($course->id, $USER->id));
-		// Extract the number of users and questions into the participation column.
-		foreach($entrycount as $ec){
-			$table->data[$i][] = "<a href=\"view.php?id=$hotquestion->coursemodule\">".get_string("viewallentries","hotquestion", $ec)."</a>";
-		}
+        // Go count the users and questions in the current round.
+        $entrycount = hotquestion_count_entries($hotquestion, groups_get_all_groups($course->id, $USER->id));
+        // Extract the number of users and questions into the participation column.
+        foreach ($entrycount as $ec) {
+            $table->data[$i][] = "<a href=\"view.php?id=$hotquestion->coursemodule\">"
+                                 .get_string("viewallentries", "hotquestion", $ec)."</a>";
+        }
     } else if (!empty($managersomewhere)) {
 
         $table->data[$i][] = "";
     }
-	
+
     $i++;
 }
 

@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -22,8 +21,8 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once($CFG->dirroot . '/mod/hotquestion/backup/moodle2/backup_hotquestion_stepslib.php'); // Because it exists (must)
-require_once($CFG->dirroot . '/mod/hotquestion/backup/moodle2/backup_hotquestion_settingslib.php'); // Because it exists (optional)
+require_once($CFG->dirroot . '/mod/hotquestion/backup/moodle2/backup_hotquestion_stepslib.php'); // Because it exists (must).
+require_once($CFG->dirroot . '/mod/hotquestion/backup/moodle2/backup_hotquestion_settingslib.php'); // Because it exists optional).
 
 /**
  * hotquestion backup task that provides all the settings and steps to perform one
@@ -35,33 +34,33 @@ class backup_hotquestion_activity_task extends backup_activity_task {
      * Define (add) particular settings this activity can have
      */
     protected function define_my_settings() {
-        // No particular settings for this activity
+        // No particular settings for this activity.
     }
 
     /**
-     * Define (add) particular steps this activity can have
+     * Define (add) particular steps this activity can have.
      */
     protected function define_my_steps() {
-        // Choice only has one structure step
+        // Choice only has one structure step.
         $this->add_step(new backup_hotquestion_activity_structure_step('hotquestion_structure', 'hotquestion.xml'));
     }
 
     /**
      * Code the transformations to perform in the activity in
-     * order to get transportable (encoded) links
+     * order to get transportable encoded) links.
      */
     static public function encode_content_links($content) {
         global $CFG;
 
-        $base = preg_quote($CFG->wwwroot,"/");
+        $base = preg_quote($CFG->wwwroot, "/");
 
-        // Link to the list of hotquestions
-        $search="/(".$base."\/mod\/hotquestion\/index.php\?id\=)([0-9]+)/";
-        $content= preg_replace($search, '$@HOTQUESTIONINDEX*$2@$', $content);
+        // Link to the list of hotquestions.
+        $search = "/(".$base."\/mod\/hotquestion\/index.php\?id\=)([0-9]+)/";
+        $content = preg_replace($search, '$@HOTQUESTIONINDEX*$2@$', $content);
 
-        // Link to hotquestion view by moduleid
-        $search="/(".$base."\/mod\/hotquestion\/view.php\?id\=)([0-9]+)/";
-        $content= preg_replace($search, '$@HOTQUESTIONVIEWBYID*$2@$', $content);
+        // Link to hotquestion view by moduleid.
+        $search = "/(".$base."\/mod\/hotquestion\/view.php\?id\=)([0-9]+)/";
+        $content = preg_replace($search, '$@HOTQUESTIONVIEWBYID*$2@$', $content);
 
         return $content;
     }

@@ -26,14 +26,6 @@ namespace mod_hotquestion\event;
 
 defined('MOODLE_INTERNAL') || die();
 
-/**
- * The mod_hotquestion course module viewed event class.
- *
- * @package    mod_hotquestion
- * @since      Moodle 2.7
- * @copyright  
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
 class course_module_viewed extends \core\event\course_module_viewed {
 
     /**
@@ -65,6 +57,4 @@ class course_module_viewed extends \core\event\course_module_viewed {
         return array($this->courseid, 'hotquestion', 'view hotquestion', 'view.php?f=' . $this->objectid,
             $this->objectid, $this->contextinstanceid);
     }
-	
-	
 }

@@ -17,8 +17,8 @@
 /**
  * The mod_hotquestion entries viewed event.
  *
- * @package 	mod_hotquestion
- * @copyright  	2014 drachels@drachels.com
+ * @package     mod_hotquestion
+ * @copyright   2014 drachels@drachels.com
  * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
