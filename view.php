@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -32,10 +31,10 @@ require_once("lib.php");
 require_once("locallib.php");
 require_once("mod_form.php");
 
-$id = required_param('id', PARAM_INT); 					// Course_module ID.
-$ajax = optional_param('ajax', 0, PARAM_BOOL); 			// Asychronous form request.
+$id = required_param('id', PARAM_INT);                  // Course_module ID.
+$ajax = optional_param('ajax', 0, PARAM_BOOL);          // Asychronous form request.
 $action  = optional_param('action', '', PARAM_ACTION);  // Action(vote, newround).
-$roundid = optional_param('round', -1, PARAM_INT);  	// Round id.
+$roundid = optional_param('round', -1, PARAM_INT);      // Round id.
 
 if (! $cm = get_coursemodule_from_id('hotquestion', $id)) {
     print_error("Course Module ID was incorrect");
@@ -68,15 +67,15 @@ if (! $cw = $DB->get_record("course_sections", array("id" => $cm->section))) {
 }
 
 // Trigger module viewed event.
-if ($CFG->version > 2014051200) { // Moodle 2.7+
-    $params = array(       
+if ($CFG->version > 2014051200) { // Moodle 2.7+.
+    $params = array(
         'objectid' => $hq->cm->id,
-		'context' => $context,
+        'context' => $context,
     );
-	$event = \mod_hotquestion\event\course_module_viewed::create($params);
-	$event->trigger();
+    $event = \mod_hotquestion\event\course_module_viewed::create($params);
+    $event->trigger();
 } else {
-	add_to_log($hq->course->id, 'hotquestion', 'view', "view.php?id={$hq->cm->id}", $hq->instance->name, $hq->cm->id);
+    add_to_log($hq->course->id, 'hotquestion', 'view', "view.php?id={$hq->cm->id}", $hq->instance->name, $hq->cm->id);
 }
 
 // Set page.
@@ -84,8 +83,6 @@ if (!$ajax) {
     $PAGE->set_url('/mod/hotquestion/view.php', array('id' => $hq->cm->id));
     $PAGE->set_title($hq->instance->name);
     $PAGE->set_heading($hq->course->shortname);
-	// Newer version of Moodle no longer use the Update this.... button on the navbar.
-    //$PAGE->set_button(update_module_button($hq->cm->id, $hq->course->id, get_string('modulename', 'hotquestion')));
     $PAGE->set_context($context);
     $PAGE->set_cm($hq->cm);
     $PAGE->add_body_class('hotquestion');
@@ -98,8 +95,8 @@ if (!$ajax) {
             array('connectionerror', 'hotquestion')
         )
     );
-    //$PAGE->requires->js_init_call('M.mod_hotquestion.init', null, false, $jsmodule);
-	$PAGE->requires->js_init_call('M.mod_hotquestion.init', null, true, $jsmodule);
+    // $PAGE->requires->js_init_call('M.mod_hotquestion.init', null, false, $jsmodule);
+    $PAGE->requires->js_init_call('M.mod_hotquestion.init', null, true, $jsmodule);
 }
 
 require_capability('mod/hotquestion:view', $context);
@@ -111,7 +108,7 @@ $output->init($hq);
 // Process submited question.
 if (has_capability('mod/hotquestion:ask', $context)) {
     $mform = new hotquestion_form(null, array($hq->instance->anonymouspost, $hq->cm));
-    if ($fromform=$mform->get_data()) {
+    if ($fromform = $mform->get_data()) {
         if (!$hq->add_new_question($fromform)) {
             redirect('view.php?id='.$hq->cm->id, get_string('invalidquestion', 'hotquestion'));
         }
@@ -133,47 +130,47 @@ if (!empty($action)) {
         case 'newround':
             if (has_capability('mod/hotquestion:manage', $context)) {
                 $hq->add_new_round();
-				// Added to make new empty round start without having to click the Reload icon.
-				redirect('view.php?id='.$hq->cm->id, get_string('newround', 'hotquestion'));
+                // Added to make new empty round start without having to click the Reload icon.
+                redirect('view.php?id='.$hq->cm->id, get_string('newroundsuccess', 'hotquestion'));
             }
             break;
-		case 'removeround':
+        case 'removeround':
             if (has_capability('mod/hotquestion:manageentries', $context)) {
-				$hq->remove_round();
-				// Added to show round has been removed.
-				redirect('view.php?id='.$hq->cm->id, get_string('removedround', 'hotquestion'));
+                $hq->remove_round();
+                // Added to show round has been removed.
+                redirect('view.php?id='.$hq->cm->id, get_string('removedround', 'hotquestion'));
             }
             break;
-		case 'remove':
-			if (has_capability('mod/hotquestion:manageentries', $context)) {
-				$q = required_param('q',  PARAM_INT);  // Question id to remove.
-				// Call remove function in locallib.
-				$hq->remove_question($q);
-				// Need redirect that goes to the round where removing question.
-				// Does work without it as it just defaults to current round.
-				// Trigger remove_question event.
-				$event = \mod_hotquestion\event\remove_question::create(array(
-					'objectid' => $hotquestion->id,
-					'context' => $context
-				));
-				$event->add_record_snapshot('course_modules', $cm);
-				$event->add_record_snapshot('course', $course);
-				$event->add_record_snapshot('hotquestion', $hotquestion);
-				$event->trigger();
-			}
-			break;
-		case 'download':
+        case 'remove':
             if (has_capability('mod/hotquestion:manageentries', $context)) {
-				$q = $cm->instance; // Course module to download questions from.
-				// Call download question function in locallib.
-				$hq->download_questions($q);
+                $q = required_param('q',  PARAM_INT);  // Question id to remove.
+                // Call remove function in locallib.
+                $hq->remove_question($q);
+                // Need redirect that goes to the round where removing question.
+                // Does work without it as it just defaults to current round.
+                // Trigger remove_question event.
+                $event = \mod_hotquestion\event\remove_question::create(array(
+                    'objectid' => $hotquestion->id,
+                    'context' => $context
+                ));
+                $event->add_record_snapshot('course_modules', $cm);
+                $event->add_record_snapshot('course', $course);
+                $event->add_record_snapshot('hotquestion', $hotquestion);
+                $event->trigger();
+            }
+            break;
+        case 'download':
+            if (has_capability('mod/hotquestion:manageentries', $context)) {
+                $q = $cm->instance; // Course module to download questions from.
+                // Call download question function in locallib.
+                $hq->download_questions($q);
             }
             break;
     }
 }
 
 // Start print page.
-if (!$ajax){
+if (!$ajax) {
     echo $output->header();
     // Print hotquestion description.
     echo $output->introduction();
@@ -194,7 +191,7 @@ echo $output->questions(has_capability('mod/hotquestion:vote', $context));
 echo $output->container_end();
 
 // Finish the page.
-if (!$ajax){
+if (!$ajax) {
     echo $output->footer();
 }
 
