@@ -8,6 +8,10 @@ which can access the moodle site. Students can also vote on others'
 questions, so that the hottest questions will be popped up to the top of
 the list. Teachers can make oral comments on selected questions in classroom.
 
+Enhanced remove question capability 7/16/2016 to show a message that you
+have successfully removed a question. Reworded the message for opening a
+new round.
+
 New capability added 7/15/2016 that places an entry with link in the 
 Recent Activity block when anyone posts an entry in a Hot Question acitivity.
 
