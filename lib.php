@@ -267,9 +267,6 @@ function hotquestion_print_recent_activity($course, $viewfullnames, $timestart) 
         $context = context_module::instance($submission->cmid);
         $link = $CFG->wwwroot.'/mod/hotquestion/view.php?id='.$cm->id;
         $name = $cm->name;
-        if ($name = 'Guest user') {
-            $name = 'Anonymous';
-        }
         print_recent_activity_note($submission->time,
                                    $submission,
                                    $name,
