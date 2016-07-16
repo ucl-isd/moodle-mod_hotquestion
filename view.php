@@ -147,6 +147,7 @@ if (!empty($action)) {
                 // Call remove function in locallib.
                 $hq->remove_question($q);
                 // Need redirect that goes to the round where removing question.
+                redirect('view.php?id='.$hq->cm->id, get_string('questionremovesuccess', 'hotquestion'));
                 // Does work without it as it just defaults to current round.
                 // Trigger remove_question event.
                 $event = \mod_hotquestion\event\remove_question::create(array(
