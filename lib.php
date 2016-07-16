@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -14,7 +13,6 @@
 //
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
-
 
 /**
  * Library of interface functions and constants for module hotquestion.
@@ -33,17 +31,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-/** example constant */
-//define('HOTQUESTION_ULTIMATE_ANSWER', 42);
-
-/**
- * If you for some reason need to use global variables instead of constants, do not forget to make them
- * global as this file can be included inside a function scope. However, using the global variables
- * at the module level is not a recommended.
- */
-//global $HOTQUESTION_GLOBAL_VARIABLE;
-//$HOTQUESTION_QUESTION_OF = array('Life', 'Universe', 'Everything');
-
 /**
  * Given an object containing all the necessary data,
  * (defined by the form in mod_form.php) this function
@@ -58,7 +45,7 @@ function hotquestion_add_instance($hotquestion) {
 
     $hotquestion->timecreated = time();
 
-    # You may have to add extra stuff in here #
+    // You may have to add extra stuff in here.
 
     $id = $DB->insert_record('hotquestion', $hotquestion);
 
@@ -79,7 +66,7 @@ function hotquestion_update_instance($hotquestion) {
     $hotquestion->timemodified = time();
     $hotquestion->id = $hotquestion->instance;
 
-    # You may have to add extra stuff in here #
+    // You may have to add extra stuff in here.
 
     return $DB->update_record('hotquestion', $hotquestion);
 }
@@ -111,8 +98,8 @@ function hotquestion_delete_instance($id) {
 }
 
 /**
- * Clear all questions and votes
- * 
+ * Clear all questions and votes.
+ *
  * @param int $hotquestionid
  * @return boolean Success/Failure
  */
@@ -139,61 +126,20 @@ function reset_instance($hotquestionid) {
 
 /**
  * Get all questions into an array for export as csv file.
- * 
+ *
  * @param int $hotquestionid
  * @return boolean Success/Failure
  */
 function get_question_list($hotquestionid) {
     global $CFG, $USER, $DB;
     $params = array();
-    $toReturn = array();
-    $questionsTblName = $CFG->prefix."hotquestion_questions";
-	$usersTblName = $CFG->prefix."user";
-//	$sql = "SELECT ".$usersTblName.".firstname, ".$usersTblName.".lastname, ".$questionsTblName.".id, ".
-//	$questionsTblName.".hotquestion, ".$questionsTblName.".content, ".
-//	$questionsTblName.".userid, ".$questionsTblName.".time, ".$questionsTblName.".anonymous".
-//	" FROM ".$questionsTblName.
-//	" LEFT JOIN ".$usersTblName." ON ".$questionsTblName.".userid = ".$usersTblName.".id".
-//	" WHERE hotquestion=".$s_id." AND ".$questionsTblName.".userid=".$u_id;
-//	$oby = " ORDER BY ".$questionsTblName.".hotquestion";
-//	$sql .= $oby;
-//	$sql .= " DESC";
-//		debugging('In function get_question_list');
-//		print_object($sql);
-//	if ($questions = $DB->get_records_sql($sql, $params)) {
-//        return $questions;
-//				print_object($sql);
-
-//	}
-//    return FALSE;
-	
-	$sql = 'SELECT COUNT(*) FROM {hotquestion_questions} WHERE userid>0';
+    $toreturn = array();
+    $questionstblname = $CFG->prefix."hotquestion_questions";
+    $userstblname = $CFG->prefix."user";
+    $sql = 'SELECT COUNT(*) FROM {hotquestion_questions} WHERE userid>0';
     return $DB->get_records_sql($sql, array($USER->id));
-	
-//$params = array($this->instance->id, $this->current_round->starttime, $this->current_round->endtime);
+}
 
-		
-//    return $DB->get_records_sql('SELECT 
-//										CASE
-//										WHEN u.firstname = "Guest user"
-//											THEN CONCAT(u.lastname, "Anonymous")
-//											ELSE u.firstname
-//										END AS "firstname", 
-//											u.lastname AS "lastname", hq.id id, hq.hotquestion hotquestion, hq.content content, hq.userid userid,
-//											FROM_UNIXTIME(hq.time) AS TIME, hq.anonymous anonymous
-//
-//
-//											FROM {hotquestion_questions} hq
-//										JOIN {user} u ON u.id = hq.userid
-//
-//											WHERE hq.userid > 0
-//											ORDER BY hq.hotquestion, u.id', $params);
-
-
-    }
-	
-	
-	
 /**
  * Return a small object with summary information about what a
  * user has done with a given particular instance of this module
@@ -227,11 +173,111 @@ function hotquestion_user_complete($course, $user, $mod, $hotquestion) {
  * that has occurred in hotquestion activities and print it out.
  * Return true if there was output, or false is there was none.
  *
+ * @global stdClass $DB
+ * @global stdClass $OUTPUT
+ * @param stdClass $course
+ * @param bool $viewfullnames
+ * @param int $timestart
  * @return boolean
- * @todo Finish documenting this function
  */
-function hotquestion_print_recent_activity($course, $isteacher, $timestart) {
-    return false;  //  True if anything was printed, otherwise false
+function hotquestion_print_recent_activity($course, $viewfullnames, $timestart) {
+    global $CFG, $USER, $DB, $OUTPUT;
+
+    $dbparams = array($timestart, $course->id, 'hotquestion');
+    $namefields = user_picture::fields('u', null, 'userid');
+    $sql = "SELECT hqq.id, hqq.time, cm.id AS cmid, $namefields
+         FROM {hotquestion_questions} hqq
+              JOIN {hotquestion} hq         ON hq.id = hqq.hotquestion
+              JOIN {course_modules} cm ON cm.instance = hq.id
+              JOIN {modules} md        ON md.id = cm.module
+              JOIN {user} u            ON u.id = hqq.userid
+         WHERE hqq.time > ? AND
+               hq.course = ? AND
+               md.name = ?
+         ORDER BY hqq.time ASC
+    ";
+
+    $newentries = $DB->get_records_sql($sql, $dbparams);
+
+    $modinfo = get_fast_modinfo($course);
+    $show    = array();
+    $grader  = array();
+    $showrecententries = get_config('hotquestion', 'showrecentactivity');
+
+    foreach ($newentries as $anentry) {
+
+        if (!array_key_exists($anentry->cmid, $modinfo->get_cms())) {
+            continue;
+        }
+        $cm = $modinfo->get_cm($anentry->cmid);
+
+        if (!$cm->uservisible) {
+            continue;
+        }
+        if ($anentry->userid == $USER->id) {
+            $show[] = $anentry;
+            continue;
+        }
+        $context = context_module::instance($anentry->cmid);
+
+        // The act of submitting of entries may be considered private -
+        // only graders will see it if specified.
+        if (empty($showrecententries)) {
+            if (!array_key_exists($cm->id, $grader)) {
+                $grader[$cm->id] = has_capability('moodle/grade:viewall', $context);
+            }
+            if (!$grader[$cm->id]) {
+                continue;
+            }
+        }
+
+        $groupmode = groups_get_activity_groupmode($cm, $course);
+
+        if ($groupmode == SEPARATEGROUPS &&
+                !has_capability('moodle/site:accessallgroups',  $context)) {
+            if (isguestuser()) {
+                // Shortcut - guest user does not belong into any group.
+                continue;
+            }
+
+            // This will be slow - show only users that share group with me in this cm.
+            if (!$modinfo->get_groups($cm->groupingid)) {
+                continue;
+            }
+            $usersgroups = groups_get_all_groups($course->id, $anentry->userid, $cm->groupingid);
+            if (is_array($usersgroups)) {
+                $usersgroups = array_keys($usersgroups);
+                $intersect = array_intersect($usersgroups, $modinfo->get_groups($cm->groupingid));
+                if (empty($intersect)) {
+                    continue;
+                }
+            }
+        }
+        $show[] = $anentry;
+    }
+
+    if (empty($show)) {
+        return false;
+    }
+
+    echo $OUTPUT->heading(get_string('modulenameplural', 'hotquestion').':', 3);
+
+    foreach ($show as $submission) {
+        $cm = $modinfo->get_cm($submission->cmid);
+        $context = context_module::instance($submission->cmid);
+        $link = $CFG->wwwroot.'/mod/hotquestion/view.php?id='.$cm->id;
+        $name = $cm->name;
+        if ($name = 'Guest user') {
+            $name = 'Anonymous';
+        }
+        print_recent_activity_note($submission->time,
+                                   $submission,
+                                   $name,
+                                   $link,
+                                   false,
+                                   $viewfullnames);
+    }
+    return true;
 }
 
 /**
@@ -277,7 +323,9 @@ function hotquestion_reset_userdata($data) {
         $instances = $DB->get_records('hotquestion', array('course' => $data->courseid));
         foreach ($instances as $instance) {
             if (reset_instance($instance->id)) {
-                $status[] = array('component'=>get_string('modulenameplural', 'hotquestion'), 'item'=>get_string('resethotquestion','hotquestion').': '.$instance->name, 'error'=>false);
+                $status[] = array('component' => get_string('modulenameplural', 'hotquestion')
+                , 'item' => get_string('resethotquestion', 'hotquestion')
+                .': '.$instance->name, 'error' => false);
             }
         }
     }
@@ -292,7 +340,7 @@ function hotquestion_reset_userdata($data) {
  */
 function hotquestion_reset_course_form_definition(&$mform) {
     $mform->addElement('header', 'hotquestionheader', get_string('modulenameplural', 'hotquestion'));
-    $mform->addElement('checkbox', 'reset_hotquestion', get_string('resethotquestion','hotquestion'));
+    $mform->addElement('checkbox', 'reset_hotquestion', get_string('resethotquestion', 'hotquestion'));
 }
 
 /**
@@ -314,7 +362,7 @@ function hotquestion_supports($feature) {
         case FEATURE_GROUPS:                  return false;
         case FEATURE_GROUPINGS:               return false;
         case FEATURE_GROUPMEMBERSONLY:        return false;
-        case FEATURE_MOD_INTRO:               return true ;
+        case FEATURE_MOD_INTRO:               return true;
         case FEATURE_COMPLETION_TRACKS_VIEWS: return false;
         case FEATURE_COMPLETION_HAS_RULES:    return false;
         case FEATURE_GRADE_HAS_GRADE:         return false;

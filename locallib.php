@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -59,7 +58,7 @@ class mod_hotquestion {
         if ($user == -1) {
             $user = $USER->id;
         }
-        return $DB->record_exists('hotquestion_votes', array('question'=>$question, 'voter'=>$user));
+        return $DB->record_exists('hotquestion_votes', array('question' => $question, 'voter' => $user));
     }
 
     /**
@@ -72,12 +71,12 @@ class mod_hotquestion {
      */
     public function add_new_question($fromform) {
         global $USER, $CFG, $DB;
-		$data = new StdClass();
+        $data = new StdClass();
         $data->hotquestion = $this->instance->id;
         $data->content = trim($fromform->question);
         $data->userid = $USER->id;
         $data->time = time();
-		$context = context_module::instance($this->cm->id);	
+        $context = context_module::instance($this->cm->id);
         if (isset($fromform->anonymous) && $fromform->anonymous && $this->instance->anonymouspost) {
             $data->anonymous = $fromform->anonymous;
             // Assume this user is guest.
@@ -85,17 +84,17 @@ class mod_hotquestion {
         }
         if (!empty($data->content)) {
             $DB->insert_record('hotquestion_questions', $data);
-			
-			if ($CFG->version > 2014051200) { // Moodle 2.7+
-				$params = array(       
-					'objectid' => $this->cm->id,
-					'context' => $context,
-			);	
-				$event = \mod_hotquestion\event\add_question::create($params);
-				$event->trigger();
-			} else {
-				add_to_log($this->course->id, "hotquestion", "add question", "view.php?id={$this->cm->id}", $data->content, $this->cm->id);
-			}
+            if ($CFG->version > 2014051200) { // Moodle 2.7+.
+                $params = array(
+                    'objectid' => $this->cm->id,
+                    'context' => $context,
+                );
+                $event = \mod_hotquestion\event\add_question::create($params);
+                $event->trigger();
+            } else {
+                add_to_log($this->course->id, "hotquestion", "add question"
+                    , "view.php?id={$this->cm->id}", $data->content, $this->cm->id);
+            }
             return true;
         } else {
             return false;
@@ -111,29 +110,29 @@ class mod_hotquestion {
      */
     public function vote_on($question) {
         global $CFG, $DB, $USER;
-		$votes = new StdClass();
-		$context = context_module::instance($this->cm->id);	
-        $question = $DB->get_record('hotquestion_questions', array('id'=>$question));
+        $votes = new StdClass();
+        $context = context_module::instance($this->cm->id);
+        $question = $DB->get_record('hotquestion_questions', array('id' => $question));
         if ($question && $this->can_vote_on($question)) {
 
-			if ($CFG->version > 2014051200) { // Moodle 2.7+
-				$params = array(       
-					'objectid' => $this->cm->id,
-					'context' => $context,
-			);
-				
-				$event = \mod_hotquestion\event\update_vote::create($params);
-				$event->trigger();
-			} else {
-				add_to_log($this->course->id, 'hotquestion', 'update vote', "view.php?id={$this->cm->id}", $question->id, $this->cm->id);
-			}		
+            if ($CFG->version > 2014051200) { // Moodle 2.7+.
+                $params = array(
+                    'objectid' => $this->cm->id,
+                    'context' => $context,
+                );
+                $event = \mod_hotquestion\event\update_vote::create($params);
+                $event->trigger();
+            } else {
+                add_to_log($this->course->id, 'hotquestion', 'update vote'
+                    , "view.php?id={$this->cm->id}", $question->id, $this->cm->id);
+            }
 
             if (!$this->has_voted($question->id)) {
                 $votes->question = $question->id;
                 $votes->voter = $USER->id;
                 $DB->insert_record('hotquestion_votes', $votes);
-            } else { 
-                $DB->delete_records('hotquestion_votes', array('question'=> $question->id, 'voter'=>$USER->id));
+            } else {
+                $DB->delete_records('hotquestion_votes', array('question' => $question->id, 'voter' => $USER->id));
             }
         }
     }
@@ -148,7 +147,7 @@ class mod_hotquestion {
         global $USER, $DB;
 
         if (is_int($question)) {
-            $question = $DB->get_record('hotquestion_questions', array('id'=>$question));
+            $question = $DB->get_record('hotquestion_questions', array('id' => $question));
         }
         if (empty($user)) {
             $user = $USER;
@@ -157,9 +156,9 @@ class mod_hotquestion {
         // Is this question in last round?
         $rounds = $DB->get_records('hotquestion_rounds', array('hotquestion' => $this->instance->id), 'id DESC', '*', 0, 1);
         $lastround = reset($rounds);
-        $in_last_round = $question->time >= $lastround->starttime;
+        $inlastround = $question->time >= $lastround->starttime;
 
-        return $question->userid != $user->id && $in_last_round;
+        return $question->userid != $user->id && $inlastround;
     }
 
     /**
@@ -168,33 +167,33 @@ class mod_hotquestion {
      * @global object
      */
     public function add_new_round() {
-        global $USER,$CFG,$DB;
-		
+        global $USER, $CFG, $DB;
+
         // Close the latest round.
-		$rounds = $DB->get_records('hotquestion_rounds', array('hotquestion' => $this->instance->id), 'id DESC', '*', 0, 1);
-		$old = array_pop($rounds);
+        $rounds = $DB->get_records('hotquestion_rounds', array('hotquestion' => $this->instance->id), 'id DESC', '*', 0, 1);
+        $old = array_pop($rounds);
         $old->endtime = time();
-		$DB->update_record('hotquestion_rounds', $old);
-		
+        $DB->update_record('hotquestion_rounds', $old);
+
         // Open a new round.
-		$new = new StdClass();
+        $new = new StdClass();
         $new->hotquestion = $this->instance->id;
         $new->starttime = time();
         $new->endtime = 0;
-		$context = context_module::instance($this->cm->id);	
+        $context = context_module::instance($this->cm->id);
         $rid = $DB->insert_record('hotquestion_rounds', $new);
-		
-			if ($CFG->version > 2014051200) { // Moodle 2.7+
-				$params = array(       
-					'objectid' => $this->cm->id,
-					'context' => $context,
-			);
-				
-				$event = \mod_hotquestion\event\add_round::create($params);
-				$event->trigger();
-			} else {
-				add_to_log($this->course->id, 'hotquestion', 'add round', "view.php?id={$this->cm->id}&round=$rid", $rid, $this->cm->id);
-			}		
+
+        if ($CFG->version > 2014051200) { // Moodle 2.7+.
+            $params = array(
+                'objectid' => $this->cm->id,
+                'context' => $context,
+            );
+
+            $event = \mod_hotquestion\event\add_round::create($params);
+            $event->trigger();
+        } else {
+            add_to_log($this->course->id, 'hotquestion', 'add round', "view.php?id={$this->cm->id}&round=$rid", $rid, $this->cm->id);
+        }
     }
 
     /**
@@ -202,14 +201,14 @@ class mod_hotquestion {
      *
      * @global object
      * @param int $roundid
-    */
+     */
     public function set_current_round($roundid = -1) {
         global $DB;
 
         $rounds = $DB->get_records('hotquestion_rounds', array('hotquestion' => $this->instance->id), 'id ASC');
         if (empty($rounds)) {
             // Create the first round.
-			$round = new StdClass();
+            $round = new StdClass();
             $round->starttime = time();
             $round->endtime = 0;
             $round->hotquestion = $this->instance->id;
@@ -222,15 +221,15 @@ class mod_hotquestion {
 
             $ids = array_keys($rounds);
             // Search previous round.
-            $current_key = array_search($roundid, $ids);
-            if (array_key_exists($current_key - 1, $ids)) {
-                $this->prev_round = $rounds[$ids[$current_key - 1]];
+            $currentkey = array_search($roundid, $ids);
+            if (array_key_exists($currentkey - 1, $ids)) {
+                $this->prev_round = $rounds[$ids[$currentkey - 1]];
             } else {
                 $this->prev_round = null;
             }
             // Search next round.
-            if (array_key_exists($current_key + 1, $ids)) {
-                $this->next_round = $rounds[$ids[$current_key + 1]];
+            if (array_key_exists($currentkey + 1, $ids)) {
+                $this->next_round = $rounds[$ids[$currentkey + 1]];
             } else {
                 $this->next_round = null;
             }
@@ -240,7 +239,7 @@ class mod_hotquestion {
             $this->prev_round = array_pop($rounds);
             $this->next_round = null;
         }
-		return $roundid;
+        return $roundid;
     }
 
     /**
@@ -279,7 +278,7 @@ class mod_hotquestion {
     public function get_questions() {
         global $DB;
         if ($this->current_round->endtime == 0) {
-            $this->current_round->endtime = 0xFFFFFFFF;  //Hack
+            $this->current_round->endtime = 0xFFFFFFFF;  // Hack.
         }
         $params = array($this->instance->id, $this->current_round->starttime, $this->current_round->endtime);
         return $DB->get_records_sql('SELECT q.*, count(v.voter) as votecount
@@ -292,52 +291,48 @@ class mod_hotquestion {
                                      GROUP BY q.id
                                      ORDER BY votecount DESC, q.time DESC', $params);
     }
-	
-	 /**
+
+    /**
      * Remove selected question and any votes that it might have.
-     * 
+     *
      * @return object
      */
     public function remove_question() {
-		global $DB;
-		if(isset($_GET['q'])){
-			$questionID = $_GET['q'];
-			$db_question = $DB->get_record('hotquestion_questions', array('id' => $questionID));
-			$DB->delete_records('hotquestion_questions', array('id'=>$db_question->id));
-			// Get an array of all votes on the question that was just deleted, then delete them.
-			$db_vote = $DB->get_records('hotquestion_votes', array('question' => $questionID));
-			$DB->delete_records('hotquestion_votes', array('question'=>$db_question->id));
-		}
-		return $this->current_round;
+        global $DB;
+        if (isset($_GET['q'])) {
+            $questionid = $_GET['q'];
+            $dbquestion = $DB->get_record('hotquestion_questions', array('id' => $questionid));
+            $DB->delete_records('hotquestion_questions', array('id' => $dbquestion->id));
+            // Get an array of all votes on the question that was just deleted, then delete them.
+            $dbvote = $DB->get_records('hotquestion_votes', array('question' => $questionid));
+            $DB->delete_records('hotquestion_votes', array('question' => $dbquestion->id));
+        }
+        return $this->current_round;
     }
-	
-	 /**
-	 * If the currently being viewed round is empty, delete it.
-     * Otherwise, remove any questions in the round currently being viewed,  
+
+    /**
+     * If the currently being viewed round is empty, delete it.
+     * Otherwise, remove any questions in the round currently being viewed,
      * remove any votes for each question being removed,
-	 * then remove the currently being viewed round.
+     * then remove the currently being viewed round.
      * @return nothing
      */
     public function remove_round() {
-		global $DB;
-		
-		$data = new StdClass();
-		$data->hotquestion = $this->instance->id;
-		$context = context_module::instance($this->cm->id);
-		// Trigger remove_round event.
-		$event = \mod_hotquestion\event\remove_round::create(array(
-			'objectid' => $data->hotquestion,
-			'context' => $context
-		));
-		$event->trigger();
-		
-		//if(isset($_GET['round'])){
-			$roundID = $_GET['round'];
-		//	$round = $DB->get_record('hotquestion_rounds', array('id' => $roundID));
-		//}
-		// Get any questions that belong to this round.
-		if ($this->current_round->endtime == 0) {
-            $this->current_round->endtime = 0xFFFFFFFF;  //Hack
+        global $DB;
+
+        $data = new StdClass();
+        $data->hotquestion = $this->instance->id;
+        $context = context_module::instance($this->cm->id);
+        // Trigger remove_round event.
+        $event = \mod_hotquestion\event\remove_round::create(array(
+            'objectid' => $data->hotquestion,
+            'context' => $context
+        ));
+        $event->trigger();
+
+        $roundid = $_GET['round'];
+        if ($this->current_round->endtime == 0) {
+            $this->current_round->endtime = 0xFFFFFFFF;  // Hack.
         }
         $params = array($this->instance->id, $this->current_round->starttime, $this->current_round->endtime);
         $questions = $DB->get_records_sql('SELECT q.*, count(v.voter) as votecount
@@ -350,122 +345,113 @@ class mod_hotquestion {
                                      GROUP BY q.id
                                      ORDER BY votecount DESC, q.time DESC', $params);
 
+        if ($questions) {
+            foreach ($questions as $q) {
+                $questionid = $q->id; // Get id of first question on the page to delete.
+                $dbquestion = $DB->get_record('hotquestion_questions', array('id' => $questionid));
+                $DB->delete_records('hotquestion_questions', array('id' => $dbquestion->id));
+                // Get an array of all votes on the question that was just deleted, then delete them.
+                $dbvote = $DB->get_records('hotquestion_votes', array('question' => $questionid));
+                $DB->delete_records('hotquestion_votes', array('question' => $dbquestion->id));
+            }
+            // Now that all questions and votes are gone, remove the round.
+            $dbround = $DB->get_record('hotquestion_rounds', array('id' => $roundid));
+            $DB->delete_records('hotquestion_rounds', array('id' => $dbround->id));
+        } else {
+            // This round is empty so delete without having to remove questions and votes.
+            $dbround = $DB->get_record('hotquestion_rounds', array('id' => $roundid));
+            $DB->delete_records('hotquestion_rounds', array('id' => $dbround->id));
+        }
+        // Now we need to see if we need a new round or have one we can still use.
+        $rounds = $DB->get_records('hotquestion_rounds', array('hotquestion' => $this->instance->id), 'id DESC');
 
-		if ($questions){
-			foreach($questions as $q){
-				$questionID = $q->id; // Get id of first question on the page to delete.
-				$db_question = $DB->get_record('hotquestion_questions', array('id' => $questionID));
-				$DB->delete_records('hotquestion_questions', array('id'=>$db_question->id));
-				// Get an array of all votes on the question that was just deleted, then delete them.
-				$db_vote = $DB->get_records('hotquestion_votes', array('question' => $questionID));
-				$DB->delete_records('hotquestion_votes', array('question'=>$db_question->id));
-				}
-				// Now that all questions and votes are gone, remove the round.
-				$db_round = $DB->get_record('hotquestion_rounds', array('id' => $roundID));
-				$DB->delete_records('hotquestion_rounds', array('id'=>$db_round->id));
-		} else {
-			// This round is empty so delete without having to remove questions and votes.
-			$db_round = $DB->get_record('hotquestion_rounds', array('id' => $roundID));
-			$DB->delete_records('hotquestion_rounds', array('id'=>$db_round->id));
-		}
-		// Now we need to see if we need a new round or have one we can still use.
-		$rounds = $DB->get_records('hotquestion_rounds', array('hotquestion' => $this->instance->id), 'id DESC');
-		//print_object($rounds);
-		
-		foreach ($rounds as $rnd){
-			if ($rnd->endtime == 0) {
-				//debugging('Endtime was 0');
-				//print_object($rnd->endtime);
-				// Deleted a closed round so just return.
-				return;
-			} else {
-				//debugging('Endtime was NOT 0');
-				//print_object($rnd->endtime);
-				// Deleted our open round so create a new round.
-				$round = new StdClass();
-				$round->starttime = time();
-				$round->endtime = 0;
-				$round->hotquestion = $this->instance->id;
-				$round->id = $DB->insert_record('hotquestion_rounds', $round);
-				$rounds[] = $round;
-				return;
-			}
-		}
-        //if (empty($rounds)) {
-
-        //}
-		return $this->current_round;
+        foreach ($rounds as $rnd) {
+            if ($rnd->endtime == 0) {
+                // Deleted a closed round so just return.
+                return;
+            } else {
+                // Deleted our open round so create a new round.
+                $round = new StdClass();
+                $round->starttime = time();
+                $round->endtime = 0;
+                $round->hotquestion = $this->instance->id;
+                $round->id = $DB->insert_record('hotquestion_rounds', $round);
+                $rounds[] = $round;
+                return;
+            }
+        }
+        return $this->current_round;
     }
-	
-	 /**
+
+    /**
      * Download questions.
-     * 
+     *
      * @return nothing
      */
     public function download_questions($array, $filename = "export.csv", $delimiter=";") {
-		global $CFG, $DB, $USER;
-			$data = new StdClass();
-			$data->hotquestion = $this->instance->id;
-			$context = context_module::instance($this->cm->id);
-			// Trigger download_questions event.
-			$event = \mod_hotquestion\event\download_questions::create(array(
-				'objectid' => $data->hotquestion,
-				'context' => $context
-			));
-			$event->trigger();
-			
-		// Construct sql query and filename based on admin or teacher.
-		// Add filename details based on course and HQ activity name.
-		if (is_siteadmin($USER->id)){
-			$whichhqs = ('AND hq.hotquestion > 0');
-			$filename = get_string('exportfilenamep1', 'hotquestion');
-		} else {
-			$whichhqs = ('AND hq.hotquestion = ');
-			$whichhqs .= ($this->instance->id);
-			$filename = ($this->course->shortname).'_';
-			$filename .= ($this->instance->name);
-		}
-		$filename .= get_string('exportfilenamep2', 'hotquestion').gmdate("Ymd_Hi").'GMT.csv';
+        global $CFG, $DB, $USER;
+        $data = new StdClass();
+        $data->hotquestion = $this->instance->id;
+        $context = context_module::instance($this->cm->id);
+        // Trigger download_questions event.
+        $event = \mod_hotquestion\event\download_questions::create(array(
+            'objectid' => $data->hotquestion,
+            'context' => $context
+        ));
+        $event->trigger();
 
-		$params = array();
+        // Construct sql query and filename based on admin or teacher.
+        // Add filename details based on course and HQ activity name.
+        if (is_siteadmin($USER->id)) {
+            $whichhqs = ('AND hq.hotquestion > 0');
+            $filename = get_string('exportfilenamep1', 'hotquestion');
+        } else {
+            $whichhqs = ('AND hq.hotquestion = ');
+            $whichhqs .= ($this->instance->id);
+            $filename = ($this->course->shortname).'_';
+            $filename .= ($this->instance->name);
+        }
+        $filename .= get_string('exportfilenamep2', 'hotquestion').gmdate("Ymd_Hi").'GMT.csv';
 
-		header('Content-Type: text/csv');
-		header('Content-Disposition: attachement; filename="'.$filename.'";');
-		header("Pragma: no-cache");
-		header("Expires: 0");
-   
-		$file = fopen('php://output', 'w');
-		$params = array(get_string('id', 'hotquestion'),
-		                get_string('firstname'),
+        $params = array();
+
+        header('Content-Type: text/csv');
+        header('Content-Disposition: attachement; filename="'.$filename.'";');
+        header("Pragma: no-cache");
+        header("Expires: 0");
+
+        $file = fopen('php://output', 'w');
+        $params = array(get_string('id', 'hotquestion'),
+                        get_string('firstname'),
                         get_string('lastname'),
                         get_string('hotquestion', 'hotquestion'),
                         get_string('content', 'hotquestion'),
                         get_string('userid', 'hotquestion'),
                         get_string('time', 'hotquestion'),
                         get_string('anonymous', 'hotquestion'));
-		fputcsv($file, $params, $delimiter);
+        fputcsv($file, $params, $delimiter);
 
-		$sql = "SELECT hq.id id,
-                  CASE
+        $sql = "SELECT hq.id id,
+                CASE
                     WHEN u.firstname = 'Guest user'
                     THEN CONCAT(u.lastname, 'Anonymous')
                     ELSE u.firstname
-                  END AS 'firstname',
-                          u.lastname AS 'lastname', hq.hotquestion hotquestion, hq.content content, hq.userid userid,
-                  FROM_UNIXTIME(hq.time) AS TIME, hq.anonymous anonymous
-                  FROM {hotquestion_questions} hq
-                  JOIN {user} u ON u.id = hq.userid
-                  WHERE hq.userid > 0 ";
-		$sql .= ($whichhqs);
-		$sql .= " ORDER BY hq.hotquestion, u.id";
-		if ($hqs = $DB->get_records_sql($sql, $params)) {	   
-			foreach($hqs as $q){
-				$fields = array($q->id, $q->firstname, $q->lastname, $q->hotquestion, $q->content, $q->userid, $q->time, $q->anonymous);
-			fputcsv($file, $fields, $delimiter);
-			}
-		}
-		fclose($file);
-		exit;
+                END AS 'firstname',
+                        u.lastname AS 'lastname', hq.hotquestion hotquestion, hq.content content, hq.userid userid,
+                FROM_UNIXTIME(hq.time) AS TIME, hq.anonymous anonymous
+                FROM {hotquestion_questions} hq
+                JOIN {user} u ON u.id = hq.userid
+                WHERE hq.userid > 0 ";
+        $sql .= ($whichhqs);
+        $sql .= " ORDER BY hq.hotquestion, u.id";
+        if ($hqs = $DB->get_records_sql($sql, $params)) {
+            foreach ($hqs as $q) {
+                $fields = array($q->id, $q->firstname, $q->lastname, $q->hotquestion, $q->content, $q->userid, $q->time, $q->anonymous);
+                fputcsv($file, $fields, $delimiter);
+            }
+        }
+        fclose($file);
+        exit;
     }
 }
 
@@ -476,41 +462,40 @@ class mod_hotquestion {
  */
 function hotquestion_count_entries($hotquestion, $groupid = 0) {
 
-	global $DB;
+    global $DB;
 
-	$cm = hotquestion_get_coursemodule($hotquestion->id);
-	$context = context_module::instance($cm->id);
-// Currently, groups are not being used by Hot Question.
-	if ($groupid) {     /// How many in a particular group?
+    $cm = hotquestion_get_coursemodule($hotquestion->id);
+    $context = context_module::instance($cm->id);
+    // Currently, groups are not being used by Hot Question.
+    if ($groupid) {     // How many in a particular group?
 
-		$sql = "SELECT DISTINCT u.id FROM {hotquestion_questions} hq
-				JOIN {groups_members} g ON g.userid = hq.userid
-				JOIN {user} u ON u.id = g.userid
-				WHERE hq.hotquestion = $hotquestion->id AND g.groupid = '$groupid'";
-		$hotquestions = $DB->get_records_sql($sql);
+        $sql = "SELECT DISTINCT u.id FROM {hotquestion_questions} hq
+                JOIN {groups_members} g ON g.userid = hq.userid
+                JOIN {user} u ON u.id = g.userid
+                WHERE hq.hotquestion = $hotquestion->id AND g.groupid = '$groupid'";
+        $hotquestions = $DB->get_records_sql($sql);
 
-	} else { /// Count all the entries from the whole course
+    } else { // Count all the entries from the whole course.
 
-		$sql = "SELECT COUNT(DISTINCT hq.userid) AS ucount, COUNT(DISTINCT hq.content) AS qcount FROM {hotquestion_questions} hq
-				JOIN {user} u ON u.id = hq.userid
-				LEFT JOIN {hotquestion_rounds} hr ON hr.hotquestion=hq.hotquestion
-				WHERE hq.hotquestion = '$hotquestion->id' 
-				    AND hr.endtime=0 
-					AND hq.time>=hr.starttime 
-					AND hq.userid>0";
-					
+        $sql = "SELECT COUNT(DISTINCT hq.userid) AS ucount, COUNT(DISTINCT hq.content) AS qcount FROM {hotquestion_questions} hq
+                JOIN {user} u ON u.id = hq.userid
+                LEFT JOIN {hotquestion_rounds} hr ON hr.hotquestion=hq.hotquestion
+                WHERE hq.hotquestion = '$hotquestion->id' AND
+                hr.endtime=0 AND
+                hq.time>=hr.starttime AND
+                hq.userid>0";
 
-		$hotquestions = $DB->get_records_sql($sql);
-	}
+        $hotquestions = $DB->get_records_sql($sql);
+    }
 
-	if (!$hotquestions) {
-		return 0;
-	}
-	
-	$canadd = get_users_by_capability($context, 'mod/hotquestion:ask', 'u.id');
-	$entriesmanager = get_users_by_capability($context, 'mod/hotquestion:manageentries', 'u.id');
+    if (!$hotquestions) {
+        return 0;
+    }
 
-	return ($hotquestions);
+    $canadd = get_users_by_capability($context, 'mod/hotquestion:ask', 'u.id');
+    $entriesmanager = get_users_by_capability($context, 'mod/hotquestion:manageentries', 'u.id');
+
+    return ($hotquestions);
 }
 
 /**
@@ -521,9 +506,9 @@ function hotquestion_count_entries($hotquestion, $groupid = 0) {
  */
 function hotquestion_get_coursemodule($hotquestionid) {
 
-	global $DB;
+    global $DB;
 
-	return $DB->get_record_sql("SELECT cm.id FROM {course_modules} cm
+    return $DB->get_record_sql("SELECT cm.id FROM {course_modules} cm
 								JOIN {modules} m ON m.id = cm.module
 								WHERE cm.instance = '$hotquestionid' AND m.name = 'hotquestion'");
 }
