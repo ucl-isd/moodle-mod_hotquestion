@@ -71,6 +71,7 @@ $string['previousround'] = 'Previous round';
 $string['question'] = 'Questions';
 $string['questionsubmitted'] = 'Your question has been submitted successfully.';
 $string['questionremove'] = 'Remove';
+$string['questionremovesuccess'] = 'You have successfully removed that question.';
 $string['removeround'] = 'Remove this round';
 $string['removedround'] = 'You have successfully removed this round.';
 $string['resethotquestion'] = 'Delete all questions and votes';
