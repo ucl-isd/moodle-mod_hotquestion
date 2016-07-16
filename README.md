@@ -14,6 +14,8 @@ new round.
 
 New capability added 7/15/2016 that places an entry with link in the 
 Recent Activity block when anyone posts an entry in a Hot Question acitivity.
+Added a Recent activity setting that lets you limit students to seeing
+only their posts. Admin, teachers and managers still see all posts.
 
 New capability added 4/01/2016 that allows admin, teachers, and managers to delete
 any round in the current Hot Question activity if they deem all the questions in the
