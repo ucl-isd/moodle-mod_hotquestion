@@ -1,5 +1,4 @@
 <?php
-
 // This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
@@ -56,11 +55,13 @@ $string['hotquestion:view'] = 'View questions';
 $string['hotquestion:vote'] = 'Vote on questions';
 $string['id'] = 'ID';
 $string['inputquestion'] = 'Submit your question here:';
+$string['inputquestion_descr'] = 'Change submit directions to what you want them to be.';
 $string['invalidquestion'] = 'Empty questions are ignored.';
 $string['modulename'] = 'Hot Question';
 $string['modulename_help'] = 'Hot question enables studends post/vote questions so that teachers know what they are expecting.';
 $string['modulenameplural'] = 'Hot Questions';
 $string['newround'] = 'Open a new round';
+$string['newroundsuccess'] = 'You have successfully opened a new round.';
 $string['newroundconfirm'] = 'Are you sure? (Existing questions and votes will be archived)';
 $string['nextround'] = 'Next round';
 $string['noquestions'] = 'No questions yet.';
@@ -74,6 +75,8 @@ $string['removeround'] = 'Remove this round';
 $string['removedround'] = 'You have successfully removed this round.';
 $string['resethotquestion'] = 'Delete all questions and votes';
 $string['round'] = 'Round {$a}';
+$string['showrecentactivity'] = 'Show recent activity';
+$string['showrecentactivityconfig'] = 'Everyone can see notifications in recent activity reports.';
 $string['time'] = 'Time';
 $string['userid'] = 'Userid';
 $string['vote'] = 'Vote';
