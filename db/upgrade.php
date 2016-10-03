@@ -16,7 +16,7 @@
 
 function xmldb_hotquestion_upgrade($oldversion=0) {
     global $CFG, $DB;
-
+    $dbman = $DB->get_manager(); // Loads ddl manager and xmldb classes.
     $result = true;
 
     // 1.9.0 Upgrade line.
@@ -78,7 +78,44 @@ function xmldb_hotquestion_upgrade($oldversion=0) {
         $rec->action = 'view';
         $result = $DB->insert_record('log_display', $rec);
     }
-        // 2.0 Upgrade start here.
 
+//  Dropping all enums/check contraints from core. MDL-18577
+    if ($result && $oldversion < 2009042700) {
+ 
+    /// Changing list of values (enum) of field type on table forum to none
+        $table = new xmldb_table('forum');
+        $field = new xmldb_field('type', XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null, 'general', 'course');
+ 
+    /// Launch change of list of values for field type
+        $dbman->drop_enum_from_field($table, $field);
+ 
+    /// forum savepoint reached
+        upgrade_mod_savepoint($result, 2009042700, 'forum');
+    }
+
+    // 3.1.0 Upgrade start here.
+    if ($oldversion < 2016100300) {
+
+        // Define field timeopen to be added to hotquestion.
+        $table = new xmldb_table('hotquestion');
+        $field = new xmldb_field('timeopen', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'timemodified');
+
+        // Conditionally launch add field timeopen.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define field timeclose to be added to hotquestion.
+        $table = new xmldb_table('hotquestion');
+        $field = new xmldb_field('timeclose', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'timeopen');
+
+        // Conditionally launch add field timeclose.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Hotquestion savepoint reached.
+        upgrade_mod_savepoint(true, 2016100300, 'hotquestion');
+    }
     return $result;
 }
