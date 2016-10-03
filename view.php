@@ -173,6 +173,20 @@ if (!empty($action)) {
 // Start print page.
 if (!$ajax) {
     echo $output->header();
+    // Allow access at any time to manager and editing teacher but prevent access to students.
+    if (!(has_capability('mod/hotquestion:manage', $context))) {
+        // Check availability timeopen and timeclose. Added 10/2/16.
+        if (!(is_available($hotquestion))) {  // Availability restrictions.
+            if ($hotquestion->timeclose != 0 && time() > $hotquestion->timeclose) {
+                echo $output->hotquestion_inaccessible(get_string('hotquestionclosed', 'hotquestion', userdate($hotquestion->timeopen)));
+            } else {
+                echo $output->hotquestion_inaccessible(get_string('hotquestion', 'hotquestion', userdate($hotquestion->timeclose)));
+            }
+        echo $OUTPUT->footer();
+        exit();
+        //} else if {   // Password code can go here.
+        }
+    }
     // Print hotquestion description.
     echo $output->introduction();
     // Print ask form.

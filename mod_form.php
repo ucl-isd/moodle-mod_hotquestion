@@ -36,7 +36,8 @@ class mod_hotquestion_mod_form extends moodleform_mod {
     public function definition() {
 
         global $COURSE, $CFG;
-        $mform =& $this->_form;
+        // $mform =& $this->_form;
+        $mform = $this->_form;
 
         // Adding the "general" fieldset, where all the common settings are shown.
         $mform->addElement('header', 'general', get_string('general', 'form'));
@@ -46,7 +47,8 @@ class mod_hotquestion_mod_form extends moodleform_mod {
         if (!empty($CFG->formatstringstriptags)) {
             $mform->setType('name', PARAM_TEXT);
         } else {
-            $mform->setType('name', PARAM_CLEAN);
+            // $mform->setType('name', PARAM_CLEAN);
+            $mform->setType('name', PARAM_CLEANHTML);
         }
         $mform->addRule('name', null, 'required', null, 'client');
         $mform->addRule('name', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
@@ -55,7 +57,7 @@ class mod_hotquestion_mod_form extends moodleform_mod {
         if ($CFG->branch < 29) {
             $this->add_intro_editor(true, get_string('description'));
         } else {
-            $this->standard_intro_elements();
+            $this->standard_intro_elements(get_string('description', 'hotquestion'));
         }
 
         // Adding the rest of hotquestion settings, spreading them into this fieldset
@@ -64,8 +66,20 @@ class mod_hotquestion_mod_form extends moodleform_mod {
         $mform->addElement('selectyesno', 'anonymouspost', get_string('allowanonymouspost', 'hotquestion'));
         $mform->setDefault('anonymouspost', '1');
 
+        // Availability.
+        $mform->addElement('header', 'availabilityhdr', get_string('availability'));
+
+        $mform->addElement('date_time_selector', 'timeopen',
+                           get_string('hotquestionopentime', 'hotquestion'),
+                           array('optional' => true, 'step' => 1));
+        $mform->addElement('date_time_selector', 'timeclose',
+                           get_string('hotquestionclosetime', 'hotquestion'),
+                           array('optional' => true, 'step' => 1));
+
         // Add standard elements, common to all modules.
         $this->standard_coursemodule_elements();
+        // Next line was missing. Added Sep 30, 2016.
+        $this->apply_admin_defaults();
 
         // Add standard buttons, common to all modules.
         $this->add_action_buttons();

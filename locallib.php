@@ -497,7 +497,16 @@ function hotquestion_count_entries($hotquestion, $groupid = 0) {
 
     return ($hotquestions);
 }
-
+/**
+ * Returns availability status.
+ * Added 10/2/16.
+ *
+ */
+function is_available($hotquestion) {
+    $timeopen = $hotquestion->timeopen;
+    $timeclose = $hotquestion->timeclose;
+    return (($timeopen == 0 || time() >= $timeopen) && ($timeclose == 0 || time() < $timeclose));
+}
 /**
  * Returns the hotquestion instance course_module id
  *

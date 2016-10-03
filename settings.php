@@ -31,10 +31,13 @@ if ($ADMIN->fulltree) {
     require_once($CFG->dirroot.'/mod/hotquestion/locallib.php');
 
     // Recent activity setting.
-    $name = new lang_string('showrecentactivity', 'hotquestion');
-    $description = new lang_string('showrecentactivityconfig', 'hotquestion');
-    $settings->add(new admin_setting_configcheckbox('hotquestion/showrecentactivity',
+    $name = new lang_string('showrecentactivity', 'mod_hotquestion');
+    $description = new lang_string('showrecentactivityconfig', 'mod_hotquestion');
+    $setting = new admin_setting_configcheckbox('mod_hotquestion/showrecentactivity',
                                                     $name,
                                                     $description,
-                                                    0));
+                                                    0);
+    $setting->set_advanced_flag_options(admin_setting_flag::ENABLED, false);
+    $setting->set_locked_flag_options(admin_setting_flag::ENABLED, false);
+    $settings->add($setting);
 }

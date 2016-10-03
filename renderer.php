@@ -214,5 +214,25 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
         }
         return $output;
     }
+    /**
+     * Returns HTML for a hotquestion inaccessible message.
+     * Added 10/2/16
+     * @param string $message
+     * @return <type>
+     */
+    public function hotquestion_inaccessible($message) {
+        global $CFG;
+        $output  = $this->output->box_start('generalbox boxaligncenter');
+        $output .= $this->output->box_start('center');
+        $output .= (get_string('notavailable', 'hotquestion'));
+        $output .= $message;
+        $output .= $this->output->box('<a href="'.$CFG->wwwroot.'/course/view.php?id='
+                . $this->page->course->id .'">'
+                . get_string('returnto', 'hotquestion', format_string($this->page->course->fullname, true))
+                .'</a>', 'hotquestionbutton standardbutton');
+        $output .= $this->output->box_end();
+        $output .= $this->output->box_end();
+        return $output;
+    }
 }
 
