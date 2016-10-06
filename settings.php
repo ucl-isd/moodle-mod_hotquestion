@@ -40,4 +40,12 @@ if ($ADMIN->fulltree) {
     $setting->set_advanced_flag_options(admin_setting_flag::ENABLED, false);
     $setting->set_locked_flag_options(admin_setting_flag::ENABLED, false);
     $settings->add($setting);
+
+    // Default submit instructions setting.
+    $settings->add(new admin_setting_configtext(
+        'mod_hotquestion/submitinstructions',
+        new lang_string('inputquestion', 'hotquestion'),
+        new lang_string('inputquestion_descr', 'hotquestion'),
+        'Submit your question here:', PARAM_TEXT, 25)
+    );
 }
