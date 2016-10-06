@@ -8,6 +8,12 @@ which can access the moodle site. Students can also vote on others'
 questions, so that the hottest questions will be popped up to the top of
 the list. Teachers can make oral comments on selected questions in classroom.
 
+Added new setting capability 10/6/2016 to display description on a course page.
+Added new setting capability 10/6/2016 for availability dates for open and close.
+Added new setting capability 10/6/2016 to allow creator to change wording of submit
+directions text.
+Included new icon 10/6/2016 for optional use.
+
 Enhanced remove question capability 7/16/2016 to show a message that you
 have successfully removed a question. Reworded the message for opening a
 new round.
