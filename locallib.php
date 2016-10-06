@@ -34,29 +34,18 @@ class mod_hotquestion {
     public $cm;
     public $course;
 
-    protected $current_round;
-    protected $prev_round;
-    protected $next_round;
+    protected $currentround;
+    protected $prevround;
+    protected $nextround;
 
     public function __construct($cmid, $roundid = -1) {
         global $DB;
         $this->cm        = get_coursemodule_from_id('hotquestion', $cmid, 0, false, MUST_EXIST);
         $this->course    = $DB->get_record('course', array('id' => $this->cm->course), '*', MUST_EXIST);
         $this->instance  = $DB->get_record('hotquestion', array('id' => $this->cm->instance), '*', MUST_EXIST);
-        $this->set_current_round($roundid);
+        $this->set_currentround($roundid);
     }
 
-    /**
-     * Returns availability status.
-     * Added 10/2/16.
-     *
-     */
-    public function is_available($hotquestion) {
-        $timeopen = $hotquestion->timeopen;
-        $timeclose = $hotquestion->timeclose;
-        return (($timeopen == 0 || time() >= $timeopen) && ($timeclose == 0 || time() < $timeclose));
-    }
-    
     /**
      * Return whether the user has voted on specified question.
      *
@@ -213,7 +202,7 @@ class mod_hotquestion {
      * @global object
      * @param int $roundid
      */
-    public function set_current_round($roundid = -1) {
+    public function set_currentround($roundid = -1) {
         global $DB;
 
         $rounds = $DB->get_records('hotquestion_rounds', array('hotquestion' => $this->instance->id), 'id ASC');
@@ -228,27 +217,27 @@ class mod_hotquestion {
         }
 
         if ($roundid != -1 && array_key_exists($roundid, $rounds)) {
-            $this->current_round = $rounds[$roundid];
+            $this->currentround = $rounds[$roundid];
 
             $ids = array_keys($rounds);
             // Search previous round.
             $currentkey = array_search($roundid, $ids);
             if (array_key_exists($currentkey - 1, $ids)) {
-                $this->prev_round = $rounds[$ids[$currentkey - 1]];
+                $this->prevround = $rounds[$ids[$currentkey - 1]];
             } else {
-                $this->prev_round = null;
+                $this->prevround = null;
             }
             // Search next round.
             if (array_key_exists($currentkey + 1, $ids)) {
-                $this->next_round = $rounds[$ids[$currentkey + 1]];
+                $this->nextround = $rounds[$ids[$currentkey + 1]];
             } else {
-                $this->next_round = null;
+                $this->nextround = null;
             }
         } else {
             // Use the last round.
-            $this->current_round = array_pop($rounds);
-            $this->prev_round = array_pop($rounds);
-            $this->next_round = null;
+            $this->currentround = array_pop($rounds);
+            $this->prevround = array_pop($rounds);
+            $this->nextround = null;
         }
         return $roundid;
     }
@@ -258,8 +247,8 @@ class mod_hotquestion {
      *
      * @return object
      */
-    public function get_current_round() {
-        return $this->current_round;
+    public function get_currentround() {
+        return $this->currentround;
     }
 
     /**
@@ -267,8 +256,8 @@ class mod_hotquestion {
      *
      * @return object
      */
-    public function get_prev_round() {
-        return $this->prev_round;
+    public function get_prevround() {
+        return $this->prevround;
     }
 
     /**
@@ -276,22 +265,22 @@ class mod_hotquestion {
      *
      * @return object
      */
-    public function get_next_round() {
-        return $this->next_round;
+    public function get_nextround() {
+        return $this->nextround;
     }
 
     /**
-     * Return questions according to $current_round.
+     * Return questions according to $currentround.
      *
      * @global object
      * @return all questions with vote count in current round.
      */
     public function get_questions() {
         global $DB;
-        if ($this->current_round->endtime == 0) {
-            $this->current_round->endtime = 0xFFFFFFFF;  // Hack.
+        if ($this->currentround->endtime == 0) {
+            $this->currentround->endtime = 0xFFFFFFFF;  // Hack.
         }
-        $params = array($this->instance->id, $this->current_round->starttime, $this->current_round->endtime);
+        $params = array($this->instance->id, $this->currentround->starttime, $this->currentround->endtime);
         return $DB->get_records_sql('SELECT q.*, count(v.voter) as votecount
                                      FROM {hotquestion_questions} q
                                          LEFT JOIN {hotquestion_votes} v
@@ -318,7 +307,7 @@ class mod_hotquestion {
             $dbvote = $DB->get_records('hotquestion_votes', array('question' => $questionid));
             $DB->delete_records('hotquestion_votes', array('question' => $dbquestion->id));
         }
-        return $this->current_round;
+        return $this->currentround;
     }
 
     /**
@@ -342,10 +331,10 @@ class mod_hotquestion {
         $event->trigger();
 
         $roundid = $_GET['round'];
-        if ($this->current_round->endtime == 0) {
-            $this->current_round->endtime = 0xFFFFFFFF;  // Hack.
+        if ($this->currentround->endtime == 0) {
+            $this->currentround->endtime = 0xFFFFFFFF;  // Hack.
         }
-        $params = array($this->instance->id, $this->current_round->starttime, $this->current_round->endtime);
+        $params = array($this->instance->id, $this->currentround->starttime, $this->currentround->endtime);
         $questions = $DB->get_records_sql('SELECT q.*, count(v.voter) as votecount
                                      FROM {hotquestion_questions} q
                                          LEFT JOIN {hotquestion_votes} v
@@ -391,7 +380,7 @@ class mod_hotquestion {
                 return;
             }
         }
-        return $this->current_round;
+        return $this->currentround;
     }
 
     /**
@@ -509,7 +498,16 @@ function hotquestion_count_entries($hotquestion, $groupid = 0) {
     return ($hotquestions);
 }
 
-
+    /**
+     * Returns availability status.
+     * Added 10/2/16.
+     *
+     */
+function hq_available($hotquestion) {
+    $timeopen = $hotquestion->timeopen;
+    $timeclose = $hotquestion->timeclose;
+    return (($timeopen == 0 || time() >= $timeopen) && ($timeclose == 0 || time() < $timeclose));
+}
 
 /**
  * Returns the hotquestion instance course_module id
