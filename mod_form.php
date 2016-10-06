@@ -36,8 +36,8 @@ class mod_hotquestion_mod_form extends moodleform_mod {
     public function definition() {
 
         global $COURSE, $CFG;
-        // $mform =& $this->_form;
-        $mform = $this->_form;
+        $mform =& $this->_form;
+        //$mform = $this->_form;
 
         // Adding the "general" fieldset, where all the common settings are shown.
         $mform->addElement('header', 'general', get_string('general', 'form'));
@@ -62,6 +62,17 @@ class mod_hotquestion_mod_form extends moodleform_mod {
 
         // Adding the rest of hotquestion settings, spreading them into this fieldset
         // or adding more fieldsets ('header' elements), if needed for better logic.
+
+        // Add submit instruction text field here.
+        $mform->addElement('text', 'submitdirections', get_string('inputquestion', 'hotquestion'), array('size' => '64'));
+        if (!empty($CFG->formatstringstriptags)) {
+            $mform->setType('submitdirections', PARAM_TEXT);
+        } else {
+            $mform->setType('submitdirections', PARAM_CLEANHTML);
+        }
+        $mform->addRule('submitdirections', null, 'required', null, 'client');
+        $mform->addRule('submitdirections', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
+
         // Adding 'anonymouspost' field.
         $mform->addElement('selectyesno', 'anonymouspost', get_string('allowanonymouspost', 'hotquestion'));
         $mform->setDefault('anonymouspost', '1');
@@ -91,14 +102,17 @@ class mod_hotquestion_mod_form extends moodleform_mod {
 class hotquestion_form extends moodleform {
 
     public function definition() {
-        global $CFG;
+        global $CFG, $DB;
 
         list($allowanonymous, $cm) = $this->_customdata;
 
+        $temp = $DB->get_record('hotquestion', array('id' => $cm->instance));
+
         $mform =& $this->_form;
-        $mform->addElement('textarea', 'question', get_string('inputquestion', 'hotquestion'), 'wrap="virtual" rows="3" cols="50"');
-        // Next line is there for a possible config setting.
-        // $mform->addElement('textarea', 'question', get_config('mod_hotquestion','inputquestion'), 'wrap="virtual" rows="3" cols="50"');
+
+        // Next line is to retrieve submit instruction setting and creates the text post area.
+        $mform->addElement('textarea', 'question', $temp->submitdirections, 'wrap="virtual" rows="3" cols="50"');
+
         $mform->setType('question', PARAM_TEXT);
         $mform->addElement('hidden', 'id', $cm->id, 'id="hotquestion_courseid"');
         $mform->setType('id', PARAM_INT);
