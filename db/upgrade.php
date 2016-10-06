@@ -79,22 +79,17 @@ function xmldb_hotquestion_upgrade($oldversion=0) {
         $result = $DB->insert_record('log_display', $rec);
     }
 
-//  Dropping all enums/check contraints from core. MDL-18577
-    if ($result && $oldversion < 2009042700) {
- 
-    /// Changing list of values (enum) of field type on table forum to none
-        $table = new xmldb_table('forum');
-        $field = new xmldb_field('type', XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null, 'general', 'course');
- 
-    /// Launch change of list of values for field type
-        $dbman->drop_enum_from_field($table, $field);
- 
-    /// forum savepoint reached
-        upgrade_mod_savepoint($result, 2009042700, 'forum');
-    }
-
     // 3.1.0 Upgrade start here.
     if ($oldversion < 2016100300) {
+
+        // Define field submitdirections to be added to hotquestion.
+        $table = new xmldb_table('hotquestion');
+        $field = new xmldb_field('submitdirections', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, 'Submit your question here', 'introformat');
+
+        // Conditionally launch add field submitdirections.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
 
         // Define field timeopen to be added to hotquestion.
         $table = new xmldb_table('hotquestion');
