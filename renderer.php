@@ -53,10 +53,10 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
     /**
      * Return the toolbar
      *
-     * @param bool $show_new whether show "New round" button
+     * @param bool $shownew whether show "New round" button
      * return alist of links
      */
-    public function toolbar($show_new = true) {
+    public function toolbar($shownew = true) {
         $output = '';
         $toolbuttons = array();
         $roundp = new stdClass();
@@ -65,7 +65,7 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
         $roundp = '';
 
         // Print export to .csv file toolbutton.
-        if ($show_new) {
+        if ($shownew) {
             $options = array();
             $options['id'] = $this->hotquestion->cm->id;
             $options['action'] = 'download';
@@ -76,19 +76,19 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
         }
 
         // Print prev/next round toolbuttons.
-        if ($this->hotquestion->get_prev_round() != null) {
-            $roundp = $this->hotquestion->get_prev_round()->id;
+        if ($this->hotquestion->get_prevround() != null) {
+            $roundp = $this->hotquestion->get_prevround()->id;
             $roundn = '';
-            // $url = new moodle_url('/mod/hotquestion/view.php', array('id'=>$this->hotquestion->cm->id, 'round'=>$this->hotquestion->get_prev_round()->id));
+
             $url = new moodle_url('/mod/hotquestion/view.php', array('id' => $this->hotquestion->cm->id, 'round' => $roundp));
             $toolbuttons[] = html_writer::link($url, $this->pix_icon('t/collapsed_rtl', get_string('previousround', 'hotquestion')), array('class' => 'toolbutton'));
         } else {
             $toolbuttons[] = html_writer::tag('span', $this->pix_icon('t/collapsed_empty_rtl', ''), array('class' => 'dis_toolbutton'));
         }
-        if ($this->hotquestion->get_next_round() != null) {
-            $roundn = $this->hotquestion->get_next_round()->id;
+        if ($this->hotquestion->get_nextround() != null) {
+            $roundn = $this->hotquestion->get_nextround()->id;
             $roundp = '';
-            // $url = new moodle_url('/mod/hotquestion/view.php', array('id'=>$this->hotquestion->cm->id, 'round'=>$this->hotquestion->get_next_round()->id));
+
             $url = new moodle_url('/mod/hotquestion/view.php', array('id' => $this->hotquestion->cm->id, 'round' => $roundn));
             $toolbuttons[] = html_writer::link($url, $this->pix_icon('t/collapsed', get_string('nextround', 'hotquestion')), array('class' => 'toolbutton'));
         } else {
@@ -96,7 +96,7 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
         }
 
         // Print new round toolbutton.
-        if ($show_new) {
+        if ($shownew) {
             $options = array();
             $options['id'] = $this->hotquestion->cm->id;
             $options['action'] = 'newround';
@@ -105,11 +105,11 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
         }
 
         // Print remove round toolbutton.
-        if ($show_new) {
+        if ($shownew) {
             $options = array();
             $options['id'] = $this->hotquestion->cm->id;
             $options['action'] = 'removeround';
-            $options['round'] = $this->hotquestion->get_current_round()->id;
+            $options['round'] = $this->hotquestion->get_currentround()->id;
             $url = new moodle_url('/mod/hotquestion/view.php', $options);
             $toolbuttons[] = html_writer::link($url, $this->pix_icon('t/less', get_string('removeround', 'hotquestion')), array('class' => 'toolbutton'));
         }
@@ -132,10 +132,10 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
      * @global object
      * @global object
      * @global object
-     * @param bool $allow_vote whether current user has vote cap
+     * @param bool $allowvote whether current user has vote cap
      * return table of questionlist
      */
-    public function questions($allow_vote = true) {
+    public function questions($allowvote = true) {
         global $DB, $CFG, $USER;
         $output = '';
         $formatoptions = new stdClass();
@@ -181,7 +181,7 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
                 $remove = '';
 
                 // Print the vote cron case.
-                if ($allow_vote && $this->hotquestion->can_vote_on($question)) {
+                if ($allowvote && $this->hotquestion->can_vote_on($question)) {
                     if (!$this->hotquestion->has_voted($question->id)) {
                         $heat .= '&nbsp;<a href="view.php?id='
                               .$this->hotquestion->cm->id
@@ -205,7 +205,7 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
                             .get_string('questionremove', 'hotquestion') .'"/></a>';
                     $line[] = $remove;
 
-                } 
+                }
                 $table->data[] = $line;
             }
             $output .= html_writer::table($table);
