@@ -52,7 +52,7 @@ class backup_hotquestion_activity_structure_step extends backup_activity_structu
 
         // Define each element separated.
         $hotquestion = new backup_nested_element('hotquestion', array('id'), array(
-            'name', 'intro', 'introformat', 'timecreated',
+            'name', 'intro', 'introformat', 'submitdirections', 'timecreated',
             'timemodified', 'anonymouspost'));
 
         $questions = new backup_nested_element('questions');
