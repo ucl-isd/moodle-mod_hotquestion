@@ -25,6 +25,14 @@
 namespace mod_hotquestion\event;
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * The mod_hotquestion remove question class.
+ *
+ * @package    mod_hotquestion
+ * @since      Moodle 2.7
+ * @copyright  2016 drachels@drachels.com
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class remove_question extends \core\event\base {
 
     /**
@@ -51,7 +59,8 @@ class remove_question extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        return "The user with id '$this->userid' has removed a question and it's votes for the hotquestion activity with the course module id
+        return "The user with id '$this->userid' has removed a question and it's votes
+            for the hotquestion activity with the course module id
             '$this->contextinstanceid'";
     }
 

@@ -25,6 +25,14 @@
 namespace mod_hotquestion\event;
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * The mod_hotquestion add round class.
+ *
+ * @package    mod_hotquestion
+ * @since      Moodle 2.7
+ * @copyright  2014 drachels@drachels.com
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class add_round extends \core\event\base {
 
     /**
@@ -51,7 +59,8 @@ class add_round extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        return "The user with id '$this->userid' has started a new round of questions for the hotquestion activity with the course module id
+        return "The user with id '$this->userid' has started a new round of questions
+            for the hotquestion activity with the course module id
             '$this->contextinstanceid'";
     }
 

@@ -15,21 +15,37 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package moodlecore
- * @subpackage backup-moodle2
+ * Define all the restore steps that will be used by the restore_hotquestion_activity_task.
+ *
+ * @package mod_hotquestion
  * @copyright 2010 onwards Eloy Lafuente (stronk7) {@link http://stronk7.com}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 /**
- * Define all the restore steps that will be used by the restore_hotquestion_activity_task.
+ 
  */
 
 /**
  * Structure step to restore one hotquestion activity.
  */
+
+defined('MOODLE_INTERNAL') || die();
+
+/**
+ * Define the complete hotquestion structure for restore, with file and id annotations
+ *
+ * @package   mod_hotquestion
+ * @copyright 2010 onwards Eloy Lafuente (stronk7) {@link http://stronk7.com}
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class restore_hotquestion_activity_structure_step extends restore_activity_structure_step {
 
+    /**
+     * Define the structure of the restore workflow.
+     *
+     * @return restore_path_element $structure
+     */
     protected function define_structure() {
 
         $paths = array();
@@ -46,6 +62,12 @@ class restore_hotquestion_activity_structure_step extends restore_activity_struc
         return $this->prepare_activity_structure($paths);
     }
 
+    /**
+     * Process a hotquestion restore.
+     *
+     * @param object $data The data in object form.
+     * @return void
+     */
     protected function process_hotquestion($data) {
         global $DB;
 
@@ -62,6 +84,11 @@ class restore_hotquestion_activity_structure_step extends restore_activity_struc
         $this->apply_activity_instance($newitemid);
     }
 
+    /**
+     * Process a question restore.
+     * @param object $data The data in object form.
+     * @return void
+     */
     protected function process_hotquestion_question($data) {
         global $DB;
 
@@ -76,6 +103,11 @@ class restore_hotquestion_activity_structure_step extends restore_activity_struc
         $this->set_mapping('hotquestion_question', $oldid, $newitemid);
     }
 
+    /**
+     * Process a round restore.
+     * @param object $data The data in object form.
+     * @return void
+     */
     protected function process_hotquestion_round($data) {
         global $DB;
 
@@ -91,6 +123,11 @@ class restore_hotquestion_activity_structure_step extends restore_activity_struc
         // (child paths, file areas nor links decoder).
     }
 
+    /**
+     * Process a vote restore.
+     * @param object $data The data in object form.
+     * @return void
+     */
     protected function process_hotquestion_vote($data) {
         global $DB;
 
@@ -104,6 +141,10 @@ class restore_hotquestion_activity_structure_step extends restore_activity_struc
         // (child paths, file areas nor links decoder).
     }
 
+    /**
+     * Once the database tables have been fully restored, restore the files.
+     * @return void
+     */
     protected function after_execute() {
         // Add hotquestion related files, no need to match by itemname (just internally handled context).
         $this->add_related_files('mod_hotquestion', 'intro', null);

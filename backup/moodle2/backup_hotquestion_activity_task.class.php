@@ -15,18 +15,24 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package moodlecore
- * @subpackage backup-moodle2
+ * This file contains the backup activity for the hotquestion module.
+ * @package mod_hotquestion
  * @copyright 2010 onwards Eloy Lafuente (stronk7) {@link http://stronk7.com}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once($CFG->dirroot . '/mod/hotquestion/backup/moodle2/backup_hotquestion_stepslib.php'); // Because it exists (must).
-require_once($CFG->dirroot . '/mod/hotquestion/backup/moodle2/backup_hotquestion_settingslib.php'); // Because it exists optional).
+defined('MOODLE_INTERNAL') || die();
+// Because it must exist.
+require_once($CFG->dirroot . '/mod/hotquestion/backup/moodle2/backup_hotquestion_stepslib.php'); 
+// Because it exists optional).
+require_once($CFG->dirroot . '/mod/hotquestion/backup/moodle2/backup_hotquestion_settingslib.php'); 
 
 /**
- * hotquestion backup task that provides all the settings and steps to perform one
- * complete backup of the activity
+ * Hotquestion backup task that provides all the settings and steps to perform one complete backup of the activity.
+ *
+ * @package   mod_hotquestion
+ * @copyright 2012 NetSpot {@link http://www.netspot.com.au}
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class backup_hotquestion_activity_task extends backup_activity_task {
 
@@ -48,6 +54,8 @@ class backup_hotquestion_activity_task extends backup_activity_task {
     /**
      * Code the transformations to perform in the activity in
      * order to get transportable encoded) links.
+     * @param string $content
+     * @return string
      */
     static public function encode_content_links($content) {
         global $CFG;

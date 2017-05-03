@@ -31,13 +31,23 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/course/moodleform_mod.php');
 
+/**
+ * Standard base class for mod_hotquestion configuration form.
+ *
+ * @package   mod_hotquestion
+ * @copyright 2011 Sun Zhigang
+ * @copyright 2016 onwards AL Rachels drachels@drachels.com
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class mod_hotquestion_mod_form extends moodleform_mod {
 
+    /**
+     * Define the HotQuestion mod_form.
+     */
     public function definition() {
 
         global $COURSE, $CFG;
         $mform =& $this->_form;
-        //$mform = $this->_form;
 
         // Adding the "general" fieldset, where all the common settings are shown.
         $mform->addElement('header', 'general', get_string('general', 'form'));
@@ -47,7 +57,6 @@ class mod_hotquestion_mod_form extends moodleform_mod {
         if (!empty($CFG->formatstringstriptags)) {
             $mform->setType('name', PARAM_TEXT);
         } else {
-            // $mform->setType('name', PARAM_CLEAN);
             $mform->setType('name', PARAM_CLEANHTML);
         }
         $mform->addRule('name', null, 'required', null, 'client');
@@ -98,9 +107,19 @@ class mod_hotquestion_mod_form extends moodleform_mod {
     }
 }
 
-// Form for submitting question.
+/**
+ * Standard base class for hotquestion_form for submitting question.
+ *
+ * @package   mod_hotquestion
+ * @copyright 2011 Sun Zhigang
+ * @copyright 2016 onwards AL Rachels drachels@drachels.com
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class hotquestion_form extends moodleform {
 
+    /**
+     * Define the HotQuestion form.
+     */
     public function definition() {
         global $CFG, $DB;
 

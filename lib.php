@@ -144,9 +144,12 @@ function get_question_list($hotquestionid) {
  * Return a small object with summary information about what a
  * user has done with a given particular instance of this module
  * Used for user activity reports.
+ * @param int $course
+ * @param int $user
+ * @param int $mod
+ * @param int $hotquestion
  * $return->time = the time they did it
  * $return->info = a short text description
- *
  * @return null
  * @todo Finish documenting this function
  */
@@ -160,7 +163,10 @@ function hotquestion_user_outline($course, $user, $mod, $hotquestion) {
 /**
  * Print a detailed representation of what a user has done with
  * a given particular instance of this module, for user activity reports.
- *
+ * @param int $course
+ * @param int $user
+ * @param int $mod
+ * @param int $hotquestion
  * @return boolean
  * @todo Finish documenting this function
  */
@@ -173,8 +179,6 @@ function hotquestion_user_complete($course, $user, $mod, $hotquestion) {
  * that has occurred in hotquestion activities and print it out.
  * Return true if there was output, or false is there was none.
  *
- * @global stdClass $DB
- * @global stdClass $OUTPUT
  * @param stdClass $course
  * @param bool $viewfullnames
  * @param int $timestart
@@ -295,8 +299,7 @@ function hotquestion_cron () {
  * independient of his role (student, teacher, admin...). The returned
  * objects must contain at least id property.
  * See other modules as example.
- *
- * @param int $hotquestionid ID of an instance of this module
+ * @param int $hotquestionid
  * @return boolean|array false if no participants, array of objects otherwise
  */
 function hotquestion_get_participants($hotquestionid) {
@@ -308,9 +311,8 @@ function hotquestion_get_participants($hotquestionid) {
  * This function will remove all posts from the specified forum
  * and clean up any related data.
  *
- * @global object
- * @param $data the data submitted from the reset course.
- * @return array status array
+ * @param stdClass $data
+ * @return array
  */
 function hotquestion_reset_userdata($data) {
     global $DB;
@@ -333,7 +335,7 @@ function hotquestion_reset_userdata($data) {
 /**
  * Called by course/reset.php
  *
- * @param $mform form passed by reference
+ * @param stdClass $mform
  */
 function hotquestion_reset_course_form_definition(&$mform) {
     $mform->addElement('header', 'hotquestionheader', get_string('modulenameplural', 'hotquestion'));
@@ -356,18 +358,30 @@ function hotquestion_reset_course_form_definition(&$mform) {
  */
 function hotquestion_supports($feature) {
     switch($feature) {
-        case FEATURE_GROUPS:                  return false;
-        case FEATURE_GROUPINGS:               return false;
-        case FEATURE_GROUPMEMBERSONLY:        return false;
-        case FEATURE_MOD_INTRO:               return true;
-        case FEATURE_COMPLETION_TRACKS_VIEWS: return false;
-        case FEATURE_COMPLETION_HAS_RULES:    return false;
-        case FEATURE_GRADE_HAS_GRADE:         return false;
-        case FEATURE_GRADE_OUTCOMES:          return false;
-        case FEATURE_RATE:                    return false;
-        case FEATURE_SHOW_DESCRIPTION:        return true;
-        case FEATURE_BACKUP_MOODLE2:          return true;
+        case FEATURE_GROUPS:
+            return false;
+        case FEATURE_GROUPINGS:
+            return false;
+        case FEATURE_GROUPMEMBERSONLY:
+            return false;
+        case FEATURE_MOD_INTRO:
+            return true;
+        case FEATURE_COMPLETION_TRACKS_VIEWS:
+            return false;
+        case FEATURE_COMPLETION_HAS_RULES:
+            return false;
+        case FEATURE_GRADE_HAS_GRADE:
+            return false;
+        case FEATURE_GRADE_OUTCOMES:
+            return false;
+        case FEATURE_RATE:
+            return false;
+        case FEATURE_SHOW_DESCRIPTION:
+            return true;
+        case FEATURE_BACKUP_MOODLE2:
+            return true;
 
-        default: return null;
+        default:
+            return null;
     }
 }

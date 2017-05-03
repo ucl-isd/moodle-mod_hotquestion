@@ -15,8 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package moodlecore
- * @subpackage backup-moodle2
+ * Define all the backup steps that will be used by the backup_hotquestion_activity_task.
+ *
+ * @package mod_hotquestion
  * @copyright 2010 onwards Eloy Lafuente (stronk7) {@link http://stronk7.com}
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -24,3 +25,5 @@
  // This activity has no particular settings but those inherited from the generic
  // backup_activity_task so here there isn't any class definition, like the ones
  // existing in /backup/moodle2/backup_settingslib.php activities section).
+
+defined('MOODLE_INTERNAL') || die();

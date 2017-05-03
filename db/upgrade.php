@@ -14,6 +14,22 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+/**
+ * Upgrade code for install
+ *
+ * @package   mod_hotquestion
+ * @copyright 2012 Zhang Anzhen
+ * @copyright 2016 onwards AL Rachels drachels@drachels.com
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+defined('MOODLE_INTERNAL') || die();
+
+/**
+ * Upgrade this hotquestion instance - this function could be skipped but it will be needed later.
+ * @param int $oldversion The old version of the hotquestion module
+ * @return bool
+ */
 function xmldb_hotquestion_upgrade($oldversion=0) {
     global $CFG, $DB;
     $dbman = $DB->get_manager(); // Loads ddl manager and xmldb classes.
@@ -84,7 +100,8 @@ function xmldb_hotquestion_upgrade($oldversion=0) {
 
         // Define field submitdirections to be added to hotquestion.
         $table = new xmldb_table('hotquestion');
-        $field = new xmldb_field('submitdirections', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL, null, 'Submit your question here', 'introformat');
+        $field = new xmldb_field('submitdirections', XMLDB_TYPE_CHAR, '255', null, XMLDB_NOTNULL,
+            null, 'Submit your question here', 'introformat');
 
         // Conditionally launch add field submitdirections.
         if (!$dbman->field_exists($table, $field)) {

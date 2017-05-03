@@ -25,6 +25,14 @@
 namespace mod_hotquestion\event;
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * The mod_hotquestion entry updated class.
+ *
+ * @package    mod_hotquestion
+ * @since      Moodle 2.7
+ * @copyright  2014 drachels@drachels.com
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class entry_updated extends \core\event\base {
 
     /**

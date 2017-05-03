@@ -113,12 +113,12 @@ M.mod_hotquestion.submit = function(e) {
     var data = '';
     inputs.each(function(node, index, nodelist) {
         if (node.get('type') != 'checkbox') {
-            data += node.get('name')+'='+node.get('value')+'&';
+            data += node.get('name') + '=' + node.get('value') + '&';
         } else {
-            data += node.get('name')+'='+node.get('checked')+'&';
+            data += node.get('name') + '=' + node.get('checked') + '&';
         }
     });
-    data += 'question='+question+'&';
+    data += 'question=' + question + '&';
     data += 'ajax=1';
 
     var cfg = {
@@ -130,4 +130,3 @@ M.mod_hotquestion.submit = function(e) {
     };
     var request = M.mod_hotquestion.Y.io('view.php', cfg);
 }
-

@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * The mod_hotquestion add round event.
+ * The mod_hotquestion update vote event.
  *
  * @package     mod_hotquestion
  * @copyright   2014 AL Rachels drachels@drachels.com
@@ -25,6 +25,14 @@
 namespace mod_hotquestion\event;
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * The mod_hotquestion update vote event class.
+ *
+ * @package    mod_hotquestion
+ * @since      Moodle 2.7
+ * @copyright  2014 drachels@drachels.com
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class update_vote extends \core\event\base {
 
     /**

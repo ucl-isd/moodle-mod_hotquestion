@@ -15,8 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * A custmom renderer class that extends the plugin_renderer_base and is used by the hotquestion module
- * and is used by the hotquestion module.
+ * This file contains a renderer for the hotquestion module.
  *
  * @package   mod_hotquestion
  * @copyright 2012 Zhang Anzhen
@@ -25,7 +24,20 @@
  */
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * A custmom renderer class that extends the plugin_renderer_base and is used by the hotquestion module.
+ *
+ * @package   mod_hotquestion
+ * @copyright 2012 Zhang Anzhen
+ * @copyright 2016 onwards AL Rachels drachels@drachels.com
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class mod_hotquestion_renderer extends plugin_renderer_base {
+
+    /**
+     * Rendering hotquestion files.
+     * @var init $hotquestion
+     */
     private $hotquestion;
 
     /**
@@ -81,16 +93,19 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
             $roundn = '';
 
             $url = new moodle_url('/mod/hotquestion/view.php', array('id' => $this->hotquestion->cm->id, 'round' => $roundp));
-            $toolbuttons[] = html_writer::link($url, $this->pix_icon('t/collapsed_rtl', get_string('previousround', 'hotquestion')), array('class' => 'toolbutton'));
+            $toolbuttons[] = html_writer::link($url, $this->pix_icon('t/collapsed_rtl'
+                , get_string('previousround', 'hotquestion')), array('class' => 'toolbutton'));
         } else {
-            $toolbuttons[] = html_writer::tag('span', $this->pix_icon('t/collapsed_empty_rtl', ''), array('class' => 'dis_toolbutton'));
+            $toolbuttons[] = html_writer::tag('span', $this->pix_icon('t/collapsed_empty_rtl', '')
+                , array('class' => 'dis_toolbutton'));
         }
         if ($this->hotquestion->get_nextround() != null) {
             $roundn = $this->hotquestion->get_nextround()->id;
             $roundp = '';
 
             $url = new moodle_url('/mod/hotquestion/view.php', array('id' => $this->hotquestion->cm->id, 'round' => $roundn));
-            $toolbuttons[] = html_writer::link($url, $this->pix_icon('t/collapsed', get_string('nextround', 'hotquestion')), array('class' => 'toolbutton'));
+            $toolbuttons[] = html_writer::link($url, $this->pix_icon('t/collapsed'
+                , get_string('nextround', 'hotquestion')), array('class' => 'toolbutton'));
         } else {
             $toolbuttons[] = html_writer::tag('span', $this->pix_icon('t/collapsed_empty', ''), array('class' => 'dis_toolbutton'));
         }
@@ -101,7 +116,8 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
             $options['id'] = $this->hotquestion->cm->id;
             $options['action'] = 'newround';
             $url = new moodle_url('/mod/hotquestion/view.php', $options);
-            $toolbuttons[] = html_writer::link($url, $this->pix_icon('t/add', get_string('newround', 'hotquestion')), array('class' => 'toolbutton'));
+            $toolbuttons[] = html_writer::link($url, $this->pix_icon('t/add'
+                , get_string('newround', 'hotquestion')), array('class' => 'toolbutton'));
         }
 
         // Print remove round toolbutton.
@@ -111,7 +127,8 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
             $options['action'] = 'removeround';
             $options['round'] = $this->hotquestion->get_currentround()->id;
             $url = new moodle_url('/mod/hotquestion/view.php', $options);
-            $toolbuttons[] = html_writer::link($url, $this->pix_icon('t/less', get_string('removeround', 'hotquestion')), array('class' => 'toolbutton'));
+            $toolbuttons[] = html_writer::link($url, $this->pix_icon('t/less'
+            , get_string('removeround', 'hotquestion')), array('class' => 'toolbutton'));
         }
 
         // Print refresh toolbutton.
@@ -129,9 +146,6 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
      * Return question list, which includes the content, the author, the time
      * and the heat. If $can_vote is true, will display an icon to vote with.
      *
-     * @global object
-     * @global object
-     * @global object
      * @param bool $allowvote whether current user has vote cap
      * return table of questionlist
      */
@@ -156,7 +170,8 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
             $table->align = array ('left', 'center', 'center');
             // Modified table heading for show/not show Remove capability.
             if (has_capability('mod/hotquestion:manageentries', $context)) {
-                $table->head = array(get_string('question', 'hotquestion'), get_string('heat', 'hotquestion'), get_string('questionremove', 'hotquestion'));
+                $table->head = array(get_string('question', 'hotquestion')
+                    , get_string('heat', 'hotquestion'), get_string('questionremove', 'hotquestion'));
             } else {
                 $table->head = array(get_string('question', 'hotquestion'), get_string('heat', 'hotquestion'));
             }
@@ -171,10 +186,12 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
                 if ($question->anonymous) {
                     $a->user = get_string('anonymous', 'hotquestion');
                 } else {
-                    $a->user = '<a href="'.$CFG->wwwroot.'/user/view.php?id='.$user->id.'&amp;course='.$this->hotquestion->course->id.'">'.fullname($user).'</a>';
+                    $a->user = '<a href="'.$CFG->wwwroot.'/user/view.php?id='
+                    .$user->id.'&amp;course='.$this->hotquestion->course->id.'">'.fullname($user).'</a>';
                 }
                 // Process the time part of the row entry.
-                $a->time = userdate($question->time).'&nbsp('.get_string('ago', 'hotquestion', format_time(time() - $question->time)).')';
+                $a->time = userdate($question->time).'&nbsp('.get_string('ago', 'hotquestion'
+                    , format_time(time() - $question->time)).')';
                 $info = '<div class="author">'.get_string('authorinfo', 'hotquestion', $a).'</div>';
                 $line[] = $content.$info;
                 $heat = $question->votecount;

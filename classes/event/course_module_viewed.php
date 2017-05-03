@@ -23,9 +23,16 @@
  */
 
 namespace mod_hotquestion\event;
-
 defined('MOODLE_INTERNAL') || die();
 
+/**
+ * The mod_hotquestion course module viewed class.
+ *
+ * @package    mod_hotquestion
+ * @since      Moodle 2.7
+ * @copyright  2014 drachels@drachels.com
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class course_module_viewed extends \core\event\course_module_viewed {
 
     /**
