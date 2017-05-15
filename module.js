@@ -36,7 +36,7 @@ M.mod_hotquestion.init = function(Y) {
     // Bind io events.
     Y.on('io:success', M.mod_hotquestion.iocomplete);
     Y.on('io:failure', M.mod_hotquestion.iofailure);
-}
+};
 
 M.mod_hotquestion.iocomplete = function(transactionid, response, arguments) {
     var Y = M.mod_hotquestion.Y;
@@ -55,13 +55,13 @@ M.mod_hotquestion.iocomplete = function(transactionid, response, arguments) {
     // Rebind buttons.
     Y.on('click', M.mod_hotquestion.refresh, '.hotquestion_vote');
     Y.on('click', M.mod_hotquestion.refresh, '.toolbutton');
-}
+};
 
 M.mod_hotquestion.iofailure = function(transactionid, response, arguments) {
     M.mod_hotquestion.submitbutton.removeAttribute('disabled');
     M.mod_hotquestion.questionbox.removeAttribute('disabled');
     alert(M.str.hotquestion.connectionerror);
-}
+};
 
 M.mod_hotquestion.refresh = function(e) {
     e.preventDefault();
@@ -77,12 +77,12 @@ M.mod_hotquestion.refresh = function(e) {
     };
 
     var request = M.mod_hotquestion.Y.io('view.php', cfg);
-}
+};
 
 M.mod_hotquestion.getquestion = function() {
     var question = M.mod_hotquestion.questionbox.get('value');
     return YAHOO.lang.trim(question);
-}
+};
 
 M.mod_hotquestion.questionchanged = function(e) {
     var question = M.mod_hotquestion.getquestion();
@@ -92,7 +92,7 @@ M.mod_hotquestion.questionchanged = function(e) {
     } else {
         submitbutton.removeAttribute('disabled');
     }
-}
+};
 
 M.mod_hotquestion.submit = function(e) {
     e.preventDefault();
@@ -129,4 +129,4 @@ M.mod_hotquestion.submit = function(e) {
         }
     };
     var request = M.mod_hotquestion.Y.io('view.php', cfg);
-}
+};

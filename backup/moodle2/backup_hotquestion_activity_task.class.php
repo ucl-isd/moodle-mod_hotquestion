@@ -23,9 +23,9 @@
 
 defined('MOODLE_INTERNAL') || die();
 // Because it must exist.
-require_once($CFG->dirroot . '/mod/hotquestion/backup/moodle2/backup_hotquestion_stepslib.php'); 
+require_once($CFG->dirroot . '/mod/hotquestion/backup/moodle2/backup_hotquestion_stepslib.php');
 // Because it exists optional).
-require_once($CFG->dirroot . '/mod/hotquestion/backup/moodle2/backup_hotquestion_settingslib.php'); 
+require_once($CFG->dirroot . '/mod/hotquestion/backup/moodle2/backup_hotquestion_settingslib.php');
 
 /**
  * Hotquestion backup task that provides all the settings and steps to perform one complete backup of the activity.

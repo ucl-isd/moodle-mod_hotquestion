@@ -23,10 +23,6 @@
  */
 
 /**
- 
- */
-
-/**
  * Structure step to restore one hotquestion activity.
  */
 

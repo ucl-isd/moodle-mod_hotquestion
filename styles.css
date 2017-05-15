@@ -9,16 +9,16 @@
     padding: 5px;
 }
 
-ul#toolbar{
+ul#toolbar {
     display: inline;
     list-style: none;
 }
 
-#toolbar li{
+#toolbar li {
     display: inline;
     padding: 0 5px;
 }
 
-.dis_toolbutton{
+.dis_toolbutton {
     color: gray;
 }
