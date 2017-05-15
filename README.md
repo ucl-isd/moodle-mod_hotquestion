@@ -39,7 +39,7 @@ any question in the current Hot Question activity if they deem the question
 as inappropriate or not applicable to the subject. 
 
 NOTE: If you plan on disciplinary action for any inappropriate question,
-you should download the evidence BEFORE you remove questions ore remove rounds, 
+you should download the evidence BEFORE you remove questions or remove rounds, 
 as once removed, questions and rounds are not recoverable.
 
 Details: https://github.com/hit-moodle/moodle-mod_hotquestion/wiki
