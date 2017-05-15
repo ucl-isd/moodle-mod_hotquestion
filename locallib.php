@@ -313,6 +313,16 @@ class mod_hotquestion {
      */
     public function remove_question() {
         global $DB;
+
+        $data = new StdClass();
+        $data->hotquestion = $this->instance->id;
+        $context = context_module::instance($this->cm->id);
+        // Trigger remove_round event.
+        $event = \mod_hotquestion\event\remove_question::create(array(
+            'objectid' => $data->hotquestion,
+            'context' => $context
+        ));
+        $event->trigger();
         if (isset($_GET['q'])) {
             $questionid = $_GET['q'];
             $dbquestion = $DB->get_record('hotquestion_questions', array('id' => $questionid));

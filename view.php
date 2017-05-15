@@ -144,20 +144,11 @@ if (!empty($action)) {
         case 'remove':
             if (has_capability('mod/hotquestion:manageentries', $context)) {
                 $q = required_param('q',  PARAM_INT);  // Question id to remove.
-                // Call remove function in locallib.
+                // Call remove_question function in locallib.
                 $hq->remove_question($q);
                 // Need redirect that goes to the round where removing question.
                 redirect('view.php?id='.$hq->cm->id, get_string('questionremovesuccess', 'hotquestion'));
                 // Does work without it as it just defaults to current round.
-                // Trigger remove_question event.
-                $event = \mod_hotquestion\event\remove_question::create(array(
-                    'objectid' => $hotquestion->id,
-                    'context' => $context
-                ));
-                $event->add_record_snapshot('course_modules', $cm);
-                $event->add_record_snapshot('course', $course);
-                $event->add_record_snapshot('hotquestion', $hotquestion);
-                $event->trigger();
             }
             break;
         case 'download':
