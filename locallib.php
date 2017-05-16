@@ -497,11 +497,14 @@ function hotquestion_count_entries($hotquestion, $groupid = 0) {
     $context = context_module::instance($cm->id);
     // Currently, groups are not being used by Hot Question.
     if ($groupid) {     // How many in a particular group?
-
-        $sql = "SELECT DISTINCT u.id FROM {hotquestion_questions} hq
-                JOIN {groups_members} g ON g.userid = hq.userid
-                JOIN {user} u ON u.id = g.userid
-                WHERE hq.hotquestion = $hotquestion->id AND g.groupid = '$groupid'";
+        // I've temporarily replaced broken group $sql until groups are implemented. See tracker for old code.
+        $sql = "SELECT COUNT(DISTINCT hq.userid) AS ucount, COUNT(DISTINCT hq.content) AS qcount FROM {hotquestion_questions} hq
+                JOIN {user} u ON u.id = hq.userid
+                LEFT JOIN {hotquestion_rounds} hr ON hr.hotquestion=hq.hotquestion
+                WHERE hq.hotquestion = '$hotquestion->id' AND
+                hr.endtime=0 AND
+                hq.time>=hr.starttime AND
+                hq.userid>0";
         $hotquestions = $DB->get_records_sql($sql);
 
     } else { // Count all the entries from the whole course.
