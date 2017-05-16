@@ -60,7 +60,7 @@ class entries_viewed extends \core\event\base {
      */
     public function get_description() {
         return "The user with id '$this->userid' has viewed the entries for the hotquestion activity with the course module id
-            '$this->contextinstanceid'";
+            '$this->contextinstanceid'.";
     }
 
     /**

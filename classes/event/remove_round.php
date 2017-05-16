@@ -60,8 +60,7 @@ class remove_round extends \core\event\base {
      */
     public function get_description() {
         return "The user with id '$this->userid' has removed a round, it's questions, and it's votes
-            for the hotquestion activity with the course module id
-            '$this->contextinstanceid'";
+            for the hotquestion activity with the course module id '$this->contextinstanceid'.";
     }
 
     /**

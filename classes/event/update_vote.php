@@ -60,7 +60,7 @@ class update_vote extends \core\event\base {
      */
     public function get_description() {
         return "The user with id '$this->userid' has just voted for a question in the hotquestion activity with the course module id
-            '$this->contextinstanceid'";
+            '$this->contextinstanceid'.";
     }
 
     /**

@@ -60,7 +60,7 @@ class entry_updated extends \core\event\base {
      */
     public function get_description() {
         return "The user with id '$this->userid' has created an entry for the hotquestion activity with the course module id
-            '$this->contextinstanceid'";
+            '$this->contextinstanceid'.";
     }
 
     /**
