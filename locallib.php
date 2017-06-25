@@ -416,6 +416,7 @@ class mod_hotquestion {
      */
     public function download_questions($array, $filename = "export.csv", $delimiter=";") {
         global $CFG, $DB, $USER;
+        require_once($CFG->libdir.'/csvlib.class.php');
         $data = new StdClass();
         $data->hotquestion = $this->instance->id;
         $context = context_module::instance($this->cm->id);
@@ -428,35 +429,32 @@ class mod_hotquestion {
 
         // Construct sql query and filename based on admin or teacher.
         // Add filename details based on course and HQ activity name.
+        $csv = new csv_export_writer();
+        $strhotquestion = get_string('hotquestion', 'hotquestion');
         if (is_siteadmin($USER->id)) {
             $whichhqs = ('AND hq.hotquestion > 0');
-            $filename = get_string('exportfilenamep1', 'hotquestion');
+            $csv->filename = clean_filename(get_string('exportfilenamep1', 'hotquestion'));
         } else {
             $whichhqs = ('AND hq.hotquestion = ');
             $whichhqs .= ($this->instance->id);
-            $filename = ($this->course->shortname).'_';
-            $filename .= ($this->instance->name);
+            $csv->filename = clean_filename(($this->course->shortname).'_');
+            $csv->filename .= clean_filename(($this->instance->name));
         }
-        $filename .= get_string('exportfilenamep2', 'hotquestion').gmdate("Ymd_Hi").'GMT.csv';
+        $csv->filename .= clean_filename(get_string('exportfilenamep2', 'hotquestion').gmdate("Ymd_Hi").'GMT.csv');
 
-        $params = array();
+        $fields = array();
 
-        header('Content-Type: text/csv');
-        header('Content-Disposition: attachement; filename="'.$filename.'";');
-        header("Pragma: no-cache");
-        header("Expires: 0");
-
-        $file = fopen('php://output', 'w');
-        $params = array(get_string('id', 'hotquestion'),
-                        get_string('firstname'),
+        $fields = array(get_string('firstname'),
                         get_string('lastname'),
+                        get_string('id', 'hotquestion'),
                         get_string('hotquestion', 'hotquestion'),
                         get_string('content', 'hotquestion'),
                         get_string('userid', 'hotquestion'),
                         get_string('time', 'hotquestion'),
                         get_string('anonymous', 'hotquestion'));
-        fputcsv($file, $params, $delimiter);
-
+        // Add the headings to our data array.
+        $csv->add_data($fields);
+        
         $sql = "SELECT hq.id id,
                 CASE
                     WHEN u.firstname = 'Guest user'
@@ -470,14 +468,17 @@ class mod_hotquestion {
                 WHERE hq.userid > 0 ";
         $sql .= ($whichhqs);
         $sql .= " ORDER BY hq.hotquestion, u.id";
-        if ($hqs = $DB->get_records_sql($sql, $params)) {
+        
+        // Add the list of users and HotQuestions to our data array.
+        if ($hqs = $DB->get_records_sql($sql, $fields)) {
             foreach ($hqs as $q) {
-                $fields = array($q->id, $q->firstname, $q->lastname, $q->hotquestion,
+                $output = array($q->firstname, $q->lastname, $q->id, $q->hotquestion,
                     $q->content, $q->userid, $q->time, $q->anonymous);
-                fputcsv($file, $fields, $delimiter);
+                $csv->add_data($output);
+                }
             }
-        }
-        fclose($file);
+            // Download the completed array.
+            $csv->download_file();
         exit;
     }
 }
