@@ -454,7 +454,7 @@ class mod_hotquestion {
                         get_string('anonymous', 'hotquestion'));
         // Add the headings to our data array.
         $csv->add_data($fields);
-        
+
         $sql = "SELECT hq.id id,
                 CASE
                     WHEN u.firstname = 'Guest user'
@@ -468,17 +468,17 @@ class mod_hotquestion {
                 WHERE hq.userid > 0 ";
         $sql .= ($whichhqs);
         $sql .= " ORDER BY hq.hotquestion, u.id";
-        
+
         // Add the list of users and HotQuestions to our data array.
         if ($hqs = $DB->get_records_sql($sql, $fields)) {
             foreach ($hqs as $q) {
                 $output = array($q->firstname, $q->lastname, $q->id, $q->hotquestion,
                     $q->content, $q->userid, $q->time, $q->anonymous);
                 $csv->add_data($output);
-                }
             }
-            // Download the completed array.
-            $csv->download_file();
+        }
+        // Download the completed array.
+        $csv->download_file();
         exit;
     }
 }
