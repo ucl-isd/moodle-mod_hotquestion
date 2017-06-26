@@ -1,8 +1,8 @@
 @mod @mod_hotquestion
 Feature: Users can post named or anonymous entries to hotquestion
-  In order to post questions
+  In order to use HotQuestion
   As a user
-  I need to post a hotquestion entry
+  I need to be able to post a hotquestion entry.
 
   Background:
     Given the following "courses" exist:
@@ -24,7 +24,7 @@ Feature: Users can post named or anonymous entries to hotquestion
       | activity     | name                   | intro             | course | idnumber     | submitdirections           |
       | hotquestion  | Test hotquestion name  | Hotquestion intro | C1     | hotquestion1 | Submit your question here: |
   Scenario: A user posts named and anonymous entries
-    # Admin 1 adds posts.
+    # Admin User adds posts.
 	Given I log in as "admin"
     When I am on "Course 1" course homepage
     And I follow "Test hotquestion name"
@@ -35,6 +35,12 @@ Feature: Users can post named or anonymous entries to hotquestion
       | Submit your question here: | Second question |
 	And I set the field "Display as anonymous" to "1"
     And I press "Post"
+	# Admin User verifies his posts are logged.
+    And I navigate to "Logs" in current page administration
+	Then I should see "Admin User" in the "#report_log_r1_c1" "css_element"
+	And I should see "Added a question" in the "#report_log_r1_c5" "css_element"
+	And I should see "Admin User" in the "#report_log_r4_c1" "css_element"
+	And I should see "Added a question" in the "#report_log_r4_c5" "css_element"
     Then I log out
     #Teacher 1 posts an entry
 	Given I log in as "teacher1"
@@ -48,6 +54,12 @@ Feature: Users can post named or anonymous entries to hotquestion
       | Submit your question here: | Fourth question |
 	And I set the field "Display as anonymous" to "1"
     And I press "Post"
+    # Teacher 1 verifies his posts are logged.
+    And I navigate to "Logs" in current page administration
+	Then I should see "Teacher 1" in the "#report_log_r1_c1" "css_element"
+	And I should see "Added a question" in the "#report_log_r1_c5" "css_element"
+	And I should see "Teacher 1" in the "#report_log_r4_c1" "css_element"
+	And I should see "Added a question" in the "#report_log_r4_c5" "css_element"
     Then I log out
     #Non-editing teacher 2 posts an entry
 	Given I log in as "teacher2"
@@ -61,6 +73,12 @@ Feature: Users can post named or anonymous entries to hotquestion
       | Submit your question here: | Sixth question |
 	And I set the field "Display as anonymous" to "1"
     And I press "Post"
+    # Teacher 2 verifies his posts are logged.
+    And I navigate to "Logs" in current page administration
+ 	Then I should see "Teacher 2" in the "#report_log_r1_c1" "css_element"
+	And I should see "Added a question" in the "#report_log_r1_c5" "css_element"
+	And I should see "Teacher 2" in the "#report_log_r4_c1" "css_element"
+	And I should see "Added a question" in the "#report_log_r4_c5" "css_element"
     Then I log out
 	#Student 1 posts an entry
 	Given I log in as "student1"
@@ -91,4 +109,16 @@ Feature: Users can post named or anonymous entries to hotquestion
 	And I should see "Posted by Anonymous"
 	And I should see "First question"
     And I should see "Posted by Admin User"
+    Then I log out
+    # Teacher 1 verifies posts are logged for student.
+	Given I log in as "teacher1"
+    When I am on "Course 1" course homepage
+    And I follow "Test hotquestion name"
+    And I navigate to "Logs" in current page administration
+	Then I should see "Teacher 1" in the "#report_log_r0_c1" "css_element"
+	And I should see "Course module viewed" in the "#report_log_r0_c5" "css_element"
+	Then I should see "Student 1" in the "#report_log_r2_c1" "css_element"
+	And I should see "Added a question" in the "#report_log_r2_c5" "css_element"
+	And I should see "Student 1" in the "#report_log_r5_c1" "css_element"
+	And I should see "Added a question" in the "#report_log_r5_c5" "css_element"
     Then I log out

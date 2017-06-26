@@ -2,7 +2,7 @@
 Feature: When posting a question while viewing a closed round, the question posts into the current round
   In order to post a question
   As a user
-  I can post while viewing any round
+  I can post while viewing any round.
 
   Background:
     Given the following "courses" exist:
@@ -43,6 +43,10 @@ Feature: When posting a question while viewing a closed round, the question post
     Then I should see "Round 1 second question by student 1"
 	And I should see "Round 1 first question by student 1"
 	And I follow "Open a new round"
+	# Teacher verfies new round is logged.
+    And I navigate to "Logs" in current page administration
+    Then I should see "Teacher 1" in the "#report_log_r1_c1" "css_element"
+	And I should see "Opened a new round" in the "#report_log_r1_c5" "css_element"
     Then I log out
 	# Student 2 adds posts while viewing round 1 and views it in round 2.
 	Given I log in as "student2"

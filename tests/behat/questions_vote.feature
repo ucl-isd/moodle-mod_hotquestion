@@ -37,7 +37,6 @@ Feature: Users can vote on named or anonymous entries to hotquestion
       | Submit your question here: | Second question by student 1 |
 	And I set the field "Display as anonymous" to "1"
     And I press "Post"
-    #And I wait "2" seconds
 	Then I should see "Second question by student 1"
 	And I should see "Posted by Anonymous"
 	Then I should see "First question by student 1"
@@ -63,8 +62,8 @@ Feature: Users can vote on named or anonymous entries to hotquestion
 	And I click on "Vote" "link" in the "Student 1" "table_row"
 	Then I should see "2" in the "Student 1" "table_row"
     Then I log out
-	#Teacher 2 votes.
-	Given I log in as "teacher2"
+	#Manager 1 votes.
+	Given I log in as "manager1"
     When I am on "Course 1" course homepage
     And I follow "Test hotquestion name"
     And I click on "Vote" "link" in the "Anonymous" "table_row"
@@ -72,12 +71,36 @@ Feature: Users can vote on named or anonymous entries to hotquestion
 	And I click on "Vote" "link" in the "Student 1" "table_row"
 	Then I should see "3" in the "Student 1" "table_row"
     Then I log out
-	#Manager 1 votes.
-	Given I log in as "manager1"
+	#Teacher 2 votes.
+	Given I log in as "teacher2"
     When I am on "Course 1" course homepage
     And I follow "Test hotquestion name"
     And I click on "Vote" "link" in the "Anonymous" "table_row"
     Then I should see "5" in the "Anonymous" "table_row"
 	And I click on "Vote" "link" in the "Student 1" "table_row"
 	Then I should see "4" in the "Student 1" "table_row"
+    # Teacher 2 verifies adding votes is logged for everyone.
+    And I navigate to "Logs" in current page administration
+    Then I should see "Teacher 2" in the "#report_log_r0_c1" "css_element"
+	And I should see "Updated vote" in the "#report_log_r0_c5" "css_element"
+    Then I should see "Teacher 2" in the "#report_log_r2_c1" "css_element"
+    And I should see "Updated vote" in the "#report_log_r2_c5" "css_element"
+	# Check for two mangager votes.
+    Then I should see "Manager 1" in the "#report_log_r5_c1" "css_element"
+    And I should see "Updated vote" in the "#report_log_r5_c5" "css_element"
+    Then I should see "Manager 1" in the "#report_log_r7_c1" "css_element"
+    And I should see "Updated vote" in the "#report_log_r7_c5" "css_element"
+	# Check for two teacher 1 votes.
+    Then I should see "Teacher 1" in the "#report_log_r10_c1" "css_element"
+    And I should see "Updated vote" in the "#report_log_r10_c5" "css_element"
+    Then I should see "Teacher 1" in the "#report_log_r12_c1" "css_element"
+    And I should see "Updated vote" in the "#report_log_r12_c5" "css_element"
+    # Check for two admin votes.
+    Then I should see "Admin User" in the "#report_log_r15_c1" "css_element"
+    And I should see "Updated vote" in the "#report_log_r15_c5" "css_element"
+    Then I should see "Admin User" in the "#report_log_r17_c1" "css_element"
+    And I should see "Updated vote" in the "#report_log_r17_c5" "css_element"
+	# Student 1 only voted once.
+    Then I should see "Student 1" in the "#report_log_r20_c1" "css_element"
+    And I should see "Updated vote" in the "#report_log_r20_c5" "css_element"
     Then I log out

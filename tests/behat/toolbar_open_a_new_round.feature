@@ -1,8 +1,8 @@
 @mod @mod_hotquestion
-Feature: Teachers and admin users can start new rounds
-  In order to start a new
-  As a user
-  I need to follow open a new round toolbutton
+Feature: Teachers and admin users can start new question rounds
+  In order to manage a HotQuestion activity
+  As a teacher
+  I need to be able to open a new round of questions
 
   Background:
     Given the following "courses" exist:
@@ -43,6 +43,10 @@ Feature: Teachers and admin users can start new rounds
     Then I should see "Round 1 second question by student 1"
 	And I should see "Round 1 first question by student 1"
 	And I follow "Open a new round"
+    # Verify new round by teacher was logged.
+    And I navigate to "Logs" in current page administration
+    Then I should see "Teacher 1" in the "#report_log_r1_c1" "css_element"
+	And I should see "Opened a new round" in the "#report_log_r1_c5" "css_element"
     Then I log out
 	# Student 2 adds posts in new round.
 	Given I log in as "student2"

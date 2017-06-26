@@ -1,8 +1,8 @@
-@mod @mod_hotquestion @hotquestion_export_admin
-Feature: Admin user exports all questions from all HotQuestions  
-  In order to export all questions on site
-  As a admin
-  I need to be able to export all questions
+@mod @mod_hotquestion
+Feature: Admin user can export all questions from all HotQuestions  
+  In order to document posts to all HotQuestion activities on site
+  As an admin
+  I need to be able to export all questions.
 
   Background:
     Given the following "users" exist:
@@ -143,7 +143,7 @@ Feature: Admin user exports all questions from all HotQuestions
     And I should see "Posted by Admin User"
     Then I log out
 	#Scenario: Clicking on export
-    #Teacher downloads current HotQuestion questions
+    #Admin downloads ALL HotQuestion questions
     Given I log in as "admin"
     When I am on "Course 1" course homepage
     And I follow "Test hotquestion name 1"
@@ -164,5 +164,9 @@ Feature: Admin user exports all questions from all HotQuestions
     And I should see "First question 1"
     And I should see "Posted by Admin User"
 	And following "Export to .csv" should download between "1200" and "1300" bytes
+    # Verify download by admin was logged.
+    And I navigate to "Logs" in current page administration
+    Then I should see "Admin User" in the "#report_log_r0_c1" "css_element"
+	And I should see "Download questions" in the "#report_log_r0_c5" "css_element"
     Then I log out
     

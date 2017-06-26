@@ -2,7 +2,7 @@
 Feature: Teachers, admin and managers can remove named or anonymous posts
   In order to manage questions
   As a teacher, manager, or admin
-  I need to remove a hotquestion entry
+  I need to be able to remove a hotquestion entry.
 
   Background:
     Given the following "courses" exist:
@@ -80,6 +80,10 @@ Feature: Teachers, admin and managers can remove named or anonymous posts
     And I follow "Test hotquestion name"	
 	And I click on "Remove" "link" in the "Seventh question by student 1" "table_row"
     Then I should not see "Seventh question by student 1"
+	# Teacher 1 verifies removing post and votes is logged.
+    And I navigate to "Logs" in current page administration
+    Then I should see "Teacher 1" in the "#report_log_r1_c1" "css_element"
+	And I should see "Remove question" in the "#report_log_r1_c5" "css_element"
     Then I log out
 	# Admin User removes a post.
 	Given I log in as "admin"
@@ -87,6 +91,10 @@ Feature: Teachers, admin and managers can remove named or anonymous posts
     And I follow "Test hotquestion name"	
 	And I click on "Remove" "link" in the "Eighth question by student 1" "table_row"
     Then I should not see "Eighth question by student 1"
+	# Admin User verifies removing post and votes is logged.
+    And I navigate to "Logs" in current page administration
+    Then I should see "Admin User" in the "#report_log_r1_c1" "css_element"
+	And I should see "Remove question" in the "#report_log_r1_c5" "css_element"
     Then I log out
 	# Manager 1 removes a post.
 	Given I log in as "manager1"
@@ -94,4 +102,8 @@ Feature: Teachers, admin and managers can remove named or anonymous posts
     And I follow "Test hotquestion name"	
 	And I click on "Remove" "link" in the "First question by teacher 1" "table_row"
     Then I should not see "First question by teacher 1"
+	# Manager 1 verifies removing post and votes is logged.
+    And I navigate to "Logs" in current page administration
+    Then I should see "Manager 1" in the "#report_log_r1_c1" "css_element"
+	And I should see "Remove question" in the "#report_log_r1_c5" "css_element"
     Then I log out

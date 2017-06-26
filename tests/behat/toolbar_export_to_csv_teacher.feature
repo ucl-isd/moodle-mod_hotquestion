@@ -1,8 +1,8 @@
-@mod @mod_hotquestion @hotquestion_export_teacher
-Feature: Teacher user export questions for current HotQuestion activity  
-  In order to export current HotQuestion questions
+@mod @mod_hotquestion
+Feature: Teacher can export questions from current HotQuestion activity  
+  In order to document posts to a HotQuestion activity
   As a teacher
-  I need to be able to export all questions
+  I need to be able to export questions.
 
   Background:
     Given the following "users" exist:
@@ -164,5 +164,9 @@ Feature: Teacher user export questions for current HotQuestion activity
     And I should see "First question 1"
     And I should see "Posted by Admin User"
 	And following "Export to .csv" should download between "600" and "700" bytes
+    # Verify download by Teacher 1 was logged.
+    And I navigate to "Logs" in current page administration
+    Then I should see "Teacher 1" in the "#report_log_r0_c1" "css_element"
+	And I should see "Download questions" in the "#report_log_r0_c5" "css_element"
     Then I log out
     

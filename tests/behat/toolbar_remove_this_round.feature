@@ -1,8 +1,8 @@
 @mod @mod_hotquestion
 Feature: Teachers and admin users can remove rounds
-  In order to remove a round
-  As a user
-  I need to have a round to remove and follow remove this round toolbutton
+  In order to manage a HotQuestion activity
+  As a teacher
+  I need to be able to remove a round.
 
   Background:
     Given the following "courses" exist:
@@ -71,6 +71,10 @@ Feature: Teachers and admin users can remove rounds
     Then I should see "Round 2 fourth question by student 2"
 	And I should see "Round 2 third question by student 2"
 	And I follow "Remove this round"
+    # Verify removing a round by teacher was logged.
+    And I navigate to "Logs" in current page administration
+    Then I should see "Teacher 1" in the "#report_log_r1_c1" "css_element"
+	And I should see "Remove round" in the "#report_log_r1_c5" "css_element"
     Then I log out
 	# Student 1 adds posts to round 3 and verifies round 2 is gone.
 	Given I log in as "student1"
