@@ -34,8 +34,16 @@ defined('MOODLE_INTERNAL') || die();
  */
 class mod_hotquestion_generator extends testing_module_generator {
 
+    /**
+     * @var int keep track of how many hotquestions have been created.
+     */
     private $hotquestioncount = 0;
-
+    
+    /**
+     * To be called from data reset code only,
+     * do not use in tests.
+     * @return void
+     */
     public function reset() {
         $this->hotquestioncount = 0;
         parent::reset();
