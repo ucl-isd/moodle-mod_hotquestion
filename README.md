@@ -8,6 +8,11 @@ which can access the moodle site. Students can also vote on others'
 questions, so that the hottest questions will be popped up to the top of
 the list. Teachers can make oral comments on selected questions in classroom.
 
+June 2017 Added 10 Behat tests.
+Changed the code for Export to CSV to make it simpler.
+Changed the order of the fields exported in Export to CSV. MS Excel will not open files
+in which the first record is "ID" so it was moved from column 1 to column 3.
+
 May 2017, fixed code style and documentation errors and warnings.
 Moved remove_question event from view.php to function remove_question in locallib.php
 Added new setting capability 10/6/2016 to display description on a course page.
