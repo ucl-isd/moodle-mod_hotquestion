@@ -66,11 +66,11 @@ M.mod_hotquestion.iofailure = function(transactionid, response, arguments) {
 M.mod_hotquestion.refresh = function(e) {
     e.preventDefault();
 
-    var data = e.currentTarget.get('href').split('?',2)[1];
+    var data = e.currentTarget.get('href').split('?', 2)[1];
     data += '&ajax=1';
     var cfg = {
-        method : "GET",
-        data : data,
+        method: "GET",
+        data: data,
         arguments: {
             caller: 'refresh',
         }
@@ -122,8 +122,8 @@ M.mod_hotquestion.submit = function(e) {
     data += 'ajax=1';
 
     var cfg = {
-        method : "POST",
-        data : data,
+        method: "POST",
+        data: data,
         arguments: {
             caller: 'submit',
         }
