@@ -97,6 +97,14 @@ class mod_hotquestion {
         $data->content = trim($fromform->question);
         $data->userid = $USER->id;
         $data->time = time();
+        // Check if approval is required for this HotQuestion activity.
+        if (!($this->instance->approval)) {
+            // If approval is NOT required, then approve the question so everyone can see it.
+            $data->approved = 1;
+        } else {
+            // If approval is required, then mark as not approved so only teachers can see it.
+            $data->approved = 0;
+        }
         $context = context_module::instance($this->cm->id);
         if (isset($fromform->anonymous) && $fromform->anonymous && $this->instance->anonymouspost) {
             $data->anonymous = $fromform->anonymous;
@@ -480,6 +488,29 @@ class mod_hotquestion {
         // Download the completed array.
         $csv->download_file();
         exit;
+    }
+
+    /**
+     * Toggle approval go/stop of current question in current round.
+     *
+     * @param var $question
+     * @return nothing
+     */
+    public function approve_question($question) {
+        global $CFG, $DB, $USER;
+        $context = context_module::instance($this->cm->id);
+        $question = $DB->get_record('hotquestion_questions', array('id' => $question));
+
+        if ($question->approved) {
+            // If currently approved, toggle to disapproved.
+            $question->approved = '0';
+            $DB->update_record('hotquestion_questions', $question);
+        } else {
+            // If currently disapproved, toggle to approved.
+            $question->approved = '1';
+            $DB->update_record('hotquestion_questions', $question);
+        }
+        return;
     }
 }
 
