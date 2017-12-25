@@ -82,9 +82,18 @@ class mod_hotquestion_mod_form extends moodleform_mod {
         $mform->addRule('submitdirections', null, 'required', null, 'client');
         $mform->addRule('submitdirections', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
 
+        // Add Entries header to form.
+        $mform->addElement('header', 'entrieshdr', get_string('entries', 'hotquestion'));
+
         // Adding 'anonymouspost' field.
         $mform->addElement('selectyesno', 'anonymouspost', get_string('allowanonymouspost', 'hotquestion'));
+        $mform->addHelpButton('anonymouspost', 'allowanonymouspost', 'hotquestion');
         $mform->setDefault('anonymouspost', '1');
+
+        // Add 'requireapproval' field.
+        $mform->addElement('selectyesno', 'approval', get_string('requireapproval', 'hotquestion'));
+        $mform->addHelpButton('approval', 'requireapproval', 'hotquestion');
+        $mform->setDefault('approval', '0');
 
         // Availability.
         $mform->addElement('header', 'availabilityhdr', get_string('availability'));
