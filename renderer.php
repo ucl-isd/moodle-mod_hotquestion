@@ -167,11 +167,13 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
             $table->cellpadding = 10;
             $table->class = 'generaltable';
             $table->width = '100%';
-            $table->align = array ('left', 'center', 'center');
-            // Modified table heading for show/not show Remove capability.
+            $table->align = array ('left', 'center', 'center', 'center');
+            // Modified table heading for show/not show Remove and Approved capability.
             if (has_capability('mod/hotquestion:manageentries', $context)) {
                 $table->head = array(get_string('question', 'hotquestion')
-                    , get_string('heat', 'hotquestion'), get_string('questionremove', 'hotquestion'));
+                    , get_string('heat', 'hotquestion')
+                    , get_string('questionremove', 'hotquestion')
+                    , get_string('approved', 'hotquestion'));
             } else {
                 $table->head = array(get_string('question', 'hotquestion'), get_string('heat', 'hotquestion'));
             }
@@ -183,47 +185,72 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
                 $user = $DB->get_record('user', array('id' => $question->userid));
 
                 // Process the question part of the row entry.
-                if ($question->anonymous) {
-                    $a->user = get_string('anonymous', 'hotquestion');
-                } else {
-                    $a->user = '<a href="'.$CFG->wwwroot.'/user/view.php?id='
-                    .$user->id.'&amp;course='.$this->hotquestion->course->id.'">'.fullname($user).'</a>';
-                }
-                // Process the time part of the row entry.
-                $a->time = userdate($question->time).'&nbsp('.get_string('ago', 'hotquestion'
-                    , format_time(time() - $question->time)).')';
-                $info = '<div class="author">'.get_string('authorinfo', 'hotquestion', $a).'</div>';
-                $line[] = $content.$info;
-                $heat = $question->votecount;
-                $remove = '';
-
-                // Print the vote cron case.
-                if ($allowvote && $this->hotquestion->can_vote_on($question)) {
-                    if (!$this->hotquestion->has_voted($question->id)) {
-                        $heat .= '&nbsp;<a href="view.php?id='
-                              .$this->hotquestion->cm->id
-                              .'&action=vote&q='.$question->id
-                              .'" class="hotquestion_vote" id="question_'
-                              .$question->id.'"><img src="'.$this->image_url('s/yes')
-                              .'" title="'.get_string('vote', 'hotquestion')
-                              .'" alt="'.get_string('vote', 'hotquestion').'"/></a>';
+                // If not a teacher and question is not approved, skip over it and do not show it.
+                if ($question->approved || (has_capability('mod/hotquestion:manageentries', $context))) {
+                    if ($question->anonymous) {
+                        $a->user = get_string('anonymous', 'hotquestion');
+                    } else {
+                        $a->user = '<a href="'.$CFG->wwwroot.'/user/view.php?id='
+                        .$user->id.'&amp;course='.$this->hotquestion->course->id.'">'.fullname($user).'</a>';
                     }
-                }
-                $line[] = $heat;
+                    // Process the time part of the row entry.
+                    $a->time = userdate($question->time).'&nbsp('.get_string('ago', 'hotquestion'
+                        , format_time(time() - $question->time)).')';
+                    $info = '<div class="author">'.get_string('authorinfo', 'hotquestion', $a).'</div>';
+                    $line[] = $content.$info;
+                    $heat = $question->votecount;
+                    $remove = '';
+                    $approve = '';
 
-                // Print the remove case option for teacher and manager.
-                if (has_capability('mod/hotquestion:manageentries', $context)) {
-                    // Do something.
-                    $remove .= '&nbsp;<a href="view.php?id='
-                            .$this->hotquestion->cm->id.'&action=remove&q='
-                            .$question->id.'" class="hotquestion_vote" id="question_'
-                            .$question->id.'"><img src="'.$this->image_url('t/delete').'" title="'
-                            .get_string('questionremove', 'hotquestion') .'" alt="'
-                            .get_string('questionremove', 'hotquestion') .'"/></a>';
-                    $line[] = $remove;
+                    // Print the vote cron case.
+                    if ($allowvote && $this->hotquestion->can_vote_on($question)) {
+                        if (!$this->hotquestion->has_voted($question->id)) {
+                            $heat .= '&nbsp;<a href="view.php?id='
+                                  .$this->hotquestion->cm->id
+                                  .'&action=vote&q='.$question->id
+                                  .'" class="hotquestion_vote" id="question_'
+                                  .$question->id.'"><img src="'.$this->image_url('s/yes')
+                                  .'" title="'.get_string('vote', 'hotquestion')
+                                  .'" alt="'.get_string('vote', 'hotquestion').'"/></a>';
+                        }
+                    }
+                    $line[] = $heat;
 
-                }
-                $table->data[] = $line;
+                    // Print the remove case option for teacher and manager.
+                    if (has_capability('mod/hotquestion:manageentries', $context)) {
+                        // Process remove column.
+                        $remove .= '&nbsp;<a href="view.php?id='
+                                .$this->hotquestion->cm->id.'&action=remove&q='
+                                .$question->id.'" class="hotquestion_vote" id="question_'
+                                .$question->id.'"><img src="'.$this->image_url('t/delete').'" title="'
+                                .get_string('questionremove', 'hotquestion') .'" alt="'
+                                .get_string('questionremove', 'hotquestion') .'"/></a>';
+                        $line[] = $remove;
+                        // Process approval column.
+
+                        if ($question->approved) {
+                            $approve .= '&nbsp;<a href="view.php?id='
+                                     .$this->hotquestion->cm->id.'&action=approve&q='
+                                     .$question->id.'" class="hotquestion_vote" id="question_'
+                                     .$question->approved.'"><img src="'.$this->image_url('t/go').'" title="'
+                                     .get_string('approved', 'hotquestion') .'" alt="'
+                                     .get_string('approved', 'hotquestion') .'"/></a>';
+                        } else {
+                            $approve .= '&nbsp;<a href="view.php?id='
+                                     .$this->hotquestion->cm->id.'&action=approve&q='
+                                     .$question->id.'" class="hotquestion_vote" id="question_'
+                                     .$question->approved.'"><img src="'.$this->image_url('t/stop').'" title="'
+                                     .get_string('approved', 'hotquestion') .'" alt="'
+                                     .get_string('approved', 'hotquestion') .'"/></a>';
+                        }
+
+                        $line[] = $approve;
+                    }
+                    $table->data[] = $line;
+                } else {
+                    $line[] = get_string('notapproved', 'hotquestion');
+                    $table->data[] = $line;
+                }// end of new if
             }
             $output .= html_writer::table($table);
         } else {
