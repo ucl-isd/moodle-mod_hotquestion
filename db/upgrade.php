@@ -129,5 +129,30 @@ function xmldb_hotquestion_upgrade($oldversion=0) {
         // Hotquestion savepoint reached.
         upgrade_mod_savepoint(true, 2016100300, 'hotquestion');
     }
+
+    // 3.3.2 Upgrade start here.
+    if ($oldversion < 2017122500) {
+
+        // Define field approval to be added to hotquestion.
+        $table = new xmldb_table('hotquestion');
+        $field = new xmldb_field('approval', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, '0', 'anonymouspost');
+
+        // Conditionally launch add field approval.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define field approved to be added to hotquestion_questions.
+        $table = new xmldb_table('hotquestion_questions');
+        $field = new xmldb_field('approved', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, '0', 'anonymous');
+
+        // Conditionally launch add field approval.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Hotquestion savepoint reached.
+        upgrade_mod_savepoint(true, 2017122500, 'hotquestion');
+    }
     return $result;
 }
