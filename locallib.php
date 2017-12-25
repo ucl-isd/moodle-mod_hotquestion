@@ -459,7 +459,8 @@ class mod_hotquestion {
                         get_string('content', 'hotquestion'),
                         get_string('userid', 'hotquestion'),
                         get_string('time', 'hotquestion'),
-                        get_string('anonymous', 'hotquestion'));
+                        get_string('anonymous', 'hotquestion'),
+                        get_string('approved', 'hotquestion'));
         // Add the headings to our data array.
         $csv->add_data($fields);
 
@@ -470,7 +471,7 @@ class mod_hotquestion {
                     ELSE u.firstname
                 END AS 'firstname',
                         u.lastname AS 'lastname', hq.hotquestion hotquestion, hq.content content, hq.userid userid,
-                FROM_UNIXTIME(hq.time) AS TIME, hq.anonymous anonymous
+                FROM_UNIXTIME(hq.time) AS TIME, hq.anonymous anonymous, hq.approved approved
                 FROM {hotquestion_questions} hq
                 JOIN {user} u ON u.id = hq.userid
                 WHERE hq.userid > 0 ";
@@ -481,7 +482,7 @@ class mod_hotquestion {
         if ($hqs = $DB->get_records_sql($sql, $fields)) {
             foreach ($hqs as $q) {
                 $output = array($q->firstname, $q->lastname, $q->id, $q->hotquestion,
-                    $q->content, $q->userid, $q->time, $q->anonymous);
+                    $q->content, $q->userid, $q->time, $q->anonymous, $q->approved);
                 $csv->add_data($output);
             }
         }
