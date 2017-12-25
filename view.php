@@ -158,6 +158,13 @@ if (!empty($action)) {
                 $hq->download_questions($q);
             }
             break;
+        case 'approve':
+            if (has_capability('mod/hotquestion:manageentries', $context)) {
+                $q = required_param('q',  PARAM_INT);  // Question id to approve.
+                // Call approve question function in locallib.
+                $hq->approve_question($q);
+            }
+            break;
     }
 }
 
