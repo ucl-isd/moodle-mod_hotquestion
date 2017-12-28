@@ -41,10 +41,22 @@ if ($ADMIN->fulltree) {
     $settings->add($setting);
 
     // Default submit instructions setting.
-    $settings->add(new admin_setting_configtext(
-        'mod_hotquestion/submitinstructions',
+    $settings->add(new admin_setting_configtext('mod_hotquestion/submitinstructions',
         new lang_string('inputquestion', 'hotquestion'),
         new lang_string('inputquestion_descr', 'hotquestion'),
         'Submit your question here:', PARAM_TEXT, 25)
     );
+
+    // Default allow anonymous post setting.
+    $settings->add(new admin_setting_configcheckbox_with_advanced('mod_hotquestion/anonymouspost',
+        get_string('allowanonymouspost', 'hotquestion'),
+        get_string('allowanonymouspost_descr', 'hotquestion'),
+        array('value' => 0, 'adv' => false)));
+
+    // Default approval required setting.
+    $settings->add(new admin_setting_configcheckbox_with_advanced('mod_hotquestion/requireapproval',
+        get_string('requireapproval', 'hotquestion'),
+        get_string('requireapproval_descr', 'hotquestion'),
+        array('value' => 0, 'adv' => false)));
+
 }
