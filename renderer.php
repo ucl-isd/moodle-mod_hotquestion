@@ -173,7 +173,7 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
                 $table->head = array(get_string('question', 'hotquestion')
                     , get_string('heat', 'hotquestion')
                     , get_string('questionremove', 'hotquestion')
-                    , get_string('approved', 'hotquestion'));
+                    , get_string('approvedyes', 'hotquestion'));
             } else {
                 $table->head = array(get_string('question', 'hotquestion'), get_string('heat', 'hotquestion'));
             }
@@ -201,7 +201,12 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
                     $heat = $question->votecount;
                     $remove = '';
                     $approve = '';
-
+                    // Set code for vote picture based on Moodle version.
+                    if ($CFG->branch > 32) {
+                        $vtemp = $this->image_url('s/yes');
+                    } else {
+                        $vtemp = $this->pix_url('s/yes');
+                    }
                     // Print the vote cron case.
                     if ($allowvote && $this->hotquestion->can_vote_on($question)) {
                         if (!$this->hotquestion->has_voted($question->id)) {
@@ -209,48 +214,60 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
                                   .$this->hotquestion->cm->id
                                   .'&action=vote&q='.$question->id
                                   .'" class="hotquestion_vote" id="question_'
-                                  .$question->id.'"><img src="'.$this->image_url('s/yes')
+                                  .$question->id.'"><img src="'.$vtemp
                                   .'" title="'.get_string('vote', 'hotquestion')
                                   .'" alt="'.get_string('vote', 'hotquestion').'"/></a>';
                         }
                     }
                     $line[] = $heat;
-
-                    // Print the remove case option for teacher and manager.
+                    // Set code for remove picture based on Moodle version.
+                    if ($CFG->branch > 32) {
+                        $rtemp = $this->image_url('t/delete');
+                    } else {
+                        $rtemp = $this->pix_url('t/delete');
+                    }
+                    // Print the remove and approve case option for teacher and manager.
                     if (has_capability('mod/hotquestion:manageentries', $context)) {
                         // Process remove column.
                         $remove .= '&nbsp;<a href="view.php?id='
                                 .$this->hotquestion->cm->id.'&action=remove&q='
                                 .$question->id.'" class="hotquestion_vote" id="question_'
-                                .$question->id.'"><img src="'.$this->image_url('t/delete').'" title="'
+                                .$question->id.'"><img src="'.$rtemp.'" title="'
                                 .get_string('questionremove', 'hotquestion') .'" alt="'
                                 .get_string('questionremove', 'hotquestion') .'"/></a>';
                         $line[] = $remove;
                         // Process approval column.
-
+                        // Set code for approve toggle picture based on Moodle version.
+                        if ($CFG->branch > 32) {
+                            $a1temp = $this->image_url('t/go');
+                            $a2temp = $this->image_url('t/stop');
+                        } else {
+                            $a1temp = $this->pix_url('t/go');
+                            $a2temp = $this->pix_url('t/stop');
+                        }
+                        // Process approval column.
                         if ($question->approved) {
                             $approve .= '&nbsp;<a href="view.php?id='
                                      .$this->hotquestion->cm->id.'&action=approve&q='
                                      .$question->id.'" class="hotquestion_vote" id="question_'
-                                     .$question->approved.'"><img src="'.$this->image_url('t/go').'" title="'
-                                     .get_string('approved', 'hotquestion') .'" alt="'
-                                     .get_string('approved', 'hotquestion') .'"/></a>';
+                                     .$question->approved.'"><img src="'.$a1temp.'" title="'
+                                     .get_string('approvedyes', 'hotquestion') .'" alt="'
+                                     .get_string('approvedyes', 'hotquestion') .'"/></a>';
                         } else {
                             $approve .= '&nbsp;<a href="view.php?id='
                                      .$this->hotquestion->cm->id.'&action=approve&q='
                                      .$question->id.'" class="hotquestion_vote" id="question_'
-                                     .$question->approved.'"><img src="'.$this->image_url('t/stop').'" title="'
-                                     .get_string('approved', 'hotquestion') .'" alt="'
-                                     .get_string('approved', 'hotquestion') .'"/></a>';
+                                     .$question->approved.'"><img src="'.$a2temp.'" title="'
+                                     .get_string('approvedno', 'hotquestion') .'" alt="'
+                                     .get_string('approvedno', 'hotquestion') .'"/></a>';
                         }
-
                         $line[] = $approve;
                     }
                     $table->data[] = $line;
                 } else {
                     $line[] = get_string('notapproved', 'hotquestion');
                     $table->data[] = $line;
-                }// end of new if
+                }
             }
             $output .= html_writer::table($table);
         } else {
