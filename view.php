@@ -118,7 +118,7 @@ if (has_capability('mod/hotquestion:ask', $context)) {
     }
 }
 
-// Handle vote and newround.
+// Handle priority, vote, newround, removeround, remove question, download questions, and approve question.
 if (!empty($action)) {
     switch ($action) {
         case 'tpriority':
@@ -126,12 +126,14 @@ if (!empty($action)) {
                 $u = required_param('u',  PARAM_INT);  // Flag to change priority up or down.
                 $q = required_param('q',  PARAM_INT);  // Question id to change priority.
                 $hq->tpriority_change($u, $q);
+                redirect('view.php?id='.$hq->cm->id, null); // Needed to prevent priority change on page reload.
             }
             break;
         case 'vote':
             if (has_capability('mod/hotquestion:vote', $context)) {
                 $q = required_param('q',  PARAM_INT);  // Question id to vote.
                 $hq->vote_on($q);
+                redirect('view.php?id='.$hq->cm->id, null); // Needed to prevent heat toggle on page reload.
             }
             break;
         case 'newround':
@@ -170,6 +172,7 @@ if (!empty($action)) {
                 $q = required_param('q',  PARAM_INT);  // Question id to approve.
                 // Call approve question function in locallib.
                 $hq->approve_question($q);
+                redirect('view.php?id='.$hq->cm->id, null); // Needed to prevent toggle on page reload.
             }
             break;
     }
