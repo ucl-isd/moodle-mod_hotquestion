@@ -154,5 +154,19 @@ function xmldb_hotquestion_upgrade($oldversion=0) {
         // Hotquestion savepoint reached.
         upgrade_mod_savepoint(true, 2017122500, 'hotquestion');
     }
+
+    // 3.4.0 Upgrade start here.
+    if ($oldversion < 2017122900.1) {
+        // Define field teacherpriority to be added to hotquestion_questions.
+        $table = new xmldb_table('hotquestion_questions');
+        $field = new xmldb_field('tpriority', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'approved');
+
+        // Conditionally launch add field teacherpriority.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+       // Hotquestion savepoint reached.
+        upgrade_mod_savepoint(true, 2017122900.1, 'hotquestion');
+    }
     return $result;
 }
