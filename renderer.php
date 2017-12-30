@@ -167,15 +167,16 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
             $table->cellpadding = 10;
             $table->class = 'generaltable';
             $table->width = '100%';
-            $table->align = array ('left', 'center', 'center', 'center');
+            $table->align = array ('left', 'center', 'center', 'center', 'center');
             // Modified table heading for show/not show Remove and Approved capability.
             if (has_capability('mod/hotquestion:manageentries', $context)) {
                 $table->head = array(get_string('question', 'hotquestion')
+                    , get_string('teacherpriority', 'hotquestion')
                     , get_string('heat', 'hotquestion')
                     , get_string('questionremove', 'hotquestion')
                     , get_string('approvedyes', 'hotquestion'));
             } else {
-                $table->head = array(get_string('question', 'hotquestion'), get_string('heat', 'hotquestion'));
+                $table->head = array(get_string('question', 'hotquestion'), get_string('teacherpriority', 'hotquestion'), get_string('heat', 'hotquestion'));
             }
 
             foreach ($questions as $question) {
@@ -198,15 +199,37 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
                         , format_time(time() - $question->time)).')';
                     $info = '<div class="author">'.get_string('authorinfo', 'hotquestion', $a).'</div>';
                     $line[] = $content.$info;
+                    $tpriority = $question->tpriority;
                     $heat = $question->votecount;
                     $remove = '';
                     $approve = '';
-                    // Set code for vote picture based on Moodle version.
+                    // Set code for thumbs up/thumbs down pictures based on Moodle version.
                     if ($CFG->branch > 32) {
-                        $vtemp = $this->image_url('s/yes');
+                        $ttemp1 = $this->image_url('s/yes');
+                        $ttemp2 = $this->image_url('s/no');
                     } else {
-                        $vtemp = $this->pix_url('s/yes');
+                        $ttemp1 = $this->pix_url('s/yes');
+                        $ttemp2 = $this->pix_url('s/no');
                     }
+                    // Process priority code here.
+                    if (has_capability('mod/hotquestion:manageentries', $context)) {
+                        // Process priority column.
+                        $tpriority .= '&nbsp;<a href="view.php?id='
+                                .$this->hotquestion->cm->id.'&action=tpriority&u=1&q='
+                                .$question->id.'" class="hotquestion_vote" id="question_'
+                                .$question->id.'"><img src="'.$ttemp1.'" title="'
+                                .get_string('teacherpriority', 'hotquestion') .'" alt="'
+                                .get_string('teacherpriority', 'hotquestion') .'"/></a><br> &nbsp;';
+                        $tpriority .= '&nbsp; &nbsp;<a href="view.php?id='
+                                .$this->hotquestion->cm->id.'&action=tpriority&u=0&q='
+                                .$question->id.'" class="hotquestion_vote" id="question_'
+                                .$question->id.'"><img src="'.$ttemp2.'" title="'
+                                .get_string('teacherpriority', 'hotquestion') .'" alt="'
+                                .get_string('teacherpriority', 'hotquestion') .'"/></a>';
+                     //   $line[] = $tpriority;
+                    }
+                    $line[] = $tpriority;
+
                     // Print the vote cron case.
                     if ($allowvote && $this->hotquestion->can_vote_on($question)) {
                         if (!$this->hotquestion->has_voted($question->id)) {
@@ -214,7 +237,7 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
                                   .$this->hotquestion->cm->id
                                   .'&action=vote&q='.$question->id
                                   .'" class="hotquestion_vote" id="question_'
-                                  .$question->id.'"><img src="'.$vtemp
+                                  .$question->id.'"><img src="'.$ttemp1
                                   .'" title="'.get_string('vote', 'hotquestion')
                                   .'" alt="'.get_string('vote', 'hotquestion').'"/></a>';
                         }

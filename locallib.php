@@ -513,6 +513,29 @@ class mod_hotquestion {
         }
         return;
     }
+
+    /**
+     * Set teacher priority of current question in current round.
+     *
+     * @param int $u the priority up or down flag.
+     * @param int $question the question id
+     */
+    public function tpriority_change($u, $question) {
+        global $CFG, $DB, $USER;
+
+        $context = context_module::instance($this->cm->id);
+        $question = $DB->get_record('hotquestion_questions', array('id' => $question));
+
+        if ($u) {
+            // If priority flag is 1, increase priority by 1.
+            $question->tpriority = ++$question->tpriority;
+            $DB->update_record('hotquestion_questions', $question);
+        } else {
+            // If priority flag is 0, decrease priority by 1.
+            $question->tpriority = --$question->tpriority;
+            $DB->update_record('hotquestion_questions', $question);
+        }
+    }
 }
 
 /**

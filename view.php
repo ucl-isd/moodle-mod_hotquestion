@@ -121,6 +121,13 @@ if (has_capability('mod/hotquestion:ask', $context)) {
 // Handle vote and newround.
 if (!empty($action)) {
     switch ($action) {
+        case 'tpriority':
+            if (has_capability('mod/hotquestion:manageentries', $context)) {
+                $u = required_param('u',  PARAM_INT);  // Flag to change priority up or down.
+                $q = required_param('q',  PARAM_INT);  // Question id to change priority.
+                $hq->tpriority_change($u, $q);
+            }
+            break;
         case 'vote':
             if (has_capability('mod/hotquestion:vote', $context)) {
                 $q = required_param('q',  PARAM_INT);  // Question id to vote.
