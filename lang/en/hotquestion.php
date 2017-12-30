@@ -97,6 +97,7 @@ $string['returnto'] = 'Return to {$a}';
 $string['round'] = 'Round {$a}';
 $string['showrecentactivity'] = 'Show recent activity';
 $string['showrecentactivityconfig'] = 'Everyone can see notifications in recent activity reports.';
+$string['teacherpriority'] = 'Priority';
 $string['time'] = 'Time';
 $string['userid'] = 'Userid';
 $string['vote'] = 'Vote';
