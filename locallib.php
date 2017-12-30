@@ -295,6 +295,8 @@ class mod_hotquestion {
 
     /**
      * Return questions according to $currentround.
+     *
+     * Sort order is priority ascending, votecount descending, and time descending.
      * @return all questions with vote count in current round.
      */
     public function get_questions() {
@@ -311,7 +313,7 @@ class mod_hotquestion {
                                         AND q.time >= ?
                                         AND q.time <= ?
                                      GROUP BY q.id
-                                     ORDER BY votecount DESC, q.time DESC', $params);
+                                     ORDER BY tpriority ASC, votecount DESC, q.time DESC', $params);
     }
 
     /**
