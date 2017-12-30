@@ -58,7 +58,7 @@ class backup_hotquestion_activity_structure_step extends backup_activity_structu
         $questions = new backup_nested_element('questions');
 
         $question = new backup_nested_element('question', array('id'), array(
-            'content', 'userid', 'time', 'anonymous', 'approved'));
+            'content', 'userid', 'time', 'anonymous', 'approved', 'tpriority'));
 
         $rounds = new backup_nested_element('rounds');
 
