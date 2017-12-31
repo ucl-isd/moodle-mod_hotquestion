@@ -359,7 +359,7 @@ function hotquestion_reset_course_form_definition(&$mform) {
 function hotquestion_supports($feature) {
     switch($feature) {
         case FEATURE_GROUPS:
-            return false;
+            return true;
         case FEATURE_GROUPINGS:
             return false;
         case FEATURE_GROUPMEMBERSONLY:
