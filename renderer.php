@@ -161,7 +161,12 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
         $id = required_param('id', PARAM_INT);
         $hq = new mod_hotquestion($id);
         $context = context_module::instance($hq->cm->id);
-
+////////////////////////////////////////////////////////////////////////
+if (! $cm = get_coursemodule_from_id('hotquestion', $id)) {
+    print_error("Course Module ID was incorrect");
+}
+//print_object($cm);
+/////////////////////////////////////////////////////////////////////////
         if ($questions) {
             $table = new html_table();
             $table->cellpadding = 10;
@@ -179,11 +184,53 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
                 $table->head = array(get_string('question', 'hotquestion'), get_string('teacherpriority', 'hotquestion'), get_string('heat', 'hotquestion'));
             }
 
+
+/////////////////////////////////////////////////////////////////////////////
+// Check to see if groups are being used here.
+$groupmode = groups_get_activity_groupmode($cm);
+$currentgroup = groups_get_activity_group($cm, true);
+if ($currentgroup) {
+    $groups = $currentgroup;
+} else {
+    $groups = '';
+}
+//$users = get_users_by_capability($context, 'mod/hotquestion:ask', '', '', '', '', $groups);
+
+
+//print_object(groups_get_group_name($groups));
+//print_object($groupmode);
+//print_object($groups);
+//print_object($users);
+//print_object($users->id);
+//////////////////////////////////////////////////////////////////////////////
+
+
             foreach ($questions as $question) {
                 $line = array();
                 $formatoptions->para = false;
                 $content = format_text($question->content, FORMAT_MOODLE, $formatoptions);
                 $user = $DB->get_record('user', array('id' => $question->userid));
+
+
+                
+               // $usergroup = $DB->get_record($user, array('id' => $question), $groups);
+
+//////////////////////////////////////////////////////////////////////////////
+//print_object($user->id);
+
+// if user is in current group, then process the question
+//print_object($user);
+//if ($users->id = $user->id) {
+if ((! $groups) || (groups_is_member($groups, $user->id))) {
+//if (groups_is_member($groups, $user->id)) {
+//debugging('in the if now');
+//print_object(groups_is_member($groups, $user->id));
+//print_object(groups_get_group_name($groups));
+
+//}
+///////////////////////////////////////////////////////////////////////////////////
+
+
 
                 // Process the question part of the row entry.
                 // If not a teacher and question is not approved, skip over it and do not show it.
@@ -291,6 +338,9 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
                     $line[] = get_string('notapproved', 'hotquestion');
                     $table->data[] = $line;
                 }
+///////////////////////////////////////////////////////////////////////////////////////////
+}
+///////////////////////////////////////////////////////////////////////////////////////////
             }
             $output .= html_writer::table($table);
         } else {
