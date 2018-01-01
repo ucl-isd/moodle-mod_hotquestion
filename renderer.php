@@ -161,19 +161,17 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
         $id = required_param('id', PARAM_INT);
         $hq = new mod_hotquestion($id);
         $context = context_module::instance($hq->cm->id);
-////////////////////////////////////////////////////////////////////////
-if (! $cm = get_coursemodule_from_id('hotquestion', $id)) {
-    print_error("Course Module ID was incorrect");
-}
-//print_object($cm);
-/////////////////////////////////////////////////////////////////////////
+
+        if (! $cm = get_coursemodule_from_id('hotquestion', $id)) {
+            print_error("Course Module ID was incorrect");
+        }
         if ($questions) {
             $table = new html_table();
             $table->cellpadding = 10;
             $table->class = 'generaltable';
             $table->width = '100%';
             $table->align = array ('left', 'center', 'center', 'center', 'center');
-            // Modified table heading for show/not show Remove and Approved capability.
+            // Teacher table shows questions, priority, heat, remove and approved headings.
             if (has_capability('mod/hotquestion:manageentries', $context)) {
                 $table->head = array(get_string('question', 'hotquestion')
                     , get_string('teacherpriority', 'hotquestion')
@@ -181,166 +179,136 @@ if (! $cm = get_coursemodule_from_id('hotquestion', $id)) {
                     , get_string('questionremove', 'hotquestion')
                     , get_string('approvedyes', 'hotquestion'));
             } else {
-                $table->head = array(get_string('question', 'hotquestion'), get_string('teacherpriority', 'hotquestion'), get_string('heat', 'hotquestion'));
+                // Students only see headings for questions, priority, and heat columns.
+                $table->head = array(get_string('question', 'hotquestion')
+                    , get_string('teacherpriority', 'hotquestion')
+                    , get_string('heat', 'hotquestion'));
             }
 
-
-/////////////////////////////////////////////////////////////////////////////
-// Check to see if groups are being used here.
-$groupmode = groups_get_activity_groupmode($cm);
-$currentgroup = groups_get_activity_group($cm, true);
-if ($currentgroup) {
-    $groups = $currentgroup;
-} else {
-    $groups = '';
-}
-//$users = get_users_by_capability($context, 'mod/hotquestion:ask', '', '', '', '', $groups);
-
-
-//print_object(groups_get_group_name($groups));
-//print_object($groupmode);
-//print_object($groups);
-//print_object($users);
-//print_object($users->id);
-//////////////////////////////////////////////////////////////////////////////
-
+            // Check to see if groups are being used here.
+            $groupmode = groups_get_activity_groupmode($cm);
+            $currentgroup = groups_get_activity_group($cm, true);
+            if ($currentgroup) {
+                $groups = $currentgroup;
+            } else {
+                $groups = '';
+            }
 
             foreach ($questions as $question) {
                 $line = array();
                 $formatoptions->para = false;
                 $content = format_text($question->content, FORMAT_MOODLE, $formatoptions);
                 $user = $DB->get_record('user', array('id' => $question->userid));
-
-
-                
-               // $usergroup = $DB->get_record($user, array('id' => $question), $groups);
-
-//////////////////////////////////////////////////////////////////////////////
-//print_object($user->id);
-
-// if user is in current group, then process the question
-//print_object($user);
-//if ($users->id = $user->id) {
-if ((! $groups) || (groups_is_member($groups, $user->id))) {
-//if (groups_is_member($groups, $user->id)) {
-//debugging('in the if now');
-//print_object(groups_is_member($groups, $user->id));
-//print_object(groups_get_group_name($groups));
-
-//}
-///////////////////////////////////////////////////////////////////////////////////
-
-
-
-                // Process the question part of the row entry.
-                // If not a teacher and question is not approved, skip over it and do not show it.
-                if ($question->approved || (has_capability('mod/hotquestion:manageentries', $context))) {
-                    if ($question->anonymous) {
-                        $a->user = get_string('anonymous', 'hotquestion');
-                    } else {
-                        $a->user = '<a href="'.$CFG->wwwroot.'/user/view.php?id='
-                        .$user->id.'&amp;course='.$this->hotquestion->course->id.'">'.fullname($user).'</a>';
-                    }
-                    // Process the time part of the row entry.
-                    $a->time = userdate($question->time).'&nbsp('.get_string('ago', 'hotquestion'
-                        , format_time(time() - $question->time)).')';
-                    $info = '<div class="author">'.get_string('authorinfo', 'hotquestion', $a).'</div>';
-                    $line[] = $content.$info;
-                    $tpriority = $question->tpriority;
-                    $heat = $question->votecount;
-                    $remove = '';
-                    $approve = '';
-                    // Set code for thumbs up/thumbs down pictures based on Moodle version.
-                    if ($CFG->branch > 32) {
-                        $ttemp1 = $this->image_url('s/yes');
-                        $ttemp2 = $this->image_url('s/no');
-                    } else {
-                        $ttemp1 = $this->pix_url('s/yes');
-                        $ttemp2 = $this->pix_url('s/no');
-                    }
-                    // Process priority code here.
-                    if (has_capability('mod/hotquestion:manageentries', $context)) {
-                        // Process priority column.
-                        $tpriority .= '&nbsp;<a href="view.php?id='
-                                .$this->hotquestion->cm->id.'&action=tpriority&u=1&q='
-                                .$question->id.'" class="hotquestion_vote" id="question_'
-                                .$question->id.'"><img src="'.$ttemp1.'" title="'
-                                .get_string('teacherpriority', 'hotquestion') .'" alt="'
-                                .get_string('teacherpriority', 'hotquestion') .'"/></a><br> &nbsp;';
-                        $tpriority .= '&nbsp; &nbsp;<a href="view.php?id='
-                                .$this->hotquestion->cm->id.'&action=tpriority&u=0&q='
-                                .$question->id.'" class="hotquestion_vote" id="question_'
-                                .$question->id.'"><img src="'.$ttemp2.'" title="'
-                                .get_string('teacherpriority', 'hotquestion') .'" alt="'
-                                .get_string('teacherpriority', 'hotquestion') .'"/></a>';
-                     //   $line[] = $tpriority;
-                    }
-                    $line[] = $tpriority;
-
-                    // Print the vote cron case.
-                    if ($allowvote && $this->hotquestion->can_vote_on($question)) {
-                        if (!$this->hotquestion->has_voted($question->id)) {
-                            $heat .= '&nbsp;<a href="view.php?id='
-                                  .$this->hotquestion->cm->id
-                                  .'&action=vote&q='.$question->id
-                                  .'" class="hotquestion_vote" id="question_'
-                                  .$question->id.'"><img src="'.$ttemp1
-                                  .'" title="'.get_string('vote', 'hotquestion')
-                                  .'" alt="'.get_string('vote', 'hotquestion').'"/></a>';
+                // If groups is set to all participants or matches current group, show the question.
+                if ((! $groups) || (groups_is_member($groups, $user->id))) {
+                    // Process the question part of the row entry.
+                    // If not a teacher and question is not approved, skip over it and do not show it.
+                    if ($question->approved || (has_capability('mod/hotquestion:manageentries', $context))) {
+                        if ($question->anonymous) {
+                            $a->user = get_string('anonymous', 'hotquestion');
+                        } else {
+                            $a->user = '<a href="'.$CFG->wwwroot.'/user/view.php?id='
+                            .$user->id.'&amp;course='.$this->hotquestion->course->id.'">'.fullname($user).'</a>';
                         }
-                    }
-                    $line[] = $heat;
-                    // Set code for remove picture based on Moodle version.
-                    if ($CFG->branch > 32) {
-                        $rtemp = $this->image_url('t/delete');
-                    } else {
-                        $rtemp = $this->pix_url('t/delete');
-                    }
-                    // Print the remove and approve case option for teacher and manager.
-                    if (has_capability('mod/hotquestion:manageentries', $context)) {
-                        // Process remove column.
-                        $remove .= '&nbsp;<a href="view.php?id='
-                                .$this->hotquestion->cm->id.'&action=remove&q='
-                                .$question->id.'" class="hotquestion_vote" id="question_'
-                                .$question->id.'"><img src="'.$rtemp.'" title="'
-                                .get_string('questionremove', 'hotquestion') .'" alt="'
-                                .get_string('questionremove', 'hotquestion') .'"/></a>';
-                        $line[] = $remove;
-                        // Process approval column.
-                        // Set code for approve toggle picture based on Moodle version.
+                        // Process the time part of the row entry.
+                        $a->time = userdate($question->time).'&nbsp('.get_string('ago', 'hotquestion'
+                            , format_time(time() - $question->time)).')';
+                        $info = '<div class="author">'.get_string('authorinfo', 'hotquestion', $a).'</div>';
+                        $line[] = $content.$info;
+                        // Get current priority value to show.
+                        $tpriority = $question->tpriority;
+                        // Get current heat total to show.
+                        $heat = $question->votecount;
+                        $remove = '';
+                        $approve = '';
+                        // Set code for thumbs up/thumbs down pictures based on Moodle version.
                         if ($CFG->branch > 32) {
-                            $a1temp = $this->image_url('t/go');
-                            $a2temp = $this->image_url('t/stop');
+                            $ttemp1 = $this->image_url('s/yes');
+                            $ttemp2 = $this->image_url('s/no');
                         } else {
-                            $a1temp = $this->pix_url('t/go');
-                            $a2temp = $this->pix_url('t/stop');
+                            $ttemp1 = $this->pix_url('s/yes');
+                            $ttemp2 = $this->pix_url('s/no');
                         }
-                        // Process approval column.
-                        if ($question->approved) {
-                            $approve .= '&nbsp;<a href="view.php?id='
-                                     .$this->hotquestion->cm->id.'&action=approve&q='
-                                     .$question->id.'" class="hotquestion_vote" id="question_'
-                                     .$question->approved.'"><img src="'.$a1temp.'" title="'
-                                     .get_string('approvedyes', 'hotquestion') .'" alt="'
-                                     .get_string('approvedyes', 'hotquestion') .'"/></a>';
+                        // Process priority code here.
+                        if (has_capability('mod/hotquestion:manageentries', $context)) {
+                            // Process priority column.
+                            $tpriority .= '&nbsp;<a href="view.php?id='
+                                       .$this->hotquestion->cm->id.'&action=tpriority&u=1&q='
+                                       .$question->id.'" class="hotquestion_vote" id="question_'
+                                       .$question->id.'"><img src="'.$ttemp1.'" title="'
+                                       .get_string('teacherpriority', 'hotquestion') .'" alt="'
+                                       .get_string('teacherpriority', 'hotquestion') .'"/></a><br> &nbsp;';
+                            $tpriority .= '&nbsp; &nbsp;<a href="view.php?id='
+                                       .$this->hotquestion->cm->id.'&action=tpriority&u=0&q='
+                                       .$question->id.'" class="hotquestion_vote" id="question_'
+                                       .$question->id.'"><img src="'.$ttemp2.'" title="'
+                                       .get_string('teacherpriority', 'hotquestion') .'" alt="'
+                                       .get_string('teacherpriority', 'hotquestion') .'"/></a>';
+                        }
+                        $line[] = $tpriority;
+
+                        // Print the vote cron case.
+                        if ($allowvote && $this->hotquestion->can_vote_on($question)) {
+                            if (!$this->hotquestion->has_voted($question->id)) {
+                                $heat .= '&nbsp;<a href="view.php?id='
+                                      .$this->hotquestion->cm->id
+                                      .'&action=vote&q='.$question->id
+                                      .'" class="hotquestion_vote" id="question_'
+                                      .$question->id.'"><img src="'.$ttemp1
+                                      .'" title="'.get_string('vote', 'hotquestion')
+                                      .'" alt="'.get_string('vote', 'hotquestion').'"/></a>';
+                            }
+                        }
+                        $line[] = $heat;
+                        // Set code for remove picture based on Moodle version.
+                        if ($CFG->branch > 32) {
+                            $rtemp = $this->image_url('t/delete');
                         } else {
-                            $approve .= '&nbsp;<a href="view.php?id='
-                                     .$this->hotquestion->cm->id.'&action=approve&q='
-                                     .$question->id.'" class="hotquestion_vote" id="question_'
-                                     .$question->approved.'"><img src="'.$a2temp.'" title="'
-                                     .get_string('approvedno', 'hotquestion') .'" alt="'
-                                     .get_string('approvedno', 'hotquestion') .'"/></a>';
+                            $rtemp = $this->pix_url('t/delete');
                         }
-                        $line[] = $approve;
+                        // Print the remove and approve case option for teacher and manager.
+                        if (has_capability('mod/hotquestion:manageentries', $context)) {
+                            // Process remove column.
+                            $remove .= '&nbsp;<a href="view.php?id='
+                                    .$this->hotquestion->cm->id.'&action=remove&q='
+                                    .$question->id.'" class="hotquestion_vote" id="question_'
+                                    .$question->id.'"><img src="'.$rtemp.'" title="'
+                                    .get_string('questionremove', 'hotquestion') .'" alt="'
+                                    .get_string('questionremove', 'hotquestion') .'"/></a>';
+                            $line[] = $remove;
+                            // Process approval column.
+                            // Set code for approve toggle picture based on Moodle version.
+                            if ($CFG->branch > 32) {
+                                $a1temp = $this->image_url('t/go');
+                                $a2temp = $this->image_url('t/stop');
+                            } else {
+                                $a1temp = $this->pix_url('t/go');
+                                $a2temp = $this->pix_url('t/stop');
+                            }
+                            // Show approval column.
+                            if ($question->approved) {
+                                $approve .= '&nbsp;<a href="view.php?id='
+                                         .$this->hotquestion->cm->id.'&action=approve&q='
+                                         .$question->id.'" class="hotquestion_vote" id="question_'
+                                         .$question->approved.'"><img src="'.$a1temp.'" title="'
+                                         .get_string('approvedyes', 'hotquestion') .'" alt="'
+                                         .get_string('approvedyes', 'hotquestion') .'"/></a>';
+                            } else {
+                                $approve .= '&nbsp;<a href="view.php?id='
+                                         .$this->hotquestion->cm->id.'&action=approve&q='
+                                         .$question->id.'" class="hotquestion_vote" id="question_'
+                                         .$question->approved.'"><img src="'.$a2temp.'" title="'
+                                         .get_string('approvedno', 'hotquestion') .'" alt="'
+                                         .get_string('approvedno', 'hotquestion') .'"/></a>';
+                            }
+                            $line[] = $approve;
+                        }
+                        $table->data[] = $line;
+                    } else {
+                        $line[] = get_string('notapproved', 'hotquestion');
+                        $table->data[] = $line;
                     }
-                    $table->data[] = $line;
-                } else {
-                    $line[] = get_string('notapproved', 'hotquestion');
-                    $table->data[] = $line;
                 }
-///////////////////////////////////////////////////////////////////////////////////////////
-}
-///////////////////////////////////////////////////////////////////////////////////////////
             }
             $output .= html_writer::table($table);
         } else {
@@ -348,6 +316,7 @@ if ((! $groups) || (groups_is_member($groups, $user->id))) {
         }
         return $output;
     }
+
     /**
      * Returns HTML for a hotquestion inaccessible message.
      * Added 10/2/16
@@ -369,4 +338,3 @@ if ((! $groups) || (groups_is_member($groups, $user->id))) {
         return $output;
     }
 }
-

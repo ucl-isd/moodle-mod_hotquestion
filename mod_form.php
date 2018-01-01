@@ -50,7 +50,6 @@ class mod_hotquestion_mod_form extends moodleform_mod {
         $mform =& $this->_form;
         $hotquestionconfig = get_config('mod_hotquestion');
 
-
         // Adding the "general" fieldset, where all the common settings are shown.
         $mform->addElement('header', 'general', get_string('general', 'form'));
 

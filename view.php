@@ -35,7 +35,7 @@ $id = required_param('id', PARAM_INT);                  // Course_module ID.
 $ajax = optional_param('ajax', 0, PARAM_BOOL);          // Asychronous form request.
 $action  = optional_param('action', '', PARAM_ACTION);  // Action(vote, newround).
 $roundid = optional_param('round', -1, PARAM_INT);      // Round id.
-$changegroup = optional_param('group', -1, PARAM_INT);   // choose the current group
+$changegroup = optional_param('group', -1, PARAM_INT);  // Choose the current group.
 
 if (! $cm = get_coursemodule_from_id('hotquestion', $id)) {
     print_error("Course Module ID was incorrect");
@@ -204,16 +204,9 @@ if (!$ajax) {
     // Print hotquestion description.
     echo $output->introduction();
 
-    // Check to see if groups are being used here.
-//    $groupmode = groups_get_activity_groupmode($cm);
-//    $currentgroup = groups_get_activity_group($cm, true);
+    // Print group information (A drop down box will be displayed if the user
+    // is a member of more than one group, or has access to all groups).
     groups_print_activity_menu($cm, $CFG->wwwroot . '/mod/hotquestion/view.php?id=' . $cm->id);
-
-//print_object($cm);
-//print_object($groupmode);
-//print_object($currentgroup);
-
-
 
     // Print the text box for typing submissions in.
     if (has_capability('mod/hotquestion:ask', $context)) {
@@ -235,4 +228,3 @@ echo $output->container_end();
 if (!$ajax) {
     echo $output->footer();
 }
-
