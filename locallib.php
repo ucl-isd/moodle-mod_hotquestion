@@ -550,20 +550,17 @@ class mod_hotquestion {
  */
 function hotquestion_count_entries($hotquestion, $groupid = 0) {
 
-    global $DB, $CFG;
+    global $DB, $CFG, $USER;
 
     $cm = hotquestion_get_coursemodule($hotquestion->id);
     $context = context_module::instance($cm->id);
+    // Get the groupmode; 0, 1, or 2.
+    $groupmode = ($hotquestion->groupmode);
 
-// Get the groupmode; 0, 1, or 2.
-$groupmode = ($hotquestion->groupmode);
-
-    // How many in a particular group?
-    // Need to change this to if: ($groupid && $groupmode = 1) {
-//    if ($groupid || ($groupmode > '0')) {
+    // How many users and questions in each Hot Question activity current round?
     if ($groupid && ($groupmode > '0')) {
         // Extract each group id from $groupid and process based on whether viewer is a member of the group.
-        // Show 0 if not a member of the current group.
+        // Show user and question counts only if a member of the current group.
         foreach ($groupid as $gid) {
         $sql = "SELECT COUNT(DISTINCT hq.userid) AS ucount, COUNT(DISTINCT hq.content) AS qcount FROM {hotquestion_questions} hq
                 JOIN {groups_members} g ON g.userid = hq.userid
@@ -576,8 +573,20 @@ $groupmode = ($hotquestion->groupmode);
                     AND hq.userid>0";
         $hotquestions = $DB->get_records_sql($sql);
         }
+    } else if (!$groupid && ($groupmode > '0')) {
+        // Check all the entries from the whole course.
+        // If not currently a group member, but group mode is set for separate groups or visible groups,
+        // see if this user has posted anyway, posted before mode was changed or posted before removal from a group.
+        $sql = "SELECT COUNT(DISTINCT hq.userid) AS ucount, COUNT(DISTINCT hq.content) AS qcount FROM {hotquestion_questions} hq
+                JOIN {user} u ON u.id = hq.userid
+                LEFT JOIN {hotquestion_rounds} hr ON hr.hotquestion=hq.hotquestion
+                WHERE hq.hotquestion = '$hotquestion->id' 
+                    AND hr.endtime=0
+                    AND hq.time>=hr.starttime
+                    AND hq.userid='$USER->id'";
+        $hotquestions = $DB->get_records_sql($sql);
     } else {
-        // Count all the entries from the whole course.
+        // Check all the users and entries from the whole course.
         $sql = "SELECT COUNT(DISTINCT hq.userid) AS ucount, COUNT(DISTINCT hq.content) AS qcount FROM {hotquestion_questions} hq
                 JOIN {user} u ON u.id = hq.userid
                 LEFT JOIN {hotquestion_rounds} hr ON hr.hotquestion=hq.hotquestion
@@ -586,9 +595,8 @@ $groupmode = ($hotquestion->groupmode);
                     AND hq.time>=hr.starttime
                     AND hq.userid>0";
         $hotquestions = $DB->get_records_sql($sql);
-    }
-//debugging('testing');
-//print_object($sql);
+}
+
     if (!$hotquestions) {
         return 0;
     }
