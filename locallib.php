@@ -550,43 +550,55 @@ class mod_hotquestion {
  */
 function hotquestion_count_entries($hotquestion, $groupid = 0) {
 
-    global $DB;
+    global $DB, $CFG;
 
     $cm = hotquestion_get_coursemodule($hotquestion->id);
     $context = context_module::instance($cm->id);
-    // Currently, groups are not being used by Hot Question.
-    if ($groupid) {     // How many in a particular group?
-        // I've temporarily replaced broken group $sql until groups are implemented. See tracker for old code.
+
+// Get the groupmode; 0, 1, or 2.
+$groupmode = ($hotquestion->groupmode);
+
+    // How many in a particular group?
+    // Need to change this to if: ($groupid && $groupmode = 1) {
+//    if ($groupid || ($groupmode > '0')) {
+    if ($groupid && ($groupmode > '0')) {
+        // Extract each group id from $groupid and process based on whether viewer is a member of the group.
+        // Show 0 if not a member of the current group.
+        foreach ($groupid as $gid) {
         $sql = "SELECT COUNT(DISTINCT hq.userid) AS ucount, COUNT(DISTINCT hq.content) AS qcount FROM {hotquestion_questions} hq
-                JOIN {user} u ON u.id = hq.userid
+                JOIN {groups_members} g ON g.userid = hq.userid
+                JOIN {user} u ON u.id = g.userid
                 LEFT JOIN {hotquestion_rounds} hr ON hr.hotquestion=hq.hotquestion
-                WHERE hq.hotquestion = '$hotquestion->id' AND
-                hr.endtime=0 AND
-                hq.time>=hr.starttime AND
-                hq.userid>0";
+                WHERE hq.hotquestion = $hotquestion->id
+                    AND g.groupid = '$gid->id' 
+                    AND hr.endtime=0
+                    AND hq.time>=hr.starttime
+                    AND hq.userid>0";
         $hotquestions = $DB->get_records_sql($sql);
-
-    } else { // Count all the entries from the whole course.
-
+        }
+    } else {
+        // Count all the entries from the whole course.
         $sql = "SELECT COUNT(DISTINCT hq.userid) AS ucount, COUNT(DISTINCT hq.content) AS qcount FROM {hotquestion_questions} hq
                 JOIN {user} u ON u.id = hq.userid
                 LEFT JOIN {hotquestion_rounds} hr ON hr.hotquestion=hq.hotquestion
-                WHERE hq.hotquestion = '$hotquestion->id' AND
-                hr.endtime=0 AND
-                hq.time>=hr.starttime AND
-                hq.userid>0";
-
+                WHERE hq.hotquestion = '$hotquestion->id' 
+                    AND hr.endtime=0
+                    AND hq.time>=hr.starttime
+                    AND hq.userid>0";
         $hotquestions = $DB->get_records_sql($sql);
     }
-
+//debugging('testing');
+//print_object($sql);
     if (!$hotquestions) {
         return 0;
     }
-
     $canadd = get_users_by_capability($context, 'mod/hotquestion:ask', 'u.id');
     $entriesmanager = get_users_by_capability($context, 'mod/hotquestion:manageentries', 'u.id');
-
-    return ($hotquestions);
+    if ($canadd || $entriesmanager) {
+        return ($hotquestions);
+    } else {
+        return 0;
+    }
 }
 
     /**
