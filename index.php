@@ -69,7 +69,7 @@ $table->align = array();
 
 if ($usesections) {
     $table->head[]  = get_string('sectionname', 'format_'.$course->format);
-    $table->align[] = 'center';
+    $table->align[] = 'left';
 }
 
 $table->head[]  = get_string('name');
@@ -81,8 +81,24 @@ $currentsection = '';
 $i = 0;
 foreach ($hotquestions as $hotquestion) {
 
+////////////////////////////////////////////////////////////////////////////////////////////
+//    $cm = hotquestion_get_coursemodule($hotquestion->id);
+//    $context = context_module::instance($cm->id);
+////////////////////////////////////////////////////////////////////////////////////////////
+
     $context = context_module::instance($hotquestion->coursemodule);
     $entriesmanager = has_capability('mod/hotquestion:view', $context);
+
+//$cm1 = ($hotquestion->coursemodule);
+//print_object($hotquestion->coursemodule);
+//print_object($cm1);
+//print_object($id);
+////////////////////////////////////////////////////////////////////////////////////////////
+// Check to see what groupe mode is being used here.
+//$groupmode = groups_get_activity_groupmode($cm1, $id);
+//print_object($cm);
+//print_object($groupmode);
+////////////////////////////////////////////////////////////////////////////////////////////
 
     // Section.
     $printsection = '';
@@ -130,6 +146,7 @@ foreach ($hotquestions as $hotquestion) {
                 }
             }
         }
+
         // Go count the users and questions in the current round.
         $entrycount = hotquestion_count_entries($hotquestion, groups_get_all_groups($course->id, $USER->id));
         // Extract the number of users and questions into the participation column.
