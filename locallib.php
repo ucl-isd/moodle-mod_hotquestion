@@ -463,7 +463,7 @@ class mod_hotquestion {
                         get_string('userid', 'hotquestion'),
                         get_string('time', 'hotquestion'),
                         get_string('anonymous', 'hotquestion'),
-                        get_string('approved', 'hotquestion'));
+                        get_string('approvedyes', 'hotquestion'));
         // Add the headings to our data array.
         $csv->add_data($fields);
 
