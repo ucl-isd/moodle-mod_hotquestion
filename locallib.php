@@ -554,7 +554,7 @@ function hotquestion_count_entries($hotquestion, $groupid = 0) {
 
     $cm = hotquestion_get_coursemodule($hotquestion->id);
     $context = context_module::instance($cm->id);
-    // Get the groupmode; 0, 1, or 2.
+    // Get the groupmode which should be 0, 1, or 2.
     $groupmode = ($hotquestion->groupmode);
 
     // How many users and questions in each Hot Question activity current round?
@@ -562,16 +562,16 @@ function hotquestion_count_entries($hotquestion, $groupid = 0) {
         // Extract each group id from $groupid and process based on whether viewer is a member of the group.
         // Show user and question counts only if a member of the current group.
         foreach ($groupid as $gid) {
-        $sql = "SELECT COUNT(DISTINCT hq.userid) AS ucount, COUNT(DISTINCT hq.content) AS qcount FROM {hotquestion_questions} hq
+            $sql = "SELECT COUNT(DISTINCT hq.userid) AS ucount, COUNT(DISTINCT hq.content) AS qcount FROM {hotquestion_questions} hq
                 JOIN {groups_members} g ON g.userid = hq.userid
                 JOIN {user} u ON u.id = g.userid
                 LEFT JOIN {hotquestion_rounds} hr ON hr.hotquestion=hq.hotquestion
                 WHERE hq.hotquestion = $hotquestion->id
-                    AND g.groupid = '$gid->id' 
+                    AND g.groupid = '$gid->id'
                     AND hr.endtime=0
                     AND hq.time>=hr.starttime
                     AND hq.userid>0";
-        $hotquestions = $DB->get_records_sql($sql);
+            $hotquestions = $DB->get_records_sql($sql);
         }
     } else if (!$groupid && ($groupmode > '0')) {
         // Check all the entries from the whole course.
@@ -580,7 +580,7 @@ function hotquestion_count_entries($hotquestion, $groupid = 0) {
         $sql = "SELECT COUNT(DISTINCT hq.userid) AS ucount, COUNT(DISTINCT hq.content) AS qcount FROM {hotquestion_questions} hq
                 JOIN {user} u ON u.id = hq.userid
                 LEFT JOIN {hotquestion_rounds} hr ON hr.hotquestion=hq.hotquestion
-                WHERE hq.hotquestion = '$hotquestion->id' 
+                WHERE hq.hotquestion = '$hotquestion->id'
                     AND hr.endtime=0
                     AND hq.time>=hr.starttime
                     AND hq.userid='$USER->id'";
@@ -590,12 +590,12 @@ function hotquestion_count_entries($hotquestion, $groupid = 0) {
         $sql = "SELECT COUNT(DISTINCT hq.userid) AS ucount, COUNT(DISTINCT hq.content) AS qcount FROM {hotquestion_questions} hq
                 JOIN {user} u ON u.id = hq.userid
                 LEFT JOIN {hotquestion_rounds} hr ON hr.hotquestion=hq.hotquestion
-                WHERE hq.hotquestion = '$hotquestion->id' 
+                WHERE hq.hotquestion = '$hotquestion->id'
                     AND hr.endtime=0
                     AND hq.time>=hr.starttime
                     AND hq.userid>0";
         $hotquestions = $DB->get_records_sql($sql);
-}
+    }
 
     if (!$hotquestions) {
         return 0;
