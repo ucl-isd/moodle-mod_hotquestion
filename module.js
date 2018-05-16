@@ -96,7 +96,7 @@ M.modHotquestion.refresh = function(e) {
 
 M.modHotquestion.getquestion = function() {
     var question = M.modHotquestion.questionbox.get('value');
-    return YAHOO.lang.trim(question);
+    return trim(question);
 };
 
 M.modHotquestion.questionchanged = function(e) {
