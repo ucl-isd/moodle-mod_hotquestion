@@ -16,7 +16,6 @@
 
 /**
  * Data provider.
- * This version export_user_data and get_contexts_for_userid appears to be working as of 1200, on 5.26.18
  *
  * @package    mod_hotquestion
  * @copyright  2016 AL Rachels
