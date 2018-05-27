@@ -142,13 +142,9 @@ class provider implements
         // Find the hotquestion IDs.
         $hotquestionidstocmids = static::get_hotquestion_ids_to_cmids_from_cmids($cmids);
 
-        // Prepare the common SQL fragments.
-        list($inhotquestionsql, $inhotquestionparams) = $DB->get_in_or_equal(array_keys($hotquestionidstocmids), SQL_PARAMS_NAMED);
-        $sqluserhotquestion = "userid = :userid AND hotquestionid $inhotquestionsql";
-        $paramsuserhotquestion = array_merge($inhotquestionparams, ['userid' => $userid]);
-
         list($contextsql, $contextparams) = $DB->get_in_or_equal($contextlist->get_contextids(), SQL_PARAMS_NAMED);
-
+        
+// Export the votes.
         $sql = "SELECT cm.id AS cmid,
                        hq.hotquestion AS hotquestion,
                        hv.question AS question,
@@ -166,7 +162,6 @@ class provider implements
         ] + $contextparams;
         $recordset = $DB->get_recordset_sql($sql, $params);
 
-        // Export the votes.
         static::recordset_loop_and_export($recordset, 'hotquestion', [], function($carry, $record) {
             $carry[] = (object) [
                 'question' => $record->question,
@@ -178,14 +173,7 @@ class provider implements
             writer::with_context($context)->export_related_data([], 'votes', (object) ['votes' => $data]);
         });
 
-        if (empty($contextlist->count())) {
-            return;
-        }
-
-        $user = $contextlist->get_user();
-
-        list($contextsql, $contextparams) = $DB->get_in_or_equal($contextlist->get_contextids(), SQL_PARAMS_NAMED);
-
+        // Export the questions.
         $sql = "SELECT cm.id AS cmid,
                        hq.hotquestion as hotquestion,
                        hq.content as content,
@@ -201,35 +189,10 @@ class provider implements
               ORDER BY cm.id";
 
         $params = ['userid' => $user->id] + $contextparams;
-        $hotquestioncontents = $DB->get_recordset_sql($sql, $params);
+        $recordset = $DB->get_recordset_sql($sql, $params);
 
-        // Reference to the hotquestion activity seen in the last iteration of the loop.
-        // By comparing this with the current record, and because we know the results
-        // are ordered, we know when we've moved to the contents for a new hotquestion
-        // activity and therefore when we can export the complete data for the last activity.
-        $lastcmid = null;
-
-        $hotquestiondata = [];
-
-        foreach ($hotquestioncontents as $record) {
-            $hotquestionquestions = format_string($record->hotquestion);
-            $path = array_merge([get_string('modulename', 'mod_mootyper'), $hotquestionquestions . " ({$record->hotquestion})"]);
-            // If we've moved to a new hotquestion, then write the last hotquestion data and reinit the hotquestion data array.
-            
-            if (!is_null($lastcmid)) {
-                if ($lastcmid != $record->cmid) {
-                    if (!empty($hotquestiondata)) {
-                        $context = \context_module::instance($lastcmid);
-                        self::export_hotquestion_data_for_user($hotquestiondata, $context, [], $user);
-                        $hotquestiondata = [];
-                    }
-                }
-            }
-            $lastcmid = $record->cmid;
-            $context = \context_module::instance($lastcmid);
-
-
-            $hotquestiondata['hotquestion'][] = [
+        static::recordset_loop_and_export($recordset, 'hotquestion', [], function($carry, $record) {
+            $carry[] = (object) [
                 'hotquestion' => $record->hotquestion,
                 'content' => $record->content,
                 'time' => transform::datetime($record->time),
@@ -237,15 +200,11 @@ class provider implements
                 'approved' => transform::yesno($record->approved),
                 'tpriority' => $record->tpriority
             ];
-        }
-        
-        $hotquestioncontents->close();
-
-        // The data for the last activity won't have been written yet, so make sure to write it now!
-        if (!empty($hotquestiondata)) {
-            $context = \context_module::instance($lastcmid);
-            self::export_hotquestion_data_for_user($hotquestiondata, $context, [], $user);
-        }
+            return $carry;
+        }, function($hotquestionid, $data) use ($hotquestionidstocmids) {
+            $context = context_module::instance($hotquestionidstocmids[$hotquestionid]);
+            writer::with_context($context)->export_related_data([], 'questions', (object) ['questions' => $data]);
+        });
     }
 
     /**
@@ -283,8 +242,8 @@ class provider implements
         }
 
         if ($cm = get_coursemodule_from_id('hotquestion', $context->instanceid)) {
-            $DB->delete_records('hotquestion_questions', ['hotquestionid' =>  $cm->instance]);
-            $DB->delete_records('hotquestion_votes', ['hotquestionid' =>  $cm->instance]);
+            $DB->delete_records('hotquestion_questions', ['hotquestionid' => $cm->instance]);
+            $DB->delete_records('hotquestion_votes', ['hotquestionid' => $cm->instance]);
         }
     }
 
