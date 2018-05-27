@@ -23,7 +23,7 @@
  * @author     AL Rachels < drachels@drachels.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
- 
+
 namespace mod_hotquestion\privacy;
 defined('MOODLE_INTERNAL') || die();
 
@@ -50,7 +50,7 @@ require_once($CFG->dirroot . '/mod/hotquestion/lib.php');
  * @author     AL Rachels <drachels@drachels.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class provider implements 
+class provider implements
     \core_privacy\local\metadata\provider,
     \core_privacy\local\request\plugin\provider {
 
@@ -76,12 +76,12 @@ class provider implements
         $collection->add_database_table('hotquestion_votes', [
             'id' => 'privacy:metadata:hotquestion_votes:id',
             'question' => 'privacy:metadata:hotquestion_votes:question',
-            'voter' => 'privacy:metadata:hotquestion_votes:voter', 
+            'voter' => 'privacy:metadata:hotquestion_votes:voter',
         ], 'privacy:metadata:hotquestion_votes');
 
         return $collection;
     }
- 
+
     /**
      * Get the list of contexts that contain user information for the specified user.
      *
@@ -90,7 +90,6 @@ class provider implements
      */
     public static function get_contexts_for_userid(int $userid) : \core_privacy\local\request\contextlist {
         $contextlist = new \core_privacy\local\request\contextlist();
-print_object('-------------In the get_contexts_for_userid function ---------------------');
 
         $sql = "SELECT c.id
                   FROM {context} c
@@ -100,10 +99,6 @@ print_object('-------------In the get_contexts_for_userid function -------------
                   JOIN {hotquestion_questions} hq ON hq.hotquestion = h.id
              LEFT JOIN {hotquestion_votes} hv ON hv.question = hq.id
                  WHERE (hq.userid = :userid1) OR (hv.voter = :userid2)";
-
-//                  WHERE (hq.userid = :userid1) OR (hv.voter = :userid2 AND (hv.question = hq.id AND hq.userid <> hv.voter))";
-
-
 
         $params = [
             'modulename' => 'hotquestion',
@@ -171,12 +166,6 @@ print_object('-------------In the get_contexts_for_userid function -------------
         ] + $contextparams;
         $recordset = $DB->get_recordset_sql($sql, $params);
 
-
-//                 WHERE (c.id {$contextsql} AND hq.userid = :userid1 AND hv.question = hq.id AND hq.userid <> hv.voter) OR (hv.voter = :userid2 AND (hv.question = hq.id AND hq.userid <> hv.voter))
-
-//                 WHERE (c.id {$contextsql} AND hq.userid = :userid1 AND hv.question = hq.id AND hq.userid = hv.voter) OR (hv.voter = :userid2 AND (hv.question = hq.id AND hq.userid <> hv.voter))
-
-
         // Export the votes.
         static::recordset_loop_and_export($recordset, 'hotquestion', [], function($carry, $record) {
             $carry[] = (object) [
@@ -188,9 +177,6 @@ print_object('-------------In the get_contexts_for_userid function -------------
             $context = context_module::instance($hotquestionidstocmids[$hotquestionid]);
             writer::with_context($context)->export_related_data([], 'votes', (object) ['votes' => $data]);
         });
-
-
-
 
         if (empty($contextlist->count())) {
             return;
@@ -217,9 +203,10 @@ print_object('-------------In the get_contexts_for_userid function -------------
         $params = ['userid' => $user->id] + $contextparams;
         $hotquestioncontents = $DB->get_recordset_sql($sql, $params);
 
-        // Reference to the hotquestion activity seen in the last iteration of the loop. By comparing this with the current record, and
-        // because we know the results are ordered, we know when we've moved to the contents for a new hotquestion activity and therefore
-        // when we can export the complete data for the last activity.
+        // Reference to the hotquestion activity seen in the last iteration of the loop.
+        // By comparing this with the current record, and because we know the results
+        // are ordered, we know when we've moved to the contents for a new hotquestion
+        // activity and therefore when we can export the complete data for the last activity.
         $lastcmid = null;
 
         $hotquestiondata = [];
@@ -300,8 +287,6 @@ print_object('-------------In the get_contexts_for_userid function -------------
             $DB->delete_records('hotquestion_votes', ['hotquestionid' =>  $cm->instance]);
         }
     }
-
-
 
     /**
      * Delete all user data for the specified user, in the specified contexts.
