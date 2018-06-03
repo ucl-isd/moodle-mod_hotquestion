@@ -59,7 +59,7 @@ class provider implements
      * @param collection $collection The initialised collection to add items to.
      * @return collection The updated collection of metadata items.
      */
-    public static function get_metadata(collection $collection) : collection {
+    public static function get_metadata(collection $collection) {
 
         $collection->add_database_table('hotquestion_questions', [
             'id' => 'privacy:metadata:hotquestion_questions:id',
