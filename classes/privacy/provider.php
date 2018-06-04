@@ -53,13 +53,16 @@ class provider implements
     \core_privacy\local\metadata\provider,
     \core_privacy\local\request\plugin\provider {
 
+    // This trait must be included.
+    use \core_privacy\local\legacy_polyfill;
+
     /**
      * Return metadata.
      *
      * @param collection $collection The initialised collection to add items to.
      * @return collection The updated collection of metadata items.
      */
-    public static function get_metadata(collection $collection) {
+    public static function _get_metadata(collection $collection) {
 
         $collection->add_database_table('hotquestion_questions', [
             'id' => 'privacy:metadata:hotquestion_questions:id',
@@ -87,7 +90,7 @@ class provider implements
      * @param int $userid the userid.
      * @return contextlist the list of contexts containing user info for the user.
      */
-    public static function get_contexts_for_userid(int $userid) : \core_privacy\local\request\contextlist {
+    public static function _get_contexts_for_userid($userid) {
         $contextlist = new \core_privacy\local\request\contextlist();
 
         $sql = "SELECT c.id
@@ -116,7 +119,7 @@ class provider implements
      *
      * @param approved_contextlist $contextlist a list of contexts approved for export.
      */
-    public static function export_user_data(approved_contextlist $contextlist) {
+    public static function _export_user_data(approved_contextlist $contextlist) {
         global $DB;
 
         $user = $contextlist->get_user();
@@ -139,11 +142,11 @@ class provider implements
             writer::with_context($context)->export_data([], $contextdata);
         }
         // Find the hotquestion IDs.
-        $hotquestionidstocmids = static::get_hotquestion_ids_to_cmids_from_cmids($cmids);
+        $hotquestionidstocmids = static::_get_hotquestion_ids_to_cmids_from_cmids($cmids);
 
         list($contextsql, $contextparams) = $DB->get_in_or_equal($contextlist->get_contextids(), SQL_PARAMS_NAMED);
         
-// Export the votes.
+        // Export the votes.
         $sql = "SELECT cm.id AS cmid,
                        hq.hotquestion AS hotquestion,
                        hv.question AS question,
@@ -161,7 +164,7 @@ class provider implements
         ] + $contextparams;
         $recordset = $DB->get_recordset_sql($sql, $params);
 
-        static::recordset_loop_and_export($recordset, 'hotquestion', [], function($carry, $record) {
+        static::_recordset_loop_and_export($recordset, 'hotquestion', [], function($carry, $record) {
             $carry[] = (object) [
                 'question' => $record->question,
                 'voter' => $record->voter,
@@ -190,7 +193,7 @@ class provider implements
         $params = ['userid' => $user->id] + $contextparams;
         $recordset = $DB->get_recordset_sql($sql, $params);
 
-        static::recordset_loop_and_export($recordset, 'hotquestion', [], function($carry, $record) {
+        static::_recordset_loop_and_export($recordset, 'hotquestion', [], function($carry, $record) {
             $carry[] = (object) [
                 'hotquestion' => $record->hotquestion,
                 'content' => $record->content,
@@ -213,7 +216,7 @@ class provider implements
      * @param \context_module $context the context of the hotquestion.
      * @param \stdClass $user the user record
      */
-    public static function export_hotquestion_data_for_user(array $hotquestiondata, \context_module $context,
+    public static function _export_hotquestion_data_for_user(array $hotquestiondata, \context_module $context,
                                                             array $subcontext, \stdClass $user) {
 
         // Fetch the generic module data for the hotquestion.
@@ -233,7 +236,7 @@ class provider implements
      *
      * @param \context $context the context to delete in.
      */
-    public static function delete_data_for_all_users_in_context(\context $context) {
+    public static function _delete_data_for_all_users_in_context(\context $context) {
         global $DB;
 
         if (!$context instanceof \context_module) {
@@ -251,7 +254,7 @@ class provider implements
      *
      * @param approved_contextlist $contextlist a list of contexts approved for deletion.
      */
-    public static function delete_data_for_user(approved_contextlist $contextlist) {
+    public static function _delete_data_for_user(approved_contextlist $contextlist) {
         global $DB;
         if (empty($contextlist->count())) {
             return;
@@ -271,7 +274,7 @@ class provider implements
      * @param array $cmids The course module IDs.
      * @return array In the form of [$hotquestionid => $cmid].
      */
-    protected static function get_hotquestion_ids_to_cmids_from_cmids(array $cmids) {
+    protected static function _get_hotquestion_ids_to_cmids_from_cmids(array $cmids) {
         global $DB;
         list($insql, $inparams) = $DB->get_in_or_equal($cmids, SQL_PARAMS_NAMED);
         $sql = "
@@ -296,7 +299,7 @@ class provider implements
      * @param callable $export The function to export the dataset, receives the last value from $splitkey and the dataset.
      * @return void
      */
-    protected static function recordset_loop_and_export(\moodle_recordset $recordset, $splitkey, $initial,
+    protected static function _recordset_loop_and_export(\moodle_recordset $recordset, $splitkey, $initial,
             callable $reducer, callable $export) {
 
         $data = $initial;
