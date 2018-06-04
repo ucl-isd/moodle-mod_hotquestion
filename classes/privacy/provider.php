@@ -30,7 +30,6 @@ use context;
 use context_helper;
 use context_user;
 use context_module;
-use stdClass;
 use core_privacy\local\metadata\collection;
 use core_privacy\local\request\approved_contextlist;
 use core_privacy\local\request\contextlist;
@@ -38,8 +37,6 @@ use core_privacy\local\request\transform;
 use core_privacy\local\request\deletion_criteria;
 use core_privacy\local\request\helper;
 use core_privacy\local\request\writer;
-
-require_once($CFG->dirroot . '/mod/hotquestion/lib.php');
 
 /**
  * Data provider class for the Hot Question activity module.
