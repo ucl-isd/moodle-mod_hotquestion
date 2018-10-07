@@ -142,7 +142,7 @@ class provider implements
         $hotquestionidstocmids = static::_get_hotquestion_ids_to_cmids_from_cmids($cmids);
 
         list($contextsql, $contextparams) = $DB->get_in_or_equal($contextlist->get_contextids(), SQL_PARAMS_NAMED);
-        
+
         // Export the votes.
         $sql = "SELECT cm.id AS cmid,
                        hq.hotquestion AS hotquestion,
@@ -211,6 +211,7 @@ class provider implements
      *
      * @param array $hotquestiondata the personal data to export for the hotquestion.
      * @param \context_module $context the context of the hotquestion.
+     * @param array $subcontext the subcontext personal data to export for the hotquestion.
      * @param \stdClass $user the user record
      */
     public static function _export_hotquestion_data_for_user(array $hotquestiondata, \context_module $context,
