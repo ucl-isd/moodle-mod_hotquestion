@@ -83,6 +83,7 @@ $string['notapproved'] = '<b>This entry is not currently approved for viewing.<b
 $string['pluginadministration'] = 'Hot question administration';
 $string['pluginname'] = 'Hot Question';
 $string['previousround'] = 'Previous round';
+$string['postbutton'] = 'Click to post';
 $string['privacy:metadata:hotquestion_questions'] = "Information about the user's entries for a given Hot Question activity. ";
 $string['privacy:metadata:hotquestion_questions:userid'] = 'The ID of the user that posted this entry.';
 $string['privacy:metadata:hotquestion_questions:hotquestion'] = 'The ID of the Hot Question activity in which the content was posted.';
