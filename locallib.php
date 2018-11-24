@@ -463,21 +463,48 @@ class mod_hotquestion {
                         get_string('userid', 'hotquestion'),
                         get_string('time', 'hotquestion'),
                         get_string('anonymous', 'hotquestion'),
+                        get_string('teacherpriority', 'hotquestion'),
                         get_string('approvedyes', 'hotquestion'));
         // Add the headings to our data array.
         $csv->add_data($fields);
+        if ($CFG->dbtype == 'pgsql') {
+            $sql = "SELECT hq.id AS id,
+                    CASE
+                        WHEN u.firstname = 'Guest user'
+                        THEN u.lastname || 'Anonymous'
+                        ELSE u.firstname
+                    END AS firstname,
+                        u.lastname AS lastname,
+                        hq.hotquestion AS hotquestion,
+                        hq.content AS content,
+                        hq.userid AS userid,
+                        to_char(to_timestamp(hq.time), 'YYYY-MM-DD HH24:MI:SS') AS time,
+                        hq.anonymous AS anonymous,
+                        hq.tpriority AS tpriority,
+                        hq.approved AS approved
+                    FROM {hotquestion_questions} hq
+                    JOIN {user} u ON u.id = hq.userid
+                    WHERE hq.userid > 0 ";
+        } else {
+            $sql = "SELECT hq.id id,
+                    CASE
+                        WHEN u.firstname = 'Guest user'
+                        THEN CONCAT(u.lastname, 'Anonymous')
+                        ELSE u.firstname
+                    END AS 'firstname',
+                        u.lastname AS 'lastname',
+                        hq.hotquestion hotquestion,
+                        hq.content content,
+                        hq.userid userid,
+                        FROM_UNIXTIME(hq.time) AS TIME,
+                        hq.anonymous anonymous,
+                        hq.tpriority AS tpriority,
+                        hq.approved approved
+                    FROM {hotquestion_questions} hq
+                    JOIN {user} u ON u.id = hq.userid
+                    WHERE hq.userid > 0 ";
+        }
 
-        $sql = "SELECT hq.id id,
-                CASE
-                    WHEN u.firstname = 'Guest user'
-                    THEN CONCAT(u.lastname, 'Anonymous')
-                    ELSE u.firstname
-                END AS 'firstname',
-                        u.lastname AS 'lastname', hq.hotquestion hotquestion, hq.content content, hq.userid userid,
-                FROM_UNIXTIME(hq.time) AS TIME, hq.anonymous anonymous, hq.approved approved
-                FROM {hotquestion_questions} hq
-                JOIN {user} u ON u.id = hq.userid
-                WHERE hq.userid > 0 ";
         $sql .= ($whichhqs);
         $sql .= " ORDER BY hq.hotquestion, u.id";
 
@@ -485,7 +512,7 @@ class mod_hotquestion {
         if ($hqs = $DB->get_records_sql($sql, $fields)) {
             foreach ($hqs as $q) {
                 $output = array($q->firstname, $q->lastname, $q->id, $q->hotquestion,
-                    $q->content, $q->userid, $q->time, $q->anonymous, $q->approved);
+                    $q->content, $q->userid, $q->time, $q->anonymous, $q->tpriority, $q->approved);
                 $csv->add_data($output);
             }
         }
