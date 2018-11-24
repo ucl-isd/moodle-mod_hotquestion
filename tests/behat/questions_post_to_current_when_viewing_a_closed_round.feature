@@ -30,11 +30,11 @@ Feature: When posting a question while viewing a closed round, the question post
     And I follow "Test hotquestion name"
     And I set the following fields to these values:
       | Submit your question here: | Round 1 first question by student 1 |
-    And I press "Post"
+    And I press "Click to post"
     And I set the following fields to these values:
       | Submit your question here: | Round 1 second question by student 1 |
 	And I set the field "Display as anonymous" to "1"
-    And I press "Post"
+    And I press "Click to post"
     Then I log out
 	# Teacher 1 opens a new round.
 	Given I log in as "teacher1"
@@ -54,11 +54,11 @@ Feature: When posting a question while viewing a closed round, the question post
     And I follow "Test hotquestion name"
     And I set the following fields to these values:
       | Submit your question here: | Round 2 third question by student 2 |
-    And I press "Post"
+    And I press "Click to post"
     And I set the following fields to these values:
       | Submit your question here: | Round 2 fourth question by student 2 |
 	And I set the field "Display as anonymous" to "1"
-    And I press "Post"
+    And I press "Click to post"
 	Then I should see "Round 2 fourth question by student 2"
 	And I should see "Round 2 third question by student 2"
 	And I follow "Previous round"
@@ -66,7 +66,7 @@ Feature: When posting a question while viewing a closed round, the question post
 	And I should see "Round 1 first question by student 1"
     And I set the following fields to these values:
       | Submit your question here: | Round 2 fifth question by student 2 |
-    And I press "Post"
+    And I press "Click to post"
 	Then I should see "Round 2 fifth question by student 2"
 	And I should see "Round 2 fourth question by student 2"
 	And I should see "Round 2 third question by student 2"
@@ -76,7 +76,7 @@ Feature: When posting a question while viewing a closed round, the question post
     And I set the following fields to these values:
       | Submit your question here: | Round 2 sixth question by student 2 |
 	And I set the field "Display as anonymous" to "1"
-    And I press "Post"
+    And I press "Click to post"
 	Then I should see "Round 2 sixth question by student 2"
 	Then I should see "Round 2 fifth question by student 2"
 	And I should see "Round 2 fourth question by student 2"

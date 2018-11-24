@@ -32,11 +32,11 @@ Feature: Teachers, admin and managers can remove named or anonymous posts
     And I follow "Test hotquestion name"
     And I set the following fields to these values:
       | Submit your question here: | First question by teacher 1 |
-    And I press "Post"
+    And I press "Click to post"
     Then I set the following fields to these values:
       | Submit your question here: | Second question by teacher 1 |
 	And I set the field "Display as anonymous" to "1"
-    And I press "Post"
+    And I press "Click to post"
     Then I log out
 	# Admin User adds posts.
 	Given I log in as "admin"
@@ -44,11 +44,11 @@ Feature: Teachers, admin and managers can remove named or anonymous posts
     And I follow "Test hotquestion name"
     And I set the following fields to these values:
       | Submit your question here: | Third question by admin user |
-    And I press "Post"
+    And I press "Click to post"
 	Then I set the following fields to these values:
       | Submit your question here: | Fourth question by admin user |
 	And I set the field "Display as anonymous" to "1"
-    And I press "Post"
+    And I press "Click to post"
     Then I log out
 	# Manager 1 adds posts.
 	Given I log in as "manager1"
@@ -56,11 +56,11 @@ Feature: Teachers, admin and managers can remove named or anonymous posts
     And I follow "Test hotquestion name"
     And I set the following fields to these values:
       | Submit your question here: | Fifth question by  manager 1 |
-    And I press "Post"
+    And I press "Click to post"
 	Then I set the following fields to these values:
       | Submit your question here: | Sixth question by manager 1 |
 	And I set the field "Display as anonymous" to "1"
-    And I press "Post"
+    And I press "Click to post"
     Then I log out
     # Student 1 adds posts.
 	Given I log in as "student1"
@@ -68,11 +68,11 @@ Feature: Teachers, admin and managers can remove named or anonymous posts
     And I follow "Test hotquestion name"
     And I set the following fields to these values:
       | Submit your question here: | Seventh question by student 1 |
-    And I press "Post"
+    And I press "Click to post"
 	Then I set the following fields to these values:
       | Submit your question here: | Eighth question by student 1 |
 	And I set the field "Display as anonymous" to "1"
-    And I press "Post"
+    And I press "Click to post"
     Then I log out
 	# Teacher 1 removes a post.
 	Given I log in as "teacher1"

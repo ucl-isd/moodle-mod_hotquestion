@@ -30,11 +30,11 @@ Feature: Teachers and admin users can remove rounds
     And I follow "Test hotquestion name"
     And I set the following fields to these values:
       | Submit your question here: | Round 1 first question by student 1 |
-    And I press "Post"
+    And I press "Click to post"
     And I set the following fields to these values:
       | Submit your question here: | Round 1 second question by student 1 |
 	And I set the field "Display as anonymous" to "1"
-    And I press "Post"
+    And I press "Click to post"
     Then I log out
 	# Teacher 1 adds new round.
 	Given I log in as "teacher1"
@@ -50,11 +50,11 @@ Feature: Teachers and admin users can remove rounds
     And I follow "Test hotquestion name"
     And I set the following fields to these values:
       | Submit your question here: | Round 2 third question by student 2 |
-    And I press "Post"
+    And I press "Click to post"
     And I set the following fields to these values:
       | Submit your question here: | Round 2 fourth question by student 2 |
 	And I set the field "Display as anonymous" to "1"
-    And I press "Post"
+    And I press "Click to post"
 	Then I should see "Round 2 fourth question by student 2"
 	And I should see "Round 2 third question by student 2"
 	And I follow "Previous round"
@@ -82,11 +82,11 @@ Feature: Teachers and admin users can remove rounds
     And I follow "Test hotquestion name"
     And I set the following fields to these values:
       | Submit your question here: | Round 3 fifth question by student 1 |
-    And I press "Post"
+    And I press "Click to post"
     And I set the following fields to these values:
       | Submit your question here: | Round 3 sixth question by student 1 |
 	And I set the field "Display as anonymous" to "1"
-    And I press "Post"
+    And I press "Click to post"
 	And I follow "Previous round"
 	Then I should see "Round 1 second question by student 1"
 	And I should see "Round 1 first question by student 1"

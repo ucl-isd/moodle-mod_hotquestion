@@ -36,21 +36,21 @@ Feature: Admin user can export all questions from all HotQuestions
     And I follow "Test hotquestion name 1"
     And I set the following fields to these values:
       | Submit your question here: | First question 1 |
-    And I press "Post"
+    And I press "Click to post"
     And I set the following fields to these values:
       | Submit your question here: | Second question 1 |
 	And I set the field "Display as anonymous" to "1"
-    And I press "Post"
+    And I press "Click to post"
     # Admin User adds posts to course 2
     When I am on "Course 2" course homepage
     And I follow "Test hotquestion name 2"
     And I set the following fields to these values:
       | Submit your question here: | First question 2 |
-    And I press "Post"
+    And I press "Click to post"
     And I set the following fields to these values:
       | Submit your question here: | Second question 2 |
 	And I set the field "Display as anonymous" to "1"
-    And I press "Post"
+    And I press "Click to post"
     Then I log out
     #Teacher 1 posts entries to course 1
 	Given I log in as "teacher1"
@@ -59,22 +59,22 @@ Feature: Admin user can export all questions from all HotQuestions
     And I follow "Test hotquestion name 1"
     And I set the following fields to these values:
       | Submit your question here: | Third question 1 |
-    And I press "Post"
+    And I press "Click to post"
     And I set the following fields to these values:
       | Submit your question here: | Fourth question 1 |
 	And I set the field "Display as anonymous" to "1"
-    And I press "Post"
+    And I press "Click to post"
     #Teacher 1 posts entries to course 2
 	And I am on homepage
     And I follow "Course 2"
     And I follow "Test hotquestion name 2"
     And I set the following fields to these values:
       | Submit your question here: | Third question 2 |
-    And I press "Post"
+    And I press "Click to post"
     And I set the following fields to these values:
       | Submit your question here: | Fourth question 2 |
 	And I set the field "Display as anonymous" to "1"
-    And I press "Post"
+    And I press "Click to post"
     Then I log out
     #Non-editing teacher 2 posts entries course 1
 	Given I log in as "teacher2"
@@ -83,22 +83,22 @@ Feature: Admin user can export all questions from all HotQuestions
     And I follow "Test hotquestion name 1"
     And I set the following fields to these values:
       | Submit your question here: | Fifth question 1 |
-    And I press "Post"
+    And I press "Click to post"
     And I set the following fields to these values:
       | Submit your question here: | Sixth question 1 |
 	And I set the field "Display as anonymous" to "1"
-    And I press "Post"
+    And I press "Click to post"
     #Non-editing teacher 2 posts entries to course 2
 	And I am on homepage
     And I follow "Course 2"
     And I follow "Test hotquestion name 2"
     And I set the following fields to these values:
       | Submit your question here: | Fifth question 2 |
-    And I press "Post"
+    And I press "Click to post"
     And I set the following fields to these values:
       | Submit your question here: | Sixth question 2 |
 	And I set the field "Display as anonymous" to "1"
-    And I press "Post"
+    And I press "Click to post"
     Then I log out
 	#Student 1 posts entries to course 1
 	Given I log in as "student1"
@@ -107,11 +107,11 @@ Feature: Admin user can export all questions from all HotQuestions
     And I follow "Test hotquestion name 1"
     And I set the following fields to these values:
       | Submit your question here: | Seventh question 1 |
-    And I press "Post"
+    And I press "Click to post"
     And I set the following fields to these values:
       | Submit your question here: | Eighth question 1 |
     And I set the field "Display as anonymous" to "1"
-    And I press "Post"
+    And I press "Click to post"
 	Then I log out
     #Student 1 posts entries course 2
     Given I log in as "student1"
@@ -120,11 +120,11 @@ Feature: Admin user can export all questions from all HotQuestions
     And I follow "Test hotquestion name 2"
     And I set the following fields to these values:
       | Submit your question here: | Seventh question 2 |
-    And I press "Post"
+    And I press "Click to post"
     And I set the following fields to these values:
       | Submit your question here: | Eighth question 2 |
     And I set the field "Display as anonymous" to "1"
-    And I press "Post"
+    And I press "Click to post"
     Then I should see "Eighth question 2"
     And I should see "Posted by Anonymous"
     And I should see "Seventh question 2"
@@ -163,7 +163,7 @@ Feature: Admin user can export all questions from all HotQuestions
     And I should see "Posted by Anonymous"
     And I should see "First question 1"
     And I should see "Posted by Admin User"
-	And following "Export to .csv" should download between "1900" and "2000" bytes
+	And following "Export to .csv" should download between "1300" and "1400" bytes
     # Verify download by admin was logged.
     And I navigate to "Logs" in current page administration
     Then I should see "Admin User" in the "#report_log_r0_c1" "css_element"

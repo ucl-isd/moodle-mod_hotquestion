@@ -32,11 +32,11 @@ Feature: Users can vote on named or anonymous entries to hotquestion
     And I follow "Test hotquestion name"
     And I set the following fields to these values:
       | Submit your question here: | First question by student 1 |
-    And I press "Post"
+    And I press "Click to post"
     And I set the following fields to these values:
       | Submit your question here: | Second question by student 1 |
 	And I set the field "Display as anonymous" to "1"
-    And I press "Post"
+    And I press "Click to post"
 	Then I should see "Second question by student 1"
 	And I should see "Posted by Anonymous"
 	Then I should see "First question by student 1"

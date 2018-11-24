@@ -30,11 +30,11 @@ Feature: Users can post named or anonymous entries to hotquestion
     And I follow "Test hotquestion name"
     And I set the following fields to these values:
       | Submit your question here: | First question |
-    And I press "Post"
+    And I press "Click to post"
     And I set the following fields to these values:
       | Submit your question here: | Second question |
 	And I set the field "Display as anonymous" to "1"
-    And I press "Post"
+    And I press "Click to post"
 	# Admin User verifies his posts are logged.
     And I navigate to "Logs" in current page administration
 	Then I should see "Admin User" in the "#report_log_r1_c1" "css_element"
@@ -49,11 +49,11 @@ Feature: Users can post named or anonymous entries to hotquestion
     And I follow "Test hotquestion name"
     And I set the following fields to these values:
       | Submit your question here: | Third question |
-    And I press "Post"
+    And I press "Click to post"
     And I set the following fields to these values:
       | Submit your question here: | Fourth question |
 	And I set the field "Display as anonymous" to "1"
-    And I press "Post"
+    And I press "Click to post"
     # Teacher 1 verifies his posts are logged.
     And I navigate to "Logs" in current page administration
 	Then I should see "Teacher 1" in the "#report_log_r1_c1" "css_element"
@@ -68,11 +68,11 @@ Feature: Users can post named or anonymous entries to hotquestion
     And I follow "Test hotquestion name"
     And I set the following fields to these values:
       | Submit your question here: | Fifth question |
-    And I press "Post"
+    And I press "Click to post"
     And I set the following fields to these values:
       | Submit your question here: | Sixth question |
 	And I set the field "Display as anonymous" to "1"
-    And I press "Post"
+    And I press "Click to post"
     # Teacher 2 verifies his posts are logged.
     And I navigate to "Logs" in current page administration
  	Then I should see "Teacher 2" in the "#report_log_r1_c1" "css_element"
@@ -87,12 +87,12 @@ Feature: Users can post named or anonymous entries to hotquestion
     And I follow "Test hotquestion name"
     And I set the following fields to these values:
       | Submit your question here: | Seventh question |
-    And I press "Post"
+    And I press "Click to post"
 	Then I should see "Seventh question"
     And I set the following fields to these values:
       | Submit your question here: | Eighth question |
 	And I set the field "Display as anonymous" to "1"
-    And I press "Post"
+    And I press "Click to post"
     Then I should see "Eighth question"
     And I should see "Posted by Anonymous"
     And I should see "Seventh question"
