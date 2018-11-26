@@ -511,14 +511,14 @@ class mod_hotquestion {
         }
 
         $sql .= ($whichhqs);
-        $sql .= "     GROUP BY u.lastname, u.firstname, hq.hotquestion, hq.id 
+        $sql .= "     GROUP BY u.lastname, u.firstname, hq.hotquestion, hq.id
                       ORDER BY hq.hotquestion ASC, hq.id ASC, tpriority DESC, heat";
 
         // Add the list of users and HotQuestions to our data array.
         if ($hqs = $DB->get_records_sql($sql, $fields)) {
             foreach ($hqs as $q) {
                 $output = array($q->firstname, $q->lastname, $q->userid, $q->hotquestion, $q->question,
-                    $q->time, $q->anonymous, $q->tpriority, $q->heat, $q->approved, $q->content,);
+                    $q->time, $q->anonymous, $q->tpriority, $q->heat, $q->approved, $q->content);
                 $csv->add_data($output);
             }
         }
