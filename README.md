@@ -8,6 +8,14 @@ which can access the moodle site. Students can also vote on others'
 questions, so that the hottest questions will be popped up to the top of
 the list. Teachers can make oral comments on selected questions in classroom.
 
+
+November 2018 Changed Behat tests due to new language string for the Post button.
+Changed the code for Export to CSV to make it also work with PostgreSQL.
+Reorganized the fields in the Export CSV to make it easier to read in spreadsheets.
+Added width and height styles for the thumb up and thumb down icons used for
+teacher priority and thumb up for heat. This is due to Moodle 3.6 has added
+svg versions of the files and uses them by default.
+
 June 2017 Added 10 Behat tests.
 Changed the code for Export to CSV to make it simpler.
 Changed the order of the fields exported in Export to CSV. MS Excel will not open files
