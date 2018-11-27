@@ -230,6 +230,7 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
                             $ttemp2 = $this->pix_url('s/no');
                         }
                         // Process priority code here.
+                        // Had to add width/height to priority and heat due to now using svg in Moodle 3.6.
                         if (has_capability('mod/hotquestion:manageentries', $context)) {
                             // Process priority column.
                             $tpriority .= '&nbsp;<a href="view.php?id='
@@ -237,13 +238,13 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
                                        .$question->id.'" class="hotquestion_vote" id="question_'
                                        .$question->id.'"><img src="'.$ttemp1.'" title="'
                                        .get_string('teacherpriority', 'hotquestion') .'" alt="'
-                                       .get_string('teacherpriority', 'hotquestion') .'"/></a><br> &nbsp;';
+                                       .get_string('teacherpriority', 'hotquestion') .'" style="width:16px;height:16px;"/></a><br> &nbsp;';
                             $tpriority .= '&nbsp; &nbsp;<a href="view.php?id='
                                        .$this->hotquestion->cm->id.'&action=tpriority&u=0&q='
                                        .$question->id.'" class="hotquestion_vote" id="question_'
                                        .$question->id.'"><img src="'.$ttemp2.'" title="'
                                        .get_string('teacherpriority', 'hotquestion') .'" alt="'
-                                       .get_string('teacherpriority', 'hotquestion') .'"/></a>';
+                                       .get_string('teacherpriority', 'hotquestion') .'" style="width:16px;height:16px;"/></a>';
                         }
                         $line[] = $tpriority;
 
@@ -256,7 +257,7 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
                                       .'" class="hotquestion_vote" id="question_'
                                       .$question->id.'"><img src="'.$ttemp1
                                       .'" title="'.get_string('vote', 'hotquestion')
-                                      .'" alt="'.get_string('vote', 'hotquestion').'"/></a>';
+                                      .'" alt="'.get_string('vote', 'hotquestion').'" style="width:16px;height:16px;"/></a>';
                             }
                         }
                         $line[] = $heat;
