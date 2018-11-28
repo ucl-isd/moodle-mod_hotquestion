@@ -54,8 +54,7 @@ Feature: Admin user can export all questions from all HotQuestions
     Then I log out
     #Teacher 1 posts entries to course 1
 	Given I log in as "teacher1"
-	And I am on homepage
-    And I follow "Course 1"
+    When I am on "Course 1" course homepage
     And I follow "Test hotquestion name 1"
     And I set the following fields to these values:
       | Submit your question here: | Third question 1 |
@@ -65,8 +64,7 @@ Feature: Admin user can export all questions from all HotQuestions
 	And I set the field "Display as anonymous" to "1"
     And I press "Click to post"
     #Teacher 1 posts entries to course 2
-	And I am on homepage
-    And I follow "Course 2"
+    When I am on "Course 2" course homepage
     And I follow "Test hotquestion name 2"
     And I set the following fields to these values:
       | Submit your question here: | Third question 2 |
@@ -78,8 +76,7 @@ Feature: Admin user can export all questions from all HotQuestions
     Then I log out
     #Non-editing teacher 2 posts entries course 1
 	Given I log in as "teacher2"
-	And I am on homepage
-    And I follow "Course 1"
+    When I am on "Course 1" course homepage
     And I follow "Test hotquestion name 1"
     And I set the following fields to these values:
       | Submit your question here: | Fifth question 1 |
@@ -89,8 +86,7 @@ Feature: Admin user can export all questions from all HotQuestions
 	And I set the field "Display as anonymous" to "1"
     And I press "Click to post"
     #Non-editing teacher 2 posts entries to course 2
-	And I am on homepage
-    And I follow "Course 2"
+    When I am on "Course 2" course homepage
     And I follow "Test hotquestion name 2"
     And I set the following fields to these values:
       | Submit your question here: | Fifth question 2 |
@@ -102,8 +98,7 @@ Feature: Admin user can export all questions from all HotQuestions
     Then I log out
 	#Student 1 posts entries to course 1
 	Given I log in as "student1"
-	And I am on homepage
-    And I follow "Course 1"
+    When I am on "Course 1" course homepage
     And I follow "Test hotquestion name 1"
     And I set the following fields to these values:
       | Submit your question here: | Seventh question 1 |
@@ -115,8 +110,7 @@ Feature: Admin user can export all questions from all HotQuestions
 	Then I log out
     #Student 1 posts entries course 2
     Given I log in as "student1"
-    And I am on homepage
-    And I follow "Course 2"
+    When I am on "Course 2" course homepage
     And I follow "Test hotquestion name 2"
     And I set the following fields to these values:
       | Submit your question here: | Seventh question 2 |

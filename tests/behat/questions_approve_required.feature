@@ -42,8 +42,7 @@ Feature: Users can post named or anonymous entries to hotquestion
     Then I log out
     #Teacher 1 adds and approves posts
 	Given I log in as "teacher1"
-	And I am on homepage
-    And I follow "Course 1"
+    When I am on "Course 1" course homepage
     And I follow "Test hotquestion name"
     And I set the following fields to these values:
       | Submit your question here: | Third question |
@@ -57,8 +56,7 @@ Feature: Users can post named or anonymous entries to hotquestion
     Then I log out
 	#Student 1 posts an entry
 	Given I log in as "student1"
-	And I am on homepage
-    And I follow "Course 1"
+    When I am on "Course 1" course homepage
     And I follow "Test hotquestion name"
 	And I should see "Fourth question"
 	And I should see "Posted by Anonymous"
@@ -80,16 +78,14 @@ Feature: Users can post named or anonymous entries to hotquestion
     Then I log out
      #Teacher 1 approves a students entries
 	Given I log in as "teacher1"
-	And I am on homepage
-    And I follow "Course 1"
+    When I am on "Course 1" course homepage
     And I follow "Test hotquestion name"
 	And I follow "Not approved"
 	And I follow "Not approved"
     Then I log out
 	#Student 1 views his approved entries
 	Given I log in as "student1"
-	And I am on homepage
-    And I follow "Course 1"
+    When I am on "Course 1" course homepage
     And I follow "Test hotquestion name"
 	And I should see "Eighth question"
 	And I should see "Posted by Anonymous"
