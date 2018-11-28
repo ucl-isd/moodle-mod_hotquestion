@@ -97,6 +97,7 @@ class mod_hotquestion {
         $data->content = trim($fromform->question);
         $data->userid = $USER->id;
         $data->time = time();
+        $data->tpriority = 0;
         // Check if approval is required for this HotQuestion activity.
         if (!($this->instance->approval)) {
             // If approval is NOT required, then approve the question so everyone can see it.
