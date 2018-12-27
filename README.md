@@ -8,6 +8,7 @@ which can access the moodle site. Students can also vote on others'
 questions, so that the hottest questions will be popped up to the top of
 the list. Teachers can make oral comments on selected questions in classroom.
 
+December 2018 Added code for HotQuestion activity calendar Open and Close events.
 
 November 2018 Changed Behat tests due to new language string for the Post button.
 Changed the code for Export to CSV to make it also work with PostgreSQL.
