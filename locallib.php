@@ -28,7 +28,8 @@
  */
 
 defined('MOODLE_INTERNAL') || die();
-
+define('HOTQUESTION_EVENT_TYPE_OPEN', 'open');
+define('HOTQUESTION_EVENT_TYPE_CLOSE', 'close');
 /**
  * Standard base class for mod_hotquestion.
  *
@@ -667,4 +668,102 @@ function hotquestion_get_coursemodule($hotquestionid) {
     return $DB->get_record_sql("SELECT cm.id FROM {course_modules} cm
 								JOIN {modules} m ON m.id = cm.module
 								WHERE cm.instance = '$hotquestionid' AND m.name = 'hotquestion'");
+}
+
+/**
+ * Update the calendar entries for this hotquestion activity.
+ *
+ * @param stdClass $hotquestion the row from the database table hotquestion.
+ * @param int $cmid The coursemodule id
+ * @return bool
+ */
+function hotquestion_update_calendar(stdClass $hotquestion, $cmid) {
+    global $DB, $CFG;
+
+    require_once($CFG->dirroot.'/calendar/lib.php');
+
+    // Hotquestion start calendar events.
+    $event = new stdClass();
+    $event->eventtype = HOTQUESTION_EVENT_TYPE_OPEN;
+    // The HOTQUESTION_EVENT_TYPE_OPEN event should only be an action event if no close time is specified.
+    $event->type = empty($hotquestion->timeclose) ? CALENDAR_EVENT_TYPE_ACTION : CALENDAR_EVENT_TYPE_STANDARD;
+    if ($event->id = $DB->get_field('event', 'id',
+        array('modulename' => 'hotquestion', 'instance' => $hotquestion->id, 'eventtype' => $event->eventtype))) {
+        if ((!empty($hotquestion->timeopen)) && ($hotquestion->timeopen > 0)) {
+            // Calendar event exists so update it.
+            $event->name = get_string('calendarstart', 'hotquestion', $hotquestion->name);
+            $event->description = format_module_intro('hotquestion', $hotquestion, $cmid);
+            $event->timestart = $hotquestion->timeopen;
+            $event->timesort = $hotquestion->timeopen;
+            $event->visible = instance_is_visible('hotquestion', $hotquestion);
+            $event->timeduration = 0;
+
+            $calendarevent = calendar_event::load($event->id);
+            $calendarevent->update($event, false);
+        } else {
+            // Calendar event is on longer needed.
+            $calendarevent = calendar_event::load($event->id);
+            $calendarevent->delete();
+        }
+    } else {
+        // Event doesn't exist so create one.
+        if ((!empty($hotquestion->timeopen)) && ($hotquestion->timeopen > 0)) {
+            $event->name = get_string('calendarstart', 'hotquestion', $hotquestion->name);
+            $event->description = format_module_intro('hotquestion', $hotquestion, $cmid);
+            $event->courseid = $hotquestion->course;
+            $event->groupid = 0;
+            $event->userid = 0;
+            $event->modulename = 'hotquestion';
+            $event->instance = $hotquestion->id;
+            $event->timestart = $hotquestion->timeopen;
+            $event->timesort = $hotquestion->timeopen;
+            $event->visible = instance_is_visible('hotquestion', $hotquestion);
+            $event->timeduration = 0;
+
+            calendar_event::create($event, false);
+        }
+    }
+
+    // Hotquestion end calendar events.
+    $event = new stdClass();
+    $event->type = CALENDAR_EVENT_TYPE_ACTION;
+    $event->eventtype = HOTQUESTION_EVENT_TYPE_CLOSE;
+    if ($event->id = $DB->get_field('event', 'id',
+        array('modulename' => 'hotquestion', 'instance' => $hotquestion->id, 'eventtype' => $event->eventtype))) {
+        if ((!empty($hotquestion->timeclose)) && ($hotquestion->timeclose > 0)) {
+            // Calendar event exists so update it.
+            $event->name = get_string('calendarend', 'hotquestion', $hotquestion->name);
+            $event->description = format_module_intro('hotquestion', $hotquestion, $cmid);
+            $event->timestart = $hotquestion->timeclose;
+            $event->timesort = $hotquestion->timeclose;
+            $event->visible = instance_is_visible('hotquestion', $hotquestion);
+            $event->timeduration = 0;
+
+            $calendarevent = calendar_event::load($event->id);
+            $calendarevent->update($event, false);
+        } else {
+            // Calendar event is on longer needed.
+            $calendarevent = calendar_event::load($event->id);
+            $calendarevent->delete();
+        }
+    } else {
+        // Event doesn't exist so create one.
+        if ((!empty($hotquestion->timeclose)) && ($hotquestion->timeclose > 0)) {
+            $event->name = get_string('calendarend', 'hotquestion', $hotquestion->name);
+            $event->description = format_module_intro('hotquestion', $hotquestion, $cmid);
+            $event->courseid = $hotquestion->course;
+            $event->groupid = 0;
+            $event->userid = 0;
+            $event->modulename = 'hotquestion';
+            $event->instance = $hotquestion->id;
+            $event->timestart = $hotquestion->timeclose;
+            $event->timesort = $hotquestion->timeclose;
+            $event->visible = instance_is_visible('hotquestion', $hotquestion);
+            $event->timeduration = 0;
+
+            calendar_event::create($event, false);
+        }
+    }
+
+    return true;
 }

@@ -41,13 +41,16 @@ defined('MOODLE_INTERNAL') || die();
  * @return int The id of the newly inserted hotquestion record
  */
 function hotquestion_add_instance($hotquestion) {
-    global $DB;
+    global $CFG, $DB;
+
+    require_once($CFG->dirroot.'/mod/hotquestion/locallib.php');
 
     $hotquestion->timecreated = time();
 
     // You may have to add extra stuff in here.
 
     $id = $DB->insert_record('hotquestion', $hotquestion);
+    hotquestion_update_calendar($hotquestion, $cmid);
 
     return $id;
 }
@@ -61,12 +64,30 @@ function hotquestion_add_instance($hotquestion) {
  * @return boolean Success/Fail
  */
 function hotquestion_update_instance($hotquestion) {
-    global $DB;
+    global $CFG, $DB;
+
+    require_once($CFG->dirroot.'/mod/hotquestion/locallib.php');
+
+    if (empty($hotquestion->timeopen)) {
+        $hotquestion->timeopen = 0;
+    }
+    if (empty($hotquestion->timeclose)) {
+        $hotquestion->timeclose = 0;
+    }
+
+    $cmid       = $hotquestion->coursemodule;
+    $cmidnumber = $hotquestion->cmidnumber;
+    $courseid   = $hotquestion->course;
+
+    $hotquestion->id = $hotquestion->instance;
+
+    $context = context_module::instance($cmid);
 
     $hotquestion->timemodified = time();
     $hotquestion->id = $hotquestion->instance;
 
     // You may have to add extra stuff in here.
+    hotquestion_update_calendar($hotquestion, $cmid);
 
     return $DB->update_record('hotquestion', $hotquestion);
 }
