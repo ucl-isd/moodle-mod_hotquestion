@@ -269,14 +269,17 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
                         }
                         // Print the remove and approve case option for teacher and manager.
                         if (has_capability('mod/hotquestion:manageentries', $context)) {
+
                             // Process remove column.
-                            $remove .= '&nbsp;<a href="view.php?id='
+                            // Added delete confirm 2/8/19.
+                            $remove .= '&nbsp;<a onclick="return confirm(\''.get_string('deleteentryconfirm', 'hotquestion').'\')" href="view.php?id='
                                     .$this->hotquestion->cm->id.'&action=remove&q='
                                     .$question->id.'" class="hotquestion_vote" id="question_'
                                     .$question->id.'"><img src="'.$rtemp.'" title="'
                                     .get_string('questionremove', 'hotquestion') .'" alt="'
                                     .get_string('questionremove', 'hotquestion') .'"/></a>';
                             $line[] = $remove;
+
                             // Process approval column.
                             // Set code for approve toggle picture based on Moodle version.
                             if ($CFG->branch > 32) {
