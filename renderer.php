@@ -69,6 +69,8 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
      * return alist of links
      */
     public function toolbar($shownew = true) {
+        global $DB, $CFG, $USER;
+
         $output = '';
         $toolbuttons = array();
         $roundp = new stdClass();
@@ -121,14 +123,27 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
         }
 
         // Print remove round toolbutton.
+        // Added remove round confirm 2/10/19.
         if ($shownew) {
             $options = array();
             $options['id'] = $this->hotquestion->cm->id;
             $options['action'] = 'removeround';
             $options['round'] = $this->hotquestion->get_currentround()->id;
-            $url = new moodle_url('/mod/hotquestion/view.php', $options);
-            $toolbuttons[] = html_writer::link($url, $this->pix_icon('t/less'
-            , get_string('removeround', 'hotquestion')), array('class' => 'toolbutton'));
+
+            if ($CFG->branch > 32) {
+                $rtemp = $this->image_url('t/delete');
+            } else {
+                $rtemp = $this->pix_url('t/delete');
+            }
+
+            $url2 = '&nbsp;<a onclick="return confirm(\''.get_string('deleteroundconfirm', 'hotquestion').'\')" href="view.php?id='
+            .$this->hotquestion->cm->id.'&action=removeround&round='
+            .$this->hotquestion->get_currentround()->id
+            .'"><img src="'.$rtemp.'" title="'
+            .get_string('removeround', 'hotquestion') .'" alt="'
+            .get_string('removeround', 'hotquestion') .'"/></a>';
+
+            $toolbuttons[] = $url2;
         }
 
         // Print refresh toolbutton.
@@ -237,8 +252,9 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
                                        .$this->hotquestion->cm->id.'&action=tpriority&u=1&q='
                                        .$question->id.'" class="hotquestion_vote" id="question_'
                                        .$question->id.'"><img src="'.$ttemp1.'" title="'
-                                       .get_string('teacherpriority', 'hotquestion') .'" alt="'
-                                       .get_string('teacherpriority', 'hotquestion') .'" style="width:16px;height:16px;"/></a><br> &nbsp;';
+                                       .get_string('teacherpriority', 'hotquestion').'" alt="'
+                                       .get_string('teacherpriority', 'hotquestion')
+                                       .'" style="width:16px;height:16px;"/></a><br> &nbsp;';
                             $tpriority .= '&nbsp; &nbsp;<a href="view.php?id='
                                        .$this->hotquestion->cm->id.'&action=tpriority&u=0&q='
                                        .$question->id.'" class="hotquestion_vote" id="question_'
@@ -269,10 +285,11 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
                         }
                         // Print the remove and approve case option for teacher and manager.
                         if (has_capability('mod/hotquestion:manageentries', $context)) {
-
                             // Process remove column.
                             // Added delete confirm 2/8/19.
-                            $remove .= '&nbsp;<a onclick="return confirm(\''.get_string('deleteentryconfirm', 'hotquestion').'\')" href="view.php?id='
+                            $remove .= '&nbsp;<a onclick="return confirm(\''
+                                    .get_string('deleteentryconfirm', 'hotquestion')
+                                    .'\')" href="view.php?id='
                                     .$this->hotquestion->cm->id.'&action=remove&q='
                                     .$question->id.'" class="hotquestion_vote" id="question_'
                                     .$question->id.'"><img src="'.$rtemp.'" title="'
