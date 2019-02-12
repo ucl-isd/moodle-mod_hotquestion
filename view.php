@@ -79,6 +79,9 @@ if ($CFG->version > 2014051200) { // Moodle 2.7+.
     add_to_log($hq->course->id, 'hotquestion', 'view', "view.php?id={$hq->cm->id}", $hq->instance->name, $hq->cm->id);
 }
 
+$completion = new completion_info($course);
+$completion->set_module_viewed($cm);
+
 // Set page.
 if (!$ajax) {
     $PAGE->set_url('/mod/hotquestion/view.php', array('id' => $hq->cm->id));
