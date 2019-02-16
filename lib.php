@@ -46,13 +46,17 @@ function hotquestion_add_instance($hotquestion) {
     require_once($CFG->dirroot.'/mod/hotquestion/locallib.php');
 
     $hotquestion->timecreated = time();
+    // Fixed instance error 02/15/19.
+    $hotquestion->id = $DB->insert_record('hotquestion', $hotquestion);
 
     // You may have to add extra stuff in here.
+    // Added next line for behat test 2/11/19.
+    $cmid = $hotquestion->coursemodule;
 
-    $id = $DB->insert_record('hotquestion', $hotquestion);
+
     hotquestion_update_calendar($hotquestion, $cmid);
 
-    return $id;
+    return $hotquestion->id;
 }
 
 /**
