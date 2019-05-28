@@ -53,7 +53,6 @@ function hotquestion_add_instance($hotquestion) {
     // Added next line for behat test 2/11/19.
     $cmid = $hotquestion->coursemodule;
 
-
     hotquestion_update_calendar($hotquestion, $cmid);
 
     return $hotquestion->id;
