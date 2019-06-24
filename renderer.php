@@ -113,13 +113,23 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
         }
 
         // Print new round toolbutton.
+        // Added new round confirm 6/24/19.
         if ($shownew) {
             $options = array();
             $options['id'] = $this->hotquestion->cm->id;
             $options['action'] = 'newround';
-            $url = new moodle_url('/mod/hotquestion/view.php', $options);
-            $toolbuttons[] = html_writer::link($url, $this->pix_icon('t/add'
-                , get_string('newround', 'hotquestion')), array('class' => 'toolbutton'));
+            if ($CFG->branch > 32) {
+                $rtemp = $this->image_url('t/add');
+            } else {
+                $rtemp = $this->pix_url('t/add');
+            }
+            $url = '&nbsp;<a onclick="return confirm(\''.get_string('newroundconfirm', 'hotquestion').'\')" href="view.php?id='
+                .$this->hotquestion->cm->id.'&action=newround&round='
+                .$this->hotquestion->get_currentround()->id
+                .'"><img src="'.$rtemp.'" title="'
+                .get_string('newround', 'hotquestion') .'" alt="'
+                .get_string('newround', 'hotquestion') .'"/></a>';
+            $toolbuttons[] = $url;
         }
 
         // Print remove round toolbutton.
@@ -135,15 +145,14 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
             } else {
                 $rtemp = $this->pix_url('t/delete');
             }
+            $url = '&nbsp;<a onclick="return confirm(\''.get_string('deleteroundconfirm', 'hotquestion').'\')" href="view.php?id='
+                .$this->hotquestion->cm->id.'&action=removeround&round='
+                .$this->hotquestion->get_currentround()->id
+                .'"><img src="'.$rtemp.'" title="'
+                .get_string('removeround', 'hotquestion') .'" alt="'
+                .get_string('removeround', 'hotquestion') .'"/></a>';
 
-            $url2 = '&nbsp;<a onclick="return confirm(\''.get_string('deleteroundconfirm', 'hotquestion').'\')" href="view.php?id='
-            .$this->hotquestion->cm->id.'&action=removeround&round='
-            .$this->hotquestion->get_currentround()->id
-            .'"><img src="'.$rtemp.'" title="'
-            .get_string('removeround', 'hotquestion') .'" alt="'
-            .get_string('removeround', 'hotquestion') .'"/></a>';
-
-            $toolbuttons[] = $url2;
+            $toolbuttons[] = $url;
         }
 
         // Print refresh toolbutton.
