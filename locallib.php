@@ -330,7 +330,7 @@ class mod_hotquestion {
         $data = new StdClass();
         $data->hotquestion = $this->instance->id;
         $context = context_module::instance($this->cm->id);
-        // Trigger remove_round event.
+        // Trigger remove_question event.
         $event = \mod_hotquestion\event\remove_question::create(array(
             'objectid' => $data->hotquestion,
             'context' => $context
