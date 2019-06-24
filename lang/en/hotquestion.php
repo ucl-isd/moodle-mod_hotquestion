@@ -76,6 +76,7 @@ $string['inputquestion_help'] = 'Change the submit directions to what you want t
 $string['invalidquestion'] = 'Empty questions are ignored.';
 $string['modulename'] = 'Hot Question';
 $string['modulename_help'] = 'A Hot Question activity enables students to post and vote on posts, in response to questions asked by course teachers.';
+$string['modulename_link'] = 'mod/hotquestion/view';
 $string['modulenameplural'] = 'Hot Questions';
 $string['newround'] = 'Open a new round';
 $string['newroundsuccess'] = 'You have successfully opened a new round.';
