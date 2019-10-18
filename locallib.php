@@ -315,7 +315,7 @@ class mod_hotquestion {
                                      WHERE q.hotquestion = ?
                                         AND q.time >= ?
                                         AND q.time <= ?
-                                     GROUP BY q.id
+                                     GROUP BY q.id, q.hotquestion, q.content, q.userid, q.time, q.anonymous, q.approved, q.tpriority
                                      ORDER BY tpriority DESC, votecount DESC, q.time DESC', $params);
     }
 
@@ -379,7 +379,7 @@ class mod_hotquestion {
                                      WHERE q.hotquestion = ?
                                          AND q.time >= ?
                                          AND q.time <= ?
-                                     GROUP BY q.id
+                                     GROUP BY q.id, q.hotquestion, q.content, q.userid, q.time, q.anonymous, q.approved, q.tpriority
                                      ORDER BY votecount DESC, q.time DESC', $params);
 
         if ($questions) {
