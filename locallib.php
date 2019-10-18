@@ -470,38 +470,30 @@ class mod_hotquestion {
                         get_string('content', 'hotquestion'));
         // Add the headings to our data array.
         $csv->add_data($fields);
-        if ($CFG->dbtype == 'pgsql') {
-            $sql = "SELECT hq.id AS question,
+
+        $guestfirstname = "CONCAT(u.lastname, 'Anonymous')";
+        $questiontime = "FROM_UNIXTIME(hq.time)";
+        switch($CFG->dbtype) {
+            case 'pgsql':
+                $guestfirstname = "u.lastname || 'Anonymous'";
+                $questiontime = "to_char(to_timestamp(hq.time), 'YYYY-MM-DD HH24:MI:SS')";
+                break;
+            case 'sqlsrv':
+                $questiontime = "convert(varchar, DATEADD(second, (hq.time - DATEDIFF(second, GETDATE(), GETUTCDATE())), CAST('1970-01-01 00:00:00' as datetime)), 20) ";
+                break;
+        }
+
+        $sql = "SELECT hq.id AS question,
                     CASE
                         WHEN u.firstname = 'Guest user'
-                        THEN u.lastname || 'Anonymous'
-                        ELSE u.firstname
-                    END AS firstname,
-                        u.lastname AS lastname,
-                        hq.hotquestion AS hotquestion,
-                        hq.content AS content,
-                        hq.userid AS userid,
-                        to_char(to_timestamp(hq.time), 'YYYY-MM-DD HH24:MI:SS') AS time,
-                        hq.anonymous AS anonymous,
-                        hq.tpriority AS tpriority,
-                        COUNT(hv.voter) AS heat,
-                        hq.approved AS approved
-                    FROM {hotquestion_questions} hq
-                    LEFT JOIN {hotquestion_votes} hv ON hv.question=hq.id
-                    JOIN {user} u ON u.id = hq.userid
-                    WHERE hq.userid > 0 ";
-        } else {
-            $sql = "SELECT hq.id AS question,
-                    CASE
-                        WHEN u.firstname = 'Guest user'
-                        THEN CONCAT(u.lastname, 'Anonymous')
+                        THEN $guestfirstname
                         ELSE u.firstname
                     END AS 'firstname',
                         u.lastname AS 'lastname',
                         hq.hotquestion AS hotquestion,
                         hq.content AS content,
                         hq.userid AS userid,
-                        FROM_UNIXTIME(hq.time) AS TIME,
+                        $questiontime AS TIME,
                         hq.anonymous AS anonymous,
                         hq.tpriority AS tpriority,
                         COUNT(hv.voter) AS heat,
@@ -509,11 +501,10 @@ class mod_hotquestion {
                     FROM {hotquestion_questions} hq
                     LEFT JOIN {hotquestion_votes} hv ON hv.question=hq.id
                     JOIN {user} u ON u.id = hq.userid
-                    WHERE hq.userid > 0 ";
-        }
+                    WHERE hq.userid > 0";
 
         $sql .= ($whichhqs);
-        $sql .= "     GROUP BY u.lastname, u.firstname, hq.hotquestion, hq.id
+        $sql .= "     GROUP BY u.lastname, u.firstname, hq.hotquestion, hq.id, hq.content, hq.userid, hq.time, hq.anonymous, hq.tpriority, hq.approved
                       ORDER BY hq.hotquestion ASC, hq.id ASC, tpriority DESC, heat";
 
         // Add the list of users and HotQuestions to our data array.
