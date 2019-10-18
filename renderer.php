@@ -18,8 +18,7 @@
  * This file contains a renderer for the hotquestion module.
  *
  * @package   mod_hotquestion
- * @copyright 2012 Zhang Anzhen
- * @copyright 2016 onwards AL Rachels drachels@drachels.com
+ * @copyright 2019 onwards AL Rachels drachels@drachels.com
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die();
@@ -28,8 +27,7 @@ defined('MOODLE_INTERNAL') || die();
  * A custmom renderer class that extends the plugin_renderer_base and is used by the hotquestion module.
  *
  * @package   mod_hotquestion
- * @copyright 2012 Zhang Anzhen
- * @copyright 2016 onwards AL Rachels drachels@drachels.com
+ * @copyright 2019 onwards AL Rachels drachels@drachels.com
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mod_hotquestion_renderer extends plugin_renderer_base {
