@@ -308,7 +308,7 @@ class mod_hotquestion {
             $this->currentround->endtime = 0xFFFFFFFF;  // Hack.
         }
         $params = array($this->instance->id, $this->currentround->starttime, $this->currentround->endtime);
-        return $DB->get_records_sql('SELECT q.*, count(v.voter) as votecount
+        return $DB->get_records_sql('SELECT q.id, q.hotquestion, q.content, q.userid, q.time, q.anonymous, q.approved, q.tpriority, count(v.voter) as votecount
                                      FROM {hotquestion_questions} q
                                          LEFT JOIN {hotquestion_votes} v
                                          ON v.question = q.id
@@ -372,7 +372,7 @@ class mod_hotquestion {
             $this->currentround->endtime = 0xFFFFFFFF;  // Hack.
         }
         $params = array($this->instance->id, $this->currentround->starttime, $this->currentround->endtime);
-        $questions = $DB->get_records_sql('SELECT q.*, count(v.voter) as votecount
+        $questions = $DB->get_records_sql('SELECT q.id, q.hotquestion, q.content, q.userid, q.time, q.anonymous, q.approved, q.tpriority, count(v.voter) as votecount
                                      FROM {hotquestion_questions} q
                                          LEFT JOIN {hotquestion_votes} v
                                          ON v.question = q.id
