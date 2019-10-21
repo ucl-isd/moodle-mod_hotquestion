@@ -479,7 +479,7 @@ class mod_hotquestion {
                 $questiontime = "to_char(to_timestamp(hq.time), 'YYYY-MM-DD HH24:MI:SS')";
                 break;
             case 'sqlsrv':
-                $questiontime = "convert(varchar, DATEADD(second, (hq.time - DATEDIFF(second, GETDATE(), GETUTCDATE())), CAST('1970-01-01 00:00:00' as datetime)), 20) ";
+                $questiontime = "convert(varchar, DATEADD(second, (hq.time - DATEDIFF(second, GETDATE(), GETUTCDATE())), CAST('1970-01-01 00:00:00' as datetime)), 120)";
                 break;
         }
 
