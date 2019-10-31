@@ -23,6 +23,8 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use \mod_hotquestion\event\course_module_instance_list_viewed;
+
 require(__DIR__ . "/../../config.php");
 require_once(__DIR__ . '/locallib.php');
 
@@ -147,10 +149,8 @@ echo "<br />";
 echo html_writer::table($table);
 
 // Trigger course module instance list event.
-$params = array(
-    'context' => context_course::instance($course->id)
-);
-$event = \mod_hotquestion\event\course_module_instance_list_viewed::create($params);
+$params = array('context' => context_course::instance($course->id));
+$event = course_module_instance_list_viewed::create($params);
 $event->add_record_snapshot('course', $course);
 $event->trigger();
 

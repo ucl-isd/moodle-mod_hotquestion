@@ -26,6 +26,8 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use \mod_hotquestion\event\course_module_viewed;
+
 require_once("../../config.php");
 require_once("lib.php");
 require_once("locallib.php");
@@ -69,11 +71,8 @@ if (! $cw = $DB->get_record("course_sections", array("id" => $cm->section))) {
 
 // Trigger module viewed event.
 if ($CFG->version > 2014051200) { // Moodle 2.7+.
-    $params = array(
-        'objectid' => $hq->cm->id,
-        'context' => $context,
-    );
-    $event = \mod_hotquestion\event\course_module_viewed::create($params);
+    $params = array('objectid' => $hq->cm->id, 'context' => $context);
+    $event = course_module_viewed::create($params);
     $event->trigger();
 } else {
     add_to_log($hq->course->id, 'hotquestion', 'view', "view.php?id={$hq->cm->id}", $hq->instance->name, $hq->cm->id);
