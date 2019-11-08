@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Administration settings definitions for the quiz module.
+ * Administration settings definitions for the Hot Question module.
  *
  * @package    mod_hotquestion
  * @copyright  2016 onwards AL Rachels (drachels@drachels.com)
