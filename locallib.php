@@ -27,6 +27,9 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use \mod_hotquestion\event\update_vote;
+use \mod_hotquestion\event\add_question;
+
 defined('MOODLE_INTERNAL') || die();
 define('HOTQUESTION_EVENT_TYPE_OPEN', 'open');
 define('HOTQUESTION_EVENT_TYPE_CLOSE', 'close');
@@ -120,7 +123,7 @@ class mod_hotquestion {
                     'objectid' => $this->cm->id,
                     'context' => $context,
                 );
-                $event = \mod_hotquestion\event\add_question::create($params);
+                $event = add_question::create($params);
                 $event->trigger();
             } else {
                 add_to_log($this->course->id, "hotquestion", "add question"
@@ -149,7 +152,7 @@ class mod_hotquestion {
                     'objectid' => $this->cm->id,
                     'context' => $context,
                 );
-                $event = \mod_hotquestion\event\update_vote::create($params);
+                $event = update_vote::create($params);
                 $event->trigger();
             } else {
                 add_to_log($this->course->id, 'hotquestion', 'update vote'
@@ -315,7 +318,7 @@ class mod_hotquestion {
                                      WHERE q.hotquestion = ?
                                         AND q.time >= ?
                                         AND q.time <= ?
-                                     GROUP BY q.id, q.hotquestion, q.content, q.userid, q.time, q.anonymous, q.approved, q.tpriority
+                                     GROUP BY q.id
                                      ORDER BY tpriority DESC, votecount DESC, q.time DESC', $params);
     }
 
@@ -379,7 +382,7 @@ class mod_hotquestion {
                                      WHERE q.hotquestion = ?
                                          AND q.time >= ?
                                          AND q.time <= ?
-                                     GROUP BY q.id, q.hotquestion, q.content, q.userid, q.time, q.anonymous, q.approved, q.tpriority
+                                     GROUP BY q.id
                                      ORDER BY votecount DESC, q.time DESC', $params);
 
         if ($questions) {
