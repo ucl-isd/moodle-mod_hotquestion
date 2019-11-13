@@ -5,6 +5,8 @@
 11/07/19 Pushed change to settings.php file. Wording error.
 11/07/19 Modified event code for update_vote and add_question in the
 locallib.php file, and pushed to github.
+11/09/19 Checked and modified as nescessary other event codes in the
+locallib.php file, and pushed the changes to github.
 
 === 3.6.1 ===
 10/18/19 Added pull request from Vidalia to fix invalid GROUP BY issue
