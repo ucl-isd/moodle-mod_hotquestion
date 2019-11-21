@@ -314,15 +314,16 @@ class mod_hotquestion {
             $this->currentround->endtime = 0xFFFFFFFF;  // Hack.
         }
         $params = array($this->instance->id, $this->currentround->starttime, $this->currentround->endtime);
-        return $DB->get_records_sql('SELECT q.id, q.hotquestion, q.content, q.userid, q.time, q.anonymous, q.approved, q.tpriority, count(v.voter) as votecount
-                                     FROM {hotquestion_questions} q
-                                         LEFT JOIN {hotquestion_votes} v
-                                         ON v.question = q.id
-                                     WHERE q.hotquestion = ?
-                                        AND q.time >= ?
-                                        AND q.time <= ?
-                                     GROUP BY q.id
-                                     ORDER BY tpriority DESC, votecount DESC, q.time DESC', $params);
+        return $DB->get_records_sql('SELECT q.id, q.hotquestion, q.content, q.userid, q.time,
+            q.anonymous, q.approved, q.tpriority, count(v.voter) as votecount
+            FROM {hotquestion_questions} q
+            LEFT JOIN {hotquestion_votes} v
+            ON v.question = q.id
+            WHERE q.hotquestion = ?
+            AND q.time >= ?
+            AND q.time <= ?
+            GROUP BY q.id
+            ORDER BY tpriority DESC, votecount DESC, q.time DESC', $params);
     }
 
     /**
@@ -391,15 +392,16 @@ class mod_hotquestion {
             $this->currentround->endtime = 0xFFFFFFFF;  // Hack.
         }
         $params = array($this->instance->id, $this->currentround->starttime, $this->currentround->endtime);
-        $questions = $DB->get_records_sql('SELECT q.id, q.hotquestion, q.content, q.userid, q.time, q.anonymous, q.approved, q.tpriority, count(v.voter) as votecount
-                                     FROM {hotquestion_questions} q
-                                         LEFT JOIN {hotquestion_votes} v
-                                         ON v.question = q.id
-                                     WHERE q.hotquestion = ?
-                                         AND q.time >= ?
-                                         AND q.time <= ?
-                                     GROUP BY q.id
-                                     ORDER BY votecount DESC, q.time DESC', $params);
+        $questions = $DB->get_records_sql('SELECT q.id, q.hotquestion, q.content, q.userid, q.time,
+            q.anonymous, q.approved, q.tpriority, count(v.voter) as votecount
+            FROM {hotquestion_questions} q
+            LEFT JOIN {hotquestion_votes} v
+            ON v.question = q.id
+            WHERE q.hotquestion = ?
+            AND q.time >= ?
+            AND q.time <= ?
+            GROUP BY q.id
+            ORDER BY votecount DESC, q.time DESC', $params);
 
         if ($questions) {
             foreach ($questions as $q) {
