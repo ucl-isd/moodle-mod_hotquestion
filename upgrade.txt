@@ -1,3 +1,11 @@
+=== 3.8.0 ===
+11/21/19 Made changes in locallib.php to fix linelength error in two functions 
+Changed line 317 of function get_questions() - tested - still works.
+Changed line 395 of function remove_round() - tested - still works.
+11/21/19 In file upgrade.txt, I changed all the "\r\n" to just "\n" using replace all,
+without any apparent problems. I also made a bunch of line length changes due to
+codechecker recommendations. Made multiple entries to make sure I did not break something.
+
 === 3.7.0 ===
 10/31/19 Rewrote event code for the Hot Question index.php file.
 10/31/19 Rewrote event code for the Hot Question view.php file.
@@ -122,13 +130,15 @@ Modified render.php, locallib.php, and language file as needed to finish approva
 
 === 3.2.2 ===
 6/25/17 Rewrote Export to csv code becasue of MS Excel bug when first record is "ID".
-6/26/17 Rewrote most of the Behat tests to add code that checks log entries. All pass, but the two download ones glitch once in a while. Probably need a wait, somewhere.
+6/26/17 Rewrote most of the Behat tests to add code that checks log entries. All pass,
+but the two download ones glitch once in a while. Probably need a wait, somewhere.
 6/26/17 Double checked and fixed as needed code style and php documentation.
 
 === 3.2.1 ===
 5/14/17 Fixed additional code style and documentation that were missed during rush to publish 3.2.0.
 5/14/17 Moved Remove question log event to be fore the code doing the removal so the log entry was actually being made.
-5/15/17 Moved code for Remove question log event trigger from view.php to the remove_question function in locallib.php so that it works like the event for remove_round.
+5/15/17 Moved code for Remove question log event trigger from view.php to the remove_question
+function in locallib.php so that it works like the event for remove_round.
 
 5/15/17 Currently working on "Are you sure" code for Remove Question and Remove Round. deferred
 
@@ -165,10 +175,13 @@ Modified render.php, locallib.php, and language file as needed to finish approva
 10/1/16 Added checkbox to the modedit.php page so that, "Display description on course page" is available.
 10/2/16 Added availability dates for Open time and Close time, which also added a number of new language strings.
 10/3/16 Updated the upgrade.php file to add timeopen and timeclose fields.
-10/4/16 Added code for a config setting for changing, "Submit your question here:" to whatever admin wants it to be for the whole site.
+10/4/16 Added code for a config setting for changing, "Submit your question here:" to whatever
+admin wants it to be for the whole site.
 10/5/16 Added code to include activity title when viewing the activity.
-10/5/16 Added code to allow teachers to change, "Submit your question here:" to whatever the teacher wants when creating a Hot Question activity, and it is now working.
-10/6/16 Added new alternate version of the activity icon (alticon.svg) provided by Kathrin84. To use it, remove icon.svg and change the name of alticon.svg to icon.svg. Clear cache to see the new icon.
+10/5/16 Added code to allow teachers to change, "Submit your question here:" to whatever the
+teacher wants when creating a Hot Question activity, and it is now working.
+10/6/16 Added new alternate version of the activity icon (alticon.svg) provided by Kathrin84.
+To use it, remove icon.svg and change the name of alticon.svg to icon.svg. Clear cache to see the new icon.
 
 === 3.0.3 ===
 04/15/16 Added "Participation in current round" column to the index.php list of Hot Question
@@ -196,12 +209,14 @@ Added details about new capabilities to READEME.md file
 Release date: Thursday, March 31, 2016, 12:15 AM
 
 03/25/16 Added download button to the toolbar for Export to .csv file. Not working yet, though.
-03/26/16 Add a remove column to the renderer.php page that shows when viewing via view.php page. Does NOT show for students.
+03/26/16 Add a remove column to the renderer.php page that shows when viewing via view.php page.
+Does NOT show for students.
 03/26/16 Added action = remove, to the view.php page. Uses a X icon right now. 
 03/26/16 Removing a question also removes any/all votes for it.
 03/26/16 Added event and trigger for logging the removal of a question and it's votes.
 03/28/16 Added question download - currently downloads all questions.
-03/29/16 Modified question download - admin downloads all - teacher and manager downloads the current HQ activity.
+03/29/16 Modified question download - admin downloads all - teacher and manager downloads the
+current HQ activity.
 03/29/16 Added trigger and log event for downloading questions.
 03/29/16 Added details about new capabilities to READEME.md file.
 
@@ -213,7 +228,8 @@ Release date: Friday, 25 March 2016, 10:36 AM
 2.9 (Build: 2016032400) (2016032400)Moodle 2.9
 Release date: Thursday, 24 March 2016, 3:41 PM
 
-03/24/16 Changed mod_form.php to use $this->standard_intro_elements(); when adding the text editor and text area.
+03/24/16 Changed mod_form.php to use $this->standard_intro_elements(); when adding the text
+editor and text area.
 
 === 2.8 ===
 2.8 (Build: 2016032300) (2016032300)Moodle 2.7, 2.8
