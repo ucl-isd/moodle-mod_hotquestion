@@ -178,6 +178,9 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
         $a = new stdClass();
         // Search questions in current round.
         $questions = $this->hotquestion->get_questions();
+        // Set column visibility flags for Priority and Heat.
+        $teacherpriorityvisibility = $this->hotquestion->instance->teacherpriorityvisibility;
+        $heatvisibility = $this->hotquestion->instance->heatvisibility;
 
         // Added for Remove capability.
         $id = required_param('id', PARAM_INT);
@@ -195,16 +198,44 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
             $table->align = array ('left', 'center', 'center', 'center', 'center');
             // Teacher table shows questions, priority, heat, remove and approved headings.
             if (has_capability('mod/hotquestion:manageentries', $context)) {
-                $table->head = array(get_string('question', 'hotquestion')
-                    , get_string('teacherpriority', 'hotquestion')
-                    , get_string('heat', 'hotquestion')
-                    , get_string('questionremove', 'hotquestion')
-                    , get_string('approvedyes', 'hotquestion'));
+                $table->head = array(get_string('question', 'hotquestion'));
+                // Check teacher priority column visibilty settings
+                if ($teacherpriorityvisibility) {
+                    // Priority column is visible, so show the label.
+                    $table->head[] .= get_string('teacherpriority', 'hotquestion');
+                } else {
+                    // Priority column is not visible, so replace label with a space.
+                    $table->head[] .= ' ';
+                }
+                // Check heat column visibilty settings
+                if ($heatvisibility) {
+                    // Heat column is visible, so show the label.
+                    $table->head[] .= get_string('heat', 'hotquestion');
+                } else {
+                    // Heat column is not visible, so replace label with a space.
+                    $table->head[] .= ' ';
+                }
+                    $table->head[] .= get_string('questionremove', 'hotquestion');
+                    $table->head[] .= get_string('approvedyes', 'hotquestion');
             } else {
                 // Students only see headings for questions, priority, and heat columns.
-                $table->head = array(get_string('question', 'hotquestion')
-                    , get_string('teacherpriority', 'hotquestion')
-                    , get_string('heat', 'hotquestion'));
+                $table->head = array(get_string('question', 'hotquestion'));
+                // Check teacher priority column visibilty settings
+                if ($teacherpriorityvisibility) {
+                    // Priority column is visible, so show the label.
+                    $table->head[] .= get_string('teacherpriority', 'hotquestion');
+                } else {
+                    // Priority column is not visible, so replace label with a space.
+                    $table->head[] .= ' ';
+                }
+                // Check heat column visibilty settings
+                if ($heatvisibility) {
+                    // Heat column is visible, so show the label.
+                    $table->head[] .= get_string('heat', 'hotquestion');
+                } else {
+                    // Heat column is not visible, so replace label with a space.
+                    $table->head[] .= ' ';
+                }
             }
 
             // Check to see if groups are being used here.
@@ -269,7 +300,15 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
                                        .get_string('teacherpriority', 'hotquestion') .'" alt="'
                                        .get_string('teacherpriority', 'hotquestion') .'" style="width:16px;height:16px;"/></a>';
                         }
-                        $line[] = $tpriority;
+
+                        // Check teacher priority column visibilty settings.
+                        if ($teacherpriorityvisibility) {
+                            // The priority column is visible, so show the data.
+                            $line[] = $tpriority;
+                        } else {
+                            // The priority column is not visible, so replace the data with a space.
+                            $line[] = ' ';
+                        }
 
                         // Print the vote cron case.
                         if ($allowvote && $this->hotquestion->can_vote_on($question)) {
@@ -283,7 +322,15 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
                                       .'" alt="'.get_string('vote', 'hotquestion').'" style="width:16px;height:16px;"/></a>';
                             }
                         }
-                        $line[] = $heat;
+                        // Check heat column visibilty settings.
+                        if ($heatvisibility) {
+                            // The heat column is visible, so show the data.
+                            $line[] = $heat;
+                        } else {
+                            // The heat column is not visible, so replace the data with a space.
+                            $line[] = ' ';
+                        }
+
                         // Set code for remove picture based on Moodle version.
                         if ($CFG->branch > 32) {
                             $rtemp = $this->image_url('t/delete');
