@@ -168,5 +168,29 @@ function xmldb_hotquestion_upgrade($oldversion=0) {
         // Hotquestion savepoint reached.
         upgrade_mod_savepoint(true, 2018010100, 'hotquestion');
     }
+
+    if ($oldversion < 2019112100) {
+
+        // Define field teacherpriorityvisibility to be added to hotquestion.
+        $table = new xmldb_table('hotquestion');
+        $field = new xmldb_field('teacherpriorityvisibility', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, '1', 'timeclose');
+
+        // Conditionally launch add field id.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define field heatvisibility to be added to hotquestion.
+        $table = new xmldb_table('hotquestion');
+        $field = new xmldb_field('heatvisibility', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, '1', 'teacherpriorityvisibility');
+
+        // Conditionally launch add field id.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Hotquestion savepoint reached.
+        upgrade_mod_savepoint(true, 2019112200, 'hotquestion');
+    }
     return $result;
 }
