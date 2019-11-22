@@ -88,10 +88,28 @@ class mod_hotquestion_mod_form extends moodleform_mod {
         $mform->addRule('submitdirections', null, 'required', null, 'client');
         $mform->addRule('submitdirections', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
 
+        // Add visibility setting for the teacher priority column.
+        $mform->addElement('selectyesno', 'teacherpriorityvisibility', get_string('teacherpriorityvisibility', 'hotquestion'));
+        $mform->addHelpButton('teacherpriorityvisibility', 'teacherpriorityvisibility', 'hotquestion');
+        $mform->setDefault('teacherpriorityvisibility', '1');
+
+        // Add visibility setting for the heat column.
+        $mform->addElement('selectyesno', 'heatvisibility', get_string('heatvisibility', 'hotquestion'));
+        $mform->addHelpButton('heatvisibility', 'heatvisibility', 'hotquestion');
+        $mform->setDefault('heatvisibility', '1');
+
         // Adding 'anonymouspost' field.
         $mform->addElement('selectyesno', 'anonymouspost', get_string('allowanonymouspost', 'hotquestion'));
         $mform->addHelpButton('anonymouspost', 'allowanonymouspost', 'hotquestion');
         $mform->setDefault('anonymouspost', '1');
+/*
+        // Add 'requireapproval' field and column visibility check box. 
+        $approvalarray = array();
+        $approvalarray[] =& $mform->createElement('selectyesno', 'approval', get_string('requireapproval', 'hotquestion'));
+        //$approvalarray[] =& $mform->createElementHelpButton('approval', 'requireapproval', 'hotquestion');
+        $approvalarray[] =& $mform->createElement('advcheckbox', 'visible_ra', get_string('visible'), 'Label displayed after checkbox', array('group' => 1), array(0, 1));
+        $mform->addGroup($approvalarray, 'approvalar', get_string('requireapproval', 'hotquestion'), array('test '), false);
+*/
 
         // Add 'requireapproval' field.
         $mform->addElement('selectyesno', 'approval', get_string('requireapproval', 'hotquestion'));
