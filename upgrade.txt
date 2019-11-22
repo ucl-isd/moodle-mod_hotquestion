@@ -5,6 +5,11 @@ Changed line 395 of function remove_round() - tested - still works.
 11/21/19 In file upgrade.txt, I changed all the "\r\n" to just "\n" using replace all,
 without any apparent problems. I also made a bunch of line length changes due to
 codechecker recommendations. Made multiple entries to make sure I did not break something.
+11/22/19 Added settings for Teacher Priority visibility and for Heat visibility. This
+required some new language strings, two new fields in the mdl_hotquestion table,
+and multiple lines of new code in renderer.php. It also required changes in the
+install.xml file, the upgrade.php file, and the backup_hotquestion_stepslib.php file.
+The final change was to bump the version to 3.8.0 and push to github.
 
 === 3.7.0 ===
 10/31/19 Rewrote event code for the Hot Question index.php file.
