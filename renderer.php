@@ -199,7 +199,7 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
             // Teacher table shows questions, priority, heat, remove and approved headings.
             if (has_capability('mod/hotquestion:manageentries', $context)) {
                 $table->head = array(get_string('question', 'hotquestion'));
-                // Check teacher priority column visibilty settings
+                // Check teacher priority column visibilty settings.
                 if ($teacherpriorityvisibility) {
                     // Priority column is visible, so show the label.
                     $table->head[] .= get_string('teacherpriority', 'hotquestion');
@@ -207,7 +207,7 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
                     // Priority column is not visible, so replace label with a space.
                     $table->head[] .= ' ';
                 }
-                // Check heat column visibilty settings
+                // Check heat column visibilty settings.
                 if ($heatvisibility) {
                     // Heat column is visible, so show the label.
                     $table->head[] .= get_string('heat', 'hotquestion');
@@ -220,7 +220,7 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
             } else {
                 // Students only see headings for questions, priority, and heat columns.
                 $table->head = array(get_string('question', 'hotquestion'));
-                // Check teacher priority column visibilty settings
+                // Check teacher priority column visibilty settings.
                 if ($teacherpriorityvisibility) {
                     // Priority column is visible, so show the label.
                     $table->head[] .= get_string('teacherpriority', 'hotquestion');
@@ -228,7 +228,7 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
                     // Priority column is not visible, so replace label with a space.
                     $table->head[] .= ' ';
                 }
-                // Check heat column visibilty settings
+                // Check heat column visibilty settings.
                 if ($heatvisibility) {
                     // Heat column is visible, so show the label.
                     $table->head[] .= get_string('heat', 'hotquestion');
