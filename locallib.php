@@ -713,7 +713,9 @@ function hotquestion_update_calendar(stdClass $hotquestion, $cmid) {
     $event = new stdClass();
     $event->eventtype = HOTQUESTION_EVENT_TYPE_OPEN;
     // The HOTQUESTION_EVENT_TYPE_OPEN event should only be an action event if no close time is specified.
-    $event->type = empty($hotquestion->timeclose) ? CALENDAR_EVENT_TYPE_ACTION : CALENDAR_EVENT_TYPE_STANDARD;
+    if ($CFG->branch > 32) {
+        $event->type = empty($hotquestion->timeclose) ? CALENDAR_EVENT_TYPE_ACTION : CALENDAR_EVENT_TYPE_STANDARD;
+    }
     if ($event->id = $DB->get_field('event', 'id',
         array('modulename' => 'hotquestion', 'instance' => $hotquestion->id, 'eventtype' => $event->eventtype))) {
         if ((!empty($hotquestion->timeopen)) && ($hotquestion->timeopen > 0)) {
@@ -753,7 +755,9 @@ function hotquestion_update_calendar(stdClass $hotquestion, $cmid) {
 
     // Hotquestion end calendar events.
     $event = new stdClass();
-    $event->type = CALENDAR_EVENT_TYPE_ACTION;
+    if ($CFG->branch > 32) {
+        $event->type = CALENDAR_EVENT_TYPE_ACTION;
+    }
     $event->eventtype = HOTQUESTION_EVENT_TYPE_CLOSE;
     if ($event->id = $DB->get_field('event', 'id',
         array('modulename' => 'hotquestion', 'instance' => $hotquestion->id, 'eventtype' => $event->eventtype))) {
