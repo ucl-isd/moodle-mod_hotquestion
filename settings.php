@@ -47,6 +47,18 @@ if ($ADMIN->fulltree) {
         'Submit your question here:', PARAM_TEXT, 25)
     );
 
+    // Default hide Priority column visibility setting.
+    $settings->add(new admin_setting_configcheckbox_with_advanced('mod_hotquestion/teacherpriorityvisibility',
+        get_string('teacherpriorityvisibility', 'hotquestion'),
+        get_string('teacherpriorityvisibility_descr', 'hotquestion'),
+        array('value' => 1, 'adv' => false)));
+
+    // Default allow Heat column visibility setting.
+    $settings->add(new admin_setting_configcheckbox_with_advanced('mod_hotquestion/heatvisibility',
+        get_string('heatvisibility', 'hotquestion'),
+        get_string('heatvisibility_descr', 'hotquestion'),
+        array('value' => 1, 'adv' => false)));
+
     // Default allow anonymous post setting.
     $settings->add(new admin_setting_configcheckbox_with_advanced('mod_hotquestion/anonymouspost',
         get_string('allowanonymouspost', 'hotquestion'),
