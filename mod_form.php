@@ -102,14 +102,6 @@ class mod_hotquestion_mod_form extends moodleform_mod {
         $mform->addElement('selectyesno', 'anonymouspost', get_string('allowanonymouspost', 'hotquestion'));
         $mform->addHelpButton('anonymouspost', 'allowanonymouspost', 'hotquestion');
         $mform->setDefault('anonymouspost', '1');
-/*
-        // Add 'requireapproval' field and column visibility check box. 
-        $approvalarray = array();
-        $approvalarray[] =& $mform->createElement('selectyesno', 'approval', get_string('requireapproval', 'hotquestion'));
-        //$approvalarray[] =& $mform->createElementHelpButton('approval', 'requireapproval', 'hotquestion');
-        $approvalarray[] =& $mform->createElement('advcheckbox', 'visible_ra', get_string('visible'), 'Label displayed after checkbox', array('group' => 1), array(0, 1));
-        $mform->addGroup($approvalarray, 'approvalar', get_string('requireapproval', 'hotquestion'), array('test '), false);
-*/
 
         // Add 'requireapproval' field.
         $mform->addElement('selectyesno', 'approval', get_string('requireapproval', 'hotquestion'));
