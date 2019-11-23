@@ -9,6 +9,8 @@ codechecker recommendations. Made multiple entries to make sure I did not break 
 required some new language strings, two new fields in the mdl_hotquestion table,
 and multiple lines of new code in renderer.php. It also required changes in the
 install.xml file, the upgrade.php file, and the backup_hotquestion_stepslib.php file.
+11/23/19 Added the two new settings to the settings.php file. Ran codechecker and
+did code cleanup as needed.
 The final change was to bump the version to 3.8.0 and push to github.
 
 === 3.7.0 ===
