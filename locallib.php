@@ -350,8 +350,8 @@ class mod_hotquestion {
                 "view.php?id={$this->cm->id}&round=$rid", $rid, $this->cm->id);
         }
 
-        if (isset($_GET['q'])) {
-            $questionid = $_GET['q'];
+        if (null !==(required_param('q', PARAM_INT))) {
+            $questionid = required_param('q', PARAM_INT);
             $dbquestion = $DB->get_record('hotquestion_questions', array('id' => $questionid));
             $DB->delete_records('hotquestion_questions', array('id' => $dbquestion->id));
             // Get an array of all votes on the question that was just deleted, then delete them.
@@ -387,7 +387,7 @@ class mod_hotquestion {
                 "view.php?id={$this->cm->id}&round=$rid", $rid, $this->cm->id);
         }
 
-        $roundid = $_GET['round'];
+        $roundid = required_param('round', PARAM_INT);
         if ($this->currentround->endtime == 0) {
             $this->currentround->endtime = 0xFFFFFFFF;  // Hack.
         }
@@ -451,8 +451,7 @@ class mod_hotquestion {
     public function download_questions($array, $filename = "export.csv", $delimiter=";") {
         global $CFG, $DB, $USER;
         require_once($CFG->libdir.'/csvlib.class.php');
-        $data = new StdClass();
-        $data->hotquestion = $this->instance->id;
+
         $context = context_module::instance($this->cm->id);
         // Trigger download_questions event.
         if ($CFG->version > 2014051200) { // If newer than Moodle 2.7+ use new event logging.
@@ -606,6 +605,7 @@ class mod_hotquestion {
 /**
  * Count questions in current rounds.
  * Counts all the hotquestion entries (optionally in a given group)
+ * and is called from index.php.
  * @param var $hotquestion
  * @param int $groupid
  * @return nothing
@@ -685,16 +685,20 @@ function hq_available($hotquestion) {
 /**
  * Returns the hotquestion instance course_module id
  *
+ * Called from function hotquestion_count_entries().
  * @param var $hotquestionid
  * @return object
  */
 function hotquestion_get_coursemodule($hotquestionid) {
-
     global $DB;
-
-    return $DB->get_record_sql("SELECT cm.id FROM {course_modules} cm
-								JOIN {modules} m ON m.id = cm.module
-								WHERE cm.instance = '$hotquestionid' AND m.name = 'hotquestion'");
+    $sql = "SELECT cm.id
+              FROM {course_modules} cm
+              JOIN {modules} m ON m.id = cm.module
+             WHERE cm.instance = ".$hotquestionid."
+               AND m.name = 'hotquestion'";
+    $params = array();
+    $params['hotquestionid'] = $hotquestionid;
+    return $DB->get_record_sql($sql, $params);
 }
 
 /**
