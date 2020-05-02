@@ -611,7 +611,6 @@ class mod_hotquestion {
  * @return nothing
  */
 function hotquestion_count_entries($hotquestion, $groupid = 0) {
-
     global $DB, $CFG, $USER;
 
     $cm = hotquestion_get_coursemodule($hotquestion->id);
@@ -619,44 +618,60 @@ function hotquestion_count_entries($hotquestion, $groupid = 0) {
     // Get the groupmode which should be 0, 1, or 2.
     $groupmode = ($hotquestion->groupmode);
 
-    // How many users and questions in each Hot Question activity current round?
+    // If user is in a group, how many users and questions in each Hot Question activity current round?
     if ($groupid && ($groupmode > '0')) {
+
         // Extract each group id from $groupid and process based on whether viewer is a member of the group.
         // Show user and question counts only if a member of the current group.
         foreach ($groupid as $gid) {
-            $sql = "SELECT COUNT(DISTINCT hq.userid) AS ucount, COUNT(DISTINCT hq.content) AS qcount FROM {hotquestion_questions} hq
-                JOIN {groups_members} g ON g.userid = hq.userid
-                JOIN {user} u ON u.id = g.userid
-                LEFT JOIN {hotquestion_rounds} hr ON hr.hotquestion=hq.hotquestion
-                WHERE hq.hotquestion = $hotquestion->id
-                    AND g.groupid = '$gid->id'
-                    AND hr.endtime=0
-                    AND hq.time>=hr.starttime
-                    AND hq.userid>0";
-            $hotquestions = $DB->get_records_sql($sql);
+            $sql = "SELECT COUNT(DISTINCT hq.userid) AS ucount,
+                     COUNT(DISTINCT hq.content) AS qcount
+                      FROM {hotquestion_questions} hq
+                      JOIN {groups_members} g ON g.userid = hq.userid
+                      JOIN {user} u ON u.id = g.userid
+                 LEFT JOIN {hotquestion_rounds} hr ON hr.hotquestion=hq.hotquestion
+                     WHERE hq.hotquestion = :hqid
+                           AND g.groupid = :gidid
+                           AND hr.endtime=0
+                           AND hq.time>=hr.starttime
+                           AND hq.userid>0";
+            $params = array();
+            $params = ['hqid' => $hotquestion->id]+ ['gidid' => $gid->id] ;
+            $hotquestions = $DB->get_records_sql($sql, $params);
         }
+
     } else if (!$groupid && ($groupmode > '0')) {
+
         // Check all the entries from the whole course.
         // If not currently a group member, but group mode is set for separate groups or visible groups,
         // see if this user has posted anyway, posted before mode was changed or posted before removal from a group.
         $sql = "SELECT COUNT(DISTINCT hq.userid) AS ucount, COUNT(DISTINCT hq.content) AS qcount FROM {hotquestion_questions} hq
-                JOIN {user} u ON u.id = hq.userid
-                LEFT JOIN {hotquestion_rounds} hr ON hr.hotquestion=hq.hotquestion
-                WHERE hq.hotquestion = '$hotquestion->id'
-                    AND hr.endtime=0
-                    AND hq.time>=hr.starttime
-                    AND hq.userid='$USER->id'";
-        $hotquestions = $DB->get_records_sql($sql);
+                  JOIN {user} u ON u.id = hq.userid
+             LEFT JOIN {hotquestion_rounds} hr ON hr.hotquestion=hq.hotquestion
+                 WHERE hq.hotquestion = :hqid
+                       AND hr.endtime = 0
+                       AND hq.time >= hr.starttime
+                       AND hq.userid = :userid";
+
+        $params = array();
+        $params = ['hqid' => $hotquestion->id]+ ['userid' => $USER->id] ;
+        $hotquestions = $DB->get_records_sql($sql, $params);
+
     } else {
+
         // Check all the users and entries from the whole course.
         $sql = "SELECT COUNT(DISTINCT hq.userid) AS ucount, COUNT(DISTINCT hq.content) AS qcount FROM {hotquestion_questions} hq
-                JOIN {user} u ON u.id = hq.userid
-                LEFT JOIN {hotquestion_rounds} hr ON hr.hotquestion=hq.hotquestion
-                WHERE hq.hotquestion = '$hotquestion->id'
-                    AND hr.endtime=0
-                    AND hq.time>=hr.starttime
-                    AND hq.userid>0";
-        $hotquestions = $DB->get_records_sql($sql);
+                  JOIN {user} u ON u.id = hq.userid
+             LEFT JOIN {hotquestion_rounds} hr ON hr.hotquestion=hq.hotquestion
+                 WHERE hq.hotquestion = :hqid
+                       AND hr.endtime = 0
+                       AND hq.time >= hr.starttime
+                       AND hq.userid > 0";
+
+
+        $params = array();
+        $params = ['hqid' => $hotquestion->id];
+        $hotquestions = $DB->get_records_sql($sql, $params);
     }
 
     if (!$hotquestions) {
@@ -664,6 +679,7 @@ function hotquestion_count_entries($hotquestion, $groupid = 0) {
     }
     $canadd = get_users_by_capability($context, 'mod/hotquestion:ask', 'u.id');
     $entriesmanager = get_users_by_capability($context, 'mod/hotquestion:manageentries', 'u.id');
+    // If not enrolled or not an admin, teacher, or manager, then return nothing.
     if ($canadd || $entriesmanager) {
         return ($hotquestions);
     } else {
