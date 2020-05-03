@@ -1,3 +1,13 @@
+=== 3.8.1 ===
+04/30/2020 Got an email regarding issue #39 on github for Hot Question.
+04/30/2020 TRK1_384 fixed Locallib.php occurrences of $_GET().
+05/02/2020 Finished TRK1_386, Hot Question - variables $hotquestion->id,
+$gid->id and $USER->id are concatenated directly to SQL, and pushed to github.
+05/03/2020 Finished TRK1_385, Hot Question - $this->instance->id should NOT be
+concatenated directly to SQL, and started testing nr HQ RC.
+05/03/2020 Finished TRK1_387, Hot Question - variable $hotquestionid is
+concatenated directly to SQL, and pushed to github.
+
 === 3.8.0 ===
 11/21/19 Made changes in locallib.php to fix linelength error in two functions 
 Changed line 317 of function get_questions() - tested - still works.

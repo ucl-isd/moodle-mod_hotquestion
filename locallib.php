@@ -711,10 +711,10 @@ function hotquestion_get_coursemodule($hotquestionid) {
     $sql = "SELECT cm.id
               FROM {course_modules} cm
               JOIN {modules} m ON m.id = cm.module
-             WHERE cm.instance = ".$hotquestionid."
+             WHERE cm.instance = :hqid
                AND m.name = 'hotquestion'";
     $params = array();
-    $params['hotquestionid'] = $hotquestionid;
+    $params = ['hqid' => $hotquestionid];
     return $DB->get_record_sql($sql, $params);
 }
 
