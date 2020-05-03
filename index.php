@@ -104,9 +104,10 @@ foreach ($hotquestions as $hotquestion) {
 
     // Link to Hot Question activities.
     if (!$hotquestion->visible) {
-        // Show dimmed if the mod is hidden.
+        // Show dimmed and with slashed eye, if the activity is hidden.
         $table->data[$i][] = "<a class=\"dimmed\" href=\"view.php?id=$hotquestion->coursemodule\">"
-                             .format_string($hotquestion->name, true)."</a>";
+                             .format_string($hotquestion->name, true)
+                             .' <i class="icon fa fa-eye-slash fa-fw " aria-hidden="true"></a>';
     } else {
         // Show normal if the mod is visible.
         $table->data[$i][] = "<a href=\"view.php?id=$hotquestion->coursemodule\">".format_string($hotquestion->name, true)."</a>";
