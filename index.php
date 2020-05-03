@@ -88,28 +88,27 @@ foreach ($hotquestions as $hotquestion) {
 
     // Section.
     $printsection = '';
-    if ($hotquestion->section !== $currentsection) {
-        if ($hotquestion->section) {
-            $printsection = get_section_name($course, $sections[$hotquestion->section]);
-        }
+    if (get_section_name($course, $sections[$hotquestion->section])) {
+        $printsection = get_section_name($course, $sections[$hotquestion->section]);
         if ($currentsection !== '') {
             $table->data[$i] = 'hr';
             $i++;
         }
         $currentsection = $hotquestion->section;
     }
+    // List topic/section name.
     if ($usesections) {
         $table->data[$i][] = $printsection;
     }
 
-    // Link to Hot Question activities.
+    // Link to Hot Question activity names.
     if (!$hotquestion->visible) {
-        // Show dimmed and with slashed eye, if the activity is hidden.
+        // Show dimmed link with slashed eye, if the activity is hidden.
         $table->data[$i][] = "<a class=\"dimmed\" href=\"view.php?id=$hotquestion->coursemodule\">"
                              .format_string($hotquestion->name, true)
                              .' <i class="icon fa fa-eye-slash fa-fw " aria-hidden="true"></a>';
     } else {
-        // Show normal if the mod is visible.
+        // Show normal link if the activity is visible.
         $table->data[$i][] = "<a href=\"view.php?id=$hotquestion->coursemodule\">".format_string($hotquestion->name, true)."</a>";
     }
 
