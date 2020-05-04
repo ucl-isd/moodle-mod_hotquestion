@@ -350,7 +350,7 @@ class mod_hotquestion {
                 "view.php?id={$this->cm->id}&round=$rid", $rid, $this->cm->id);
         }
 
-        if (null !==(required_param('q', PARAM_INT))) {
+        if (null !== (required_param('q', PARAM_INT))) {
             $questionid = required_param('q', PARAM_INT);
             $dbquestion = $DB->get_record('hotquestion_questions', array('id' => $questionid));
             $DB->delete_records('hotquestion_questions', array('id' => $dbquestion->id));
@@ -637,7 +637,7 @@ function hotquestion_count_entries($hotquestion, $groupid = 0) {
                            AND hq.time>=hr.starttime
                            AND hq.userid>0";
             $params = array();
-            $params = ['hqid' => $hotquestion->id]+ ['gidid' => $gid->id] ;
+            $params = ['hqid' => $hotquestion->id] + ['gidid' => $gid->id];
             $hotquestions = $DB->get_records_sql($sql, $params);
         }
 
@@ -655,7 +655,7 @@ function hotquestion_count_entries($hotquestion, $groupid = 0) {
                        AND hq.userid = :userid";
 
         $params = array();
-        $params = ['hqid' => $hotquestion->id]+ ['userid' => $USER->id] ;
+        $params = ['hqid' => $hotquestion->id] + ['userid' => $USER->id];
         $hotquestions = $DB->get_records_sql($sql, $params);
 
     } else {
@@ -668,8 +668,6 @@ function hotquestion_count_entries($hotquestion, $groupid = 0) {
                        AND hr.endtime = 0
                        AND hq.time >= hr.starttime
                        AND hq.userid > 0";
-
-
         $params = array();
         $params = ['hqid' => $hotquestion->id];
         $hotquestions = $DB->get_records_sql($sql, $params);

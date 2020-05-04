@@ -153,8 +153,8 @@ class hotquestion_form extends moodleform {
 
         // Next line is to retrieve submit instruction setting and creates the text post area.
         $mform->addElement('textarea', 'question', $temp->submitdirections, 'wrap="virtual" rows="3" cols="50"');
-
         $mform->setType('question', PARAM_TEXT);
+
         $mform->addElement('hidden', 'id', $cm->id, 'id="hotquestion_courseid"');
         $mform->setType('id', PARAM_INT);
 
