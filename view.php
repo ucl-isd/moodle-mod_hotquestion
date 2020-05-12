@@ -183,7 +183,7 @@ if (!empty($action)) {
 
 // Start print page.
 if (!$ajax) {
-    // Added 176 and 178 to include the activity name, 10/05/16.
+    // Added code to include the activity name, 10/05/16.
     $hotquestionname = format_string($hotquestion->name, true, array('context' => $context));
     echo $output->header();
     echo $OUTPUT->heading($hotquestionname);
