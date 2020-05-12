@@ -14,6 +14,18 @@ index.php, when the HQ activity is hidden from students or regular users.
 05/03/2020 Finished TRK1_389, Hot Question - index.php does not show Topic Name
 for topic zero. Old code was skipping name of topic zero. New code shows it.
 05/04/2020 Ran codehecker and phpchecker and fixed as needed. Push to github.
+05/11/2020 Added database fields to allow changing the column headings
+used on the view.php page.
+05/11/2020 Made needed changes to the settings.php and language strings
+the new column heading settings.
+05/12/2020 Made changes to mod_form.php, settings.php, hotquestion.php, and
+renderer.php to complete code changes needed for allowing each Hot Question
+activity to have column headings that more closely reflect what the activity
+is being used for. e.g. The regular, Questions, column on view.php, is more
+meaningful if it is changed to, Suggestions, when HQ is being used as
+a suggestion box.
+
+TODO add settings to mod_form.php
 
 === 3.8.0 ===
 11/21/19 Made changes in locallib.php to fix linelength error in two functions 

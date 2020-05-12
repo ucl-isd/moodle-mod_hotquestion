@@ -42,7 +42,7 @@ require_once($CFG->dirroot.'/course/moodleform_mod.php');
 class mod_hotquestion_mod_form extends moodleform_mod {
 
     /**
-     * Define the HotQuestion mod_form.
+     * Define the Hot Question mod_form used when editing a Hot Question activity.
      */
     public function definition() {
 
@@ -87,16 +87,56 @@ class mod_hotquestion_mod_form extends moodleform_mod {
         $mform->addHelpButton('submitdirections', 'inputquestion', 'hotquestion');
         $mform->addRule('submitdirections', null, 'required', null, 'client');
         $mform->addRule('submitdirections', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
-
-        // Add visibility setting for the teacher priority column.
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // Add Questions label text field here.
+        $mform->addElement('text', 'questionlabel', get_string('questionlabel', 'hotquestion'), array('size' => '20'));
+        if (!empty($CFG->formatstringstriptags)) {
+            $mform->setType('questionlabel', PARAM_TEXT);
+        } else {
+            $mform->setType('questionlabel', PARAM_CLEANHTML);
+        }
+        $mform->setDefault('questionlabel', $hotquestionconfig->questionlabel);
+        $mform->addHelpButton('questionlabel', 'inputquestionlabel', 'hotquestion');
+        $mform->addRule('questionlabel', null, 'required', null, 'client');
+        $mform->addRule('questionlabel', get_string('maximumchars', '', 20), 'maxlength', 20, 'client');
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // Add visibility setting for the teacher Priority column.
         $mform->addElement('selectyesno', 'teacherpriorityvisibility', get_string('teacherpriorityvisibility', 'hotquestion'));
         $mform->addHelpButton('teacherpriorityvisibility', 'teacherpriorityvisibility', 'hotquestion');
         $mform->setDefault('teacherpriorityvisibility', '1');
 
-        // Add visibility setting for the heat column.
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // Add Priority label text field here.
+        $mform->addElement('text', 'teacherprioritylabel', get_string('teacherprioritylabel', 'hotquestion'), array('size' => '20'));
+        if (!empty($CFG->formatstringstriptags)) {
+            $mform->setType('teacherprioritylabel', PARAM_TEXT);
+        } else {
+            $mform->setType('teacherprioritylabel', PARAM_CLEANHTML);
+        }
+        $mform->setDefault('teacherprioritylabel', $hotquestionconfig->teacherprioritylabel);
+        $mform->addHelpButton('teacherprioritylabel', 'inputteacherprioritylabel', 'hotquestion');
+        $mform->addRule('teacherprioritylabel', null, 'required', null, 'client');
+        $mform->addRule('teacherprioritylabel', get_string('maximumchars', '', 20), 'maxlength', 20, 'client');
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        // Add visibility setting for the Heat column.
         $mform->addElement('selectyesno', 'heatvisibility', get_string('heatvisibility', 'hotquestion'));
         $mform->addHelpButton('heatvisibility', 'heatvisibility', 'hotquestion');
         $mform->setDefault('heatvisibility', '1');
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // Add Heat label text field here.
+        $mform->addElement('text', 'heatlabel', get_string('heatlabel', 'hotquestion'), array('size' => '20'));
+        if (!empty($CFG->formatstringstriptags)) {
+            $mform->setType('heatlabel', PARAM_TEXT);
+        } else {
+            $mform->setType('heatlabel', PARAM_CLEANHTML);
+        }
+        $mform->setDefault('heatlabel', $hotquestionconfig->heatlabel);
+        $mform->addHelpButton('heatlabel', 'inputheatlabel', 'hotquestion');
+        $mform->addRule('heatlabel', null, 'required', null, 'client');
+        $mform->addRule('heatlabel', get_string('maximumchars', '', 20), 'maxlength', 20, 'client');
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         // Adding 'anonymouspost' field.
         $mform->addElement('selectyesno', 'anonymouspost', get_string('allowanonymouspost', 'hotquestion'));
@@ -107,6 +147,34 @@ class mod_hotquestion_mod_form extends moodleform_mod {
         $mform->addElement('selectyesno', 'approval', get_string('requireapproval', 'hotquestion'));
         $mform->addHelpButton('approval', 'requireapproval', 'hotquestion');
         $mform->setDefault('approval', '0');
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // Add Approval label text field here.
+        $mform->addElement('text', 'approvallabel', get_string('approvallabel', 'hotquestion'), array('size' => '20'));
+        if (!empty($CFG->formatstringstriptags)) {
+            $mform->setType('approvallabel', PARAM_TEXT);
+        } else {
+            $mform->setType('approvallabel', PARAM_CLEANHTML);
+        }
+        $mform->setDefault('approvallabel', $hotquestionconfig->approvallabel);
+        $mform->addHelpButton('approvallabel', 'inputapprovallabel', 'hotquestion');
+        $mform->addRule('approvallabel', null, 'required', null, 'client');
+        $mform->addRule('approvallabel', get_string('maximumchars', '', 20), 'maxlength', 20, 'client');
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // Add Remove label text field here.
+        $mform->addElement('text', 'removelabel', get_string('removelabel', 'hotquestion'), array('size' => '20'));
+        if (!empty($CFG->formatstringstriptags)) {
+            $mform->setType('removelabel', PARAM_TEXT);
+        } else {
+            $mform->setType('removelabel', PARAM_CLEANHTML);
+        }
+        $mform->setDefault('removelabel', $hotquestionconfig->removelabel);
+        $mform->addHelpButton('removelabel', 'inputapprovallabel', 'hotquestion');
+        $mform->addRule('removelabel', null, 'required', null, 'client');
+        $mform->addRule('removelabel', get_string('maximumchars', '', 20), 'maxlength', 20, 'client');
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         // Availability.
         $mform->addElement('header', 'availabilityhdr', get_string('availability'));
@@ -140,7 +208,7 @@ class mod_hotquestion_mod_form extends moodleform_mod {
 class hotquestion_form extends moodleform {
 
     /**
-     * Define the HotQuestion form.
+     * Define the Hot Question input form called from view.php.
      */
     public function definition() {
         global $CFG, $DB;

@@ -33,6 +33,10 @@ $string['allowanonymouspost_descr'] = 'If enabled, questions can be posted anono
 $string['alwaysshowdescription'] = 'Always show description';
 $string['alwaysshowdescription_help'] = 'If disabled, the Hot Question Description will not be visible to students.';
 $string['anonymous'] = 'Anonymous';
+//==================================================================================================
+$string['approvallabel'] = 'Approval required column label';
+$string['approvallabel_descr'] = 'Enter a default label for the Approved column.';
+//==================================================================================================
 $string['approvedyes'] = 'Approved';
 $string['approvedno'] = 'Not approved';
 $string['authorinfo'] = 'Posted by {$a->user} at {$a->time}';
@@ -56,6 +60,10 @@ $string['exportfilename'] = 'questions.csv';
 $string['exportfilenamep1'] = 'All_Site';
 $string['exportfilenamep2'] = '_HQ_Questions_Exported_On_';
 $string['heat'] = 'Heat';
+//==================================================================================================
+$string['heatlabel'] = 'Heat column label';
+$string['heatlabel_descr'] = 'Enter a default label for the Heat column.';
+//==================================================================================================
 $string['heatvisibility'] = 'Heat column visibility';
 $string['heatvisibility_help'] = 'If enabled, the Heat column is visible.';
 $string['heatvisibility_descr'] = 'If enabled, the Heat column is visible, otherwise it is hidden.';
@@ -76,6 +84,35 @@ $string['id'] = 'ID';
 $string['inputquestion'] = 'Submit your question here:';
 $string['inputquestion_descr'] = 'Change submit directions to what you want them to be.';
 $string['inputquestion_help'] = 'Change the submit directions to what you want them to be.';
+//==================================================================================================
+$string['inputquestionlabel'] = 'Questions';
+$string['inputquestionlabel_descr'] = 'Change the Questions column name to what you want it to be.';
+$string['inputquestionlabel_help'] = 'Change the Questions column name to better fit the use of this activity.';
+//==================================================================================================
+//==================================================================================================
+$string['inputteacherprioritylabel'] = 'Priority';
+$string['inputteacherprioritylabel_descr'] = 'Change the Priority column name to what you want it to be.';
+$string['inputteacherprioritylabel_help'] = 'Change the Priority column name to better fit the use of this activity.';
+//==================================================================================================
+
+//==================================================================================================
+$string['inputheatlabel'] = 'Heat';
+$string['inputheatlabel_descr'] = 'Change the Heat column name to what you want it to be.';
+$string['inputheatlabel_help'] = 'Change the Heat column name to better fit the use of this activity.';
+//==================================================================================================
+
+//==================================================================================================
+$string['inputremovelabel'] = 'Remove';
+$string['inputremovelabel_descr'] = 'Change the Remove column name to what you want it to be.';
+$string['inputremovelabel_help'] = 'Change the remove column name to better fit the use of this activity.';
+//==================================================================================================
+
+//==================================================================================================
+$string['inputapprovallabel'] = 'Approved';
+$string['inputapprovallabel_descr'] = 'Change the Approved column name to what you want it to be.';
+$string['inputapprovallabel_help'] = 'Change the Approved column name to better fit the use of this activity.';
+//==================================================================================================
+
 $string['invalidquestion'] = 'Empty questions are ignored.';
 $string['modulename'] = 'Hot Question';
 $string['modulename_help'] = 'A Hot Question activity enables students to post and vote on posts, in response to questions asked by course teachers.';
@@ -105,11 +142,22 @@ $string['privacy:metadata:hotquestion_votes'] = 'Information about votes on ques
 $string['privacy:metadata:hotquestion_votes:id'] = 'ID of the entry.';
 $string['privacy:metadata:hotquestion_votes:question'] = 'The ID of the entry for this vote';
 $string['privacy:metadata:hotquestion_votes:voter'] = 'User ID who voted.';
-
+//==================================================================================================
+$string['teacherprioritylabel'] = 'Priority column label';
+$string['teacherprioritylabel_descr'] = 'Enter a default label for the Priority column.';
+//==================================================================================================
 $string['question'] = 'Questions';
+//==================================================================================================
+$string['questionlabel'] = 'Questions column label';
+$string['questionlabel_descr'] = 'Enter a default label for the Questions column.';
+//==================================================================================================
 $string['questionsubmitted'] = 'Your post has been submitted successfully.';
 $string['questionremove'] = 'Remove';
 $string['questionremovesuccess'] = 'You have successfully removed that question.';
+//==================================================================================================
+$string['removelabel'] = 'Remove column label';
+$string['removelabel_descr'] = 'Enter a default label for the Remove column.';
+//==================================================================================================
 $string['removeround'] = 'Remove this round';
 $string['removedround'] = 'You have successfully removed this round.';
 $string['requireapproval'] = 'Approval required';

@@ -44,8 +44,13 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_configtext('mod_hotquestion/submitinstructions',
         new lang_string('inputquestion', 'hotquestion'),
         new lang_string('inputquestion_descr', 'hotquestion'),
-        'Submit your question here:', PARAM_TEXT, 25)
-    );
+        'Submit your question here:', PARAM_TEXT, 25));
+
+    // Default heading questionlabel setting.
+    $settings->add(new admin_setting_configtext('mod_hotquestion/questionlabel',
+        new lang_string('questionlabel', 'hotquestion'),
+        new lang_string('questionlabel_descr', 'hotquestion'),
+        'Questions', PARAM_TEXT, 20));
 
     // Default hide Priority column visibility setting.
     $settings->add(new admin_setting_configcheckbox_with_advanced('mod_hotquestion/teacherpriorityvisibility',
@@ -53,11 +58,23 @@ if ($ADMIN->fulltree) {
         get_string('teacherpriorityvisibility_descr', 'hotquestion'),
         array('value' => 1, 'adv' => false)));
 
+    // Default heading prioritylabel setting.
+    $settings->add(new admin_setting_configtext('mod_hotquestion/teacherprioritylabel',
+        new lang_string('teacherprioritylabel', 'hotquestion'),
+        new lang_string('teacherprioritylabel_descr', 'hotquestion'),
+        'Priority', PARAM_TEXT, 20));
+
     // Default allow Heat column visibility setting.
     $settings->add(new admin_setting_configcheckbox_with_advanced('mod_hotquestion/heatvisibility',
         get_string('heatvisibility', 'hotquestion'),
         get_string('heatvisibility_descr', 'hotquestion'),
         array('value' => 1, 'adv' => false)));
+
+    // Default heading heatlabel setting.
+    $settings->add(new admin_setting_configtext('mod_hotquestion/heatlabel',
+        new lang_string('heatlabel', 'hotquestion'),
+        new lang_string('heatlabel_descr', 'hotquestion'),
+        'Heat', PARAM_TEXT, 20));
 
     // Default allow anonymous post setting.
     $settings->add(new admin_setting_configcheckbox_with_advanced('mod_hotquestion/anonymouspost',
@@ -65,10 +82,21 @@ if ($ADMIN->fulltree) {
         get_string('allowanonymouspost_descr', 'hotquestion'),
         array('value' => 0, 'adv' => false)));
 
+    // Default heading removelabel setting.
+    $settings->add(new admin_setting_configtext('mod_hotquestion/removelabel',
+        new lang_string('removelabel', 'hotquestion'),
+        new lang_string('removelabel_descr', 'hotquestion'),
+        'Remove', PARAM_TEXT, 20));
+
     // Default approval required setting.
     $settings->add(new admin_setting_configcheckbox_with_advanced('mod_hotquestion/requireapproval',
         get_string('requireapproval', 'hotquestion'),
         get_string('requireapproval_descr', 'hotquestion'),
         array('value' => 0, 'adv' => false)));
 
+    // Default heading approvallabel setting.
+    $settings->add(new admin_setting_configtext('mod_hotquestion/approvallabel',
+        new lang_string('approvallabel', 'hotquestion'),
+        new lang_string('approvallabel_descr', 'hotquestion'),
+        'Approved', PARAM_TEXT, 20));
 }
