@@ -146,7 +146,8 @@ $string['privacy:metadata:hotquestion_votes:voter'] = 'User ID who voted.';
 $string['teacherprioritylabel'] = 'Priority column label';
 $string['teacherprioritylabel_descr'] = 'Enter a default label for the Priority column.';
 //==================================================================================================
-$string['question'] = 'Questions';
+$string['question'] = 'Question';
+$string['questions'] = 'Questions';
 //==================================================================================================
 $string['questionlabel'] = 'Questions column label';
 $string['questionlabel_descr'] = 'Enter a default label for the Questions column.';
