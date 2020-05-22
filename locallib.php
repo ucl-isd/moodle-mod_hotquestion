@@ -486,17 +486,24 @@ class mod_hotquestion {
         $fields = array(get_string('firstname'),
                         get_string('lastname'),
                         get_string('userid', 'hotquestion'),
-                        get_string('hotquestion', 'hotquestion'),
-                        get_string('question', 'hotquestion'),
+                        get_string('hotquestion', 'hotquestion').' ID',
+                        get_string('question', 'hotquestion').' ID',
                         get_string('time', 'hotquestion'),
                         get_string('anonymous', 'hotquestion'),
-                        get_string('teacherpriority', 'hotquestion'),
-                        get_string('heat', 'hotquestion'),
-                        get_string('approvedyes', 'hotquestion'),
-                        get_string('content', 'hotquestion'),
-                        'thisinstid' => $this->instance->id);
-        // Add the headings to our data array.
+                        $this->instance->teacherprioritylabel,
+                        $this->instance->heatlabel,
+                        $this->instance->approvallabel,
+                        $this->instance->questionlabel,
+                        );
+        // 20200513 Add the course shortname and the HQ activity name to our data array.
+        $activityname = array($this->course->shortname,$this->instance->name);
+        $csv->add_data($activityname);
+
+        // Add the column headings to our data array.
         $csv->add_data($fields);
+        // Now add this instance id that's needed in the sql for teachers and managers downloads.
+        $fields = array($fields,'thisinstid' => $this->instance->id);
+
         if ($CFG->dbtype == 'pgsql') {
             $sql = "SELECT hq.id AS question,
                       CASE
@@ -545,6 +552,8 @@ class mod_hotquestion {
 
         // Add the list of users and HotQuestions to our data array.
         if ($hqs = $DB->get_records_sql($sql, $fields)) {
+//print_object($hqs);
+//exit;
             foreach ($hqs as $q) {
                 $output = array($q->firstname, $q->lastname, $q->userid, $q->hotquestion, $q->question,
                     $q->time, $q->anonymous, $q->tpriority, $q->heat, $q->approved, $q->content);
