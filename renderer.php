@@ -199,7 +199,7 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
             // Admin, manager and teachers headings for questions, priority, heat, remove and approved headings.
             if (has_capability('mod/hotquestion:manageentries', $context)) {
                 // 20200512 Changed from fixed string to new questionlabel column setting.
-                //$table->head = array(get_string('question', 'hotquestion'));
+                //$table->head = array(get_string('questions', 'hotquestion'));
                 $table->head = array($this->hotquestion->instance->questionlabel);
                 // Check teacher priority column visibilty settings.
                 if ($teacherpriorityvisibility) {
@@ -230,7 +230,7 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
             } else {
                 // Students only see headings for questions, priority, and heat columns.
                 // 20200512 Changed from fixed string to new questionlabel column setting.
-                //$table->head = array(get_string('question', 'hotquestion'));
+                //$table->head = array(get_string('questions', 'hotquestion'));
                 $table->head = array($this->hotquestion->instance->questionlabel);
                 // Check teacher priority column visibilty settings.
                 if ($teacherpriorityvisibility) {
