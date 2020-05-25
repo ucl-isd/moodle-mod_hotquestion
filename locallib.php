@@ -448,7 +448,7 @@ class mod_hotquestion {
      * @param string $delimiter - The character to use as a delimiter.
      * @return nothing
      */
-    public function download_questions($array, $filename = "export.csv", $delimiter=";") {
+    public function download_questions($chq, $filename = "export.csv", $delimiter=";") {
         global $CFG, $DB, $USER;
         require_once($CFG->libdir.'/csvlib.class.php');
 
@@ -466,38 +466,60 @@ class mod_hotquestion {
                 "view.php?id={$this->cm->id}&round=$rid", $rid, $this->cm->id);
         }
 
-        // Construct sql query and filename based on admin or teacher.
+        // Construct sql query and filename based on admin or teacher/manager.
         // Add filename details based on course and HQ activity name.
         $csv = new csv_export_writer();
         $strhotquestion = get_string('hotquestion', 'hotquestion');
-        if (is_siteadmin($USER->id)) {
-            $whichhqs = ('AND hq.hotquestion > 0');
-            $csv->filename = clean_filename(get_string('exportfilenamep1', 'hotquestion'));
-        } else {
-            $whichhqs = ('AND hq.hotquestion = ');
-            $whichhqs .= (':thisinstid');
-            $csv->filename = clean_filename(($this->course->shortname).'_');
-            $csv->filename .= clean_filename(($this->instance->name));
-        }
-        $csv->filename .= clean_filename(get_string('exportfilenamep2', 'hotquestion').gmdate("Ymd_Hi").'GMT.csv');
 
         $fields = array();
 
-        $fields = array(get_string('firstname'),
-                        get_string('lastname'),
-                        get_string('userid', 'hotquestion'),
-                        get_string('hotquestion', 'hotquestion').' ID',
-                        get_string('question', 'hotquestion').' ID',
-                        get_string('time', 'hotquestion'),
-                        get_string('anonymous', 'hotquestion'),
-                        $this->instance->teacherprioritylabel,
-                        $this->instance->heatlabel,
-                        $this->instance->approvallabel,
-                        $this->instance->questionlabel,
-                        );
-        // 20200513 Add the course shortname and the HQ activity name to our data array.
-        $activityname = array($this->course->shortname,$this->instance->name);
-        $csv->add_data($activityname);
+        if (is_siteadmin($USER->id)) {
+            // Add fields with HQ default labels since admin will list ALL site questions.
+            $fields = array(get_string('firstname'),
+                            get_string('lastname'),
+                            get_string('userid', 'hotquestion'),
+                            get_string('hotquestion', 'hotquestion').' ID',
+                            get_string('question', 'hotquestion').' ID',
+                            get_string('time', 'hotquestion'),
+                            get_string('anonymous', 'hotquestion'),
+                            get_string('teacherpriority', 'hotquestion'),
+                            get_string('heat', 'hotquestion'),
+                            get_string('approvedyes', 'hotquestion'),
+                            get_string('content', 'hotquestion')
+                            );
+            // For admin we want every hotquestion activity.
+            $whichhqs = ('AND hq.hotquestion > 0');
+            $csv->filename = clean_filename(get_string('exportfilenamep1', 'hotquestion'));
+
+            // 20200524 Add info to our data array and denote this is ALL site questions.
+            $activityinfo = array(null,null,null,null,null,null,null,null,null,null, get_string('exportfilenamep1', 'hotquestion').get_string('exportfilenamep2', 'hotquestion').gmdate("Ymd_Hi").get_string('for', 'hotquestion').$CFG->wwwroot);
+            $csv->add_data($activityinfo);
+        } else {
+            // Add fields with the column labels for ONLY the current HQ activity.
+            $fields = array(get_string('firstname'),
+                            get_string('lastname'),
+                            get_string('userid', 'hotquestion'),
+                            get_string('hotquestion', 'hotquestion').' ID',
+                            get_string('question', 'hotquestion').' ID',
+                            get_string('time', 'hotquestion'),
+                            get_string('anonymous', 'hotquestion'),
+                            $this->instance->teacherprioritylabel,
+                            $this->instance->heatlabel,
+                            $this->instance->approvallabel,
+                            $this->instance->questionlabel,
+                            );
+
+            $whichhqs = ('AND hq.hotquestion = ');
+            $whichhqs .= (':thisinstid');
+
+            $csv->filename = clean_filename(($this->course->shortname).'_');
+            $csv->filename .= clean_filename(($this->instance->name));
+            // 20200513 Add the course shortname and the HQ activity name to our data array.
+            $activityinfo = array(get_string('course').': '.$this->course->shortname,get_string('activity').': '.$this->instance->name);
+            $csv->add_data($activityinfo);
+        }
+
+        $csv->filename .= clean_filename(get_string('exportfilenamep2', 'hotquestion').gmdate("Ymd_Hi").'GMT.csv');
 
         // Add the column headings to our data array.
         $csv->add_data($fields);
@@ -552,8 +574,6 @@ class mod_hotquestion {
 
         // Add the list of users and HotQuestions to our data array.
         if ($hqs = $DB->get_records_sql($sql, $fields)) {
-//print_object($hqs);
-//exit;
             foreach ($hqs as $q) {
                 $output = array($q->firstname, $q->lastname, $q->userid, $q->hotquestion, $q->question,
                     $q->time, $q->anonymous, $q->tpriority, $q->heat, $q->approved, $q->content);
