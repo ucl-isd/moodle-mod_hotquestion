@@ -1,7 +1,38 @@
 === 3.8.2 ===
 05/22/2020 Started dev on v 3.8.2 and began moving tickets from User Support
 Tracker into Hot Question Support Tracker.
-
+05/22/2020 Published all of the following tickets to Hot Question github.
+    HotQuestion_476 $this->instance->id should NOT be concatenated directly to SQL.
+    HotQuestion_405 Need to remove this instance id in heading row, column L.
+    HotQuestion_403 CSV download headings Hotquestion, Questions and Content are incorrect.
+    HotQuestion_401 Teacher/Manager download needs to use new column labels.
+    HotQuestion_400 Approved column heading on view.php should be an activity setting.
+    HotQuestion_399 Remove column heading on view.php should be an activity setting.
+    HotQuestion_398 Heat column heading on view.php should be an activity setting.
+    HotQuestion_397 Priority column heading on view.php should be an activity setting.
+    HotQuestion_396 Questions column heading on view.php should be an activity setting.
+05/22/2020 Converted TRK1_219 to HotQuestion_477, locallib.php need SQL fixes.
+05/22/2020 Converted TRK1_283 to HotQuestion_478, Need to add more info to events.
+05/22/2020 Converted TRK1_359 to HotQuestion_479, need to move locallib.php
+    functions to .../classes/...
+05/22/2020 Converted TRK1_383 to HotQuestion_480, Round does no seem to be
+    in csv download.
+05/22/2020 Converted TRK1_28 to HotQuestion_481, module.js errors and warnings
+    need to be fixed.
+05/22/2020 Converted TRK1_227 to HotQuestion_482, Need Who Voted toolbutton.
+05/22/2020 Converted TRK1_226 to HotQuestion_483, Investigate making old round
+    the current round.
+05/22/2020 Converted TRK1_128 to HotQuestion_484, Need to update GDPR Code.
+05/22/2020 Converted TRK1_142 to HotQuestion_485, Activity heading does not
+    include help.
+05/22/2020 Converted TRK1_136 to HotQuestion_486, Need to update Behat tests
+    for new remove confirmation
+05/22/2020 Converted TRK1_104 to HotQuestion_487, Need to implement Comments.
+05/22/2020 Converted TRK1_83 to HotQuestion_488, Need Groups and Priority
+    added to Behat Tests.
+05/22/2020 Converted TRK1_82 to HotQuestion_489, Need Behat Tests for Approval Testing.
+05/25/2020 HotQuestion_402, Admin download needs to use appropriate column labels,
+completed and pushed to github. 
 
 
 === 3.8.1 ===
