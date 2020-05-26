@@ -243,5 +243,21 @@ function xmldb_hotquestion_upgrade($oldversion=0) {
         // Hotquestion savepoint reached.
         upgrade_mod_savepoint(true, 2020051000, 'hotquestion');
     }
+
+    if ($oldversion < 2020052500) {
+
+        // Define field heatlimit to be added to hotquestion.
+        $table = new xmldb_table('hotquestion');
+        $field = new xmldb_field('heatlimit', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, '0', 'heatlabel');
+
+        // Conditionally launch add field heatlimit.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Hotquestion savepoint reached.
+        upgrade_mod_savepoint(true, 2020052500, 'hotquestion');
+    }
+
     return $result;
 }
