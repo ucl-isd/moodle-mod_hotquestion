@@ -76,6 +76,14 @@ if ($ADMIN->fulltree) {
         new lang_string('heatlabel_descr', 'hotquestion'),
         'Heat', PARAM_TEXT, 20));
 
+    // Default heading heatlimit setting.
+    $tl = array();
+    for ($i = 0; $i <= 10; $i++) {
+        $tl[] = $i;
+    }
+    $settings->add(new admin_setting_configselect('mod_hotquestion/heatlimit',
+        get_string('heatlimit', 'hotquestion'), get_string('heatlimit_descr', 'hotquestion'), 5, $tl));
+
     // Default allow anonymous post setting.
     $settings->add(new admin_setting_configcheckbox_with_advanced('mod_hotquestion/anonymouspost',
         get_string('allowanonymouspost', 'hotquestion'),
