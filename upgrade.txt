@@ -1,3 +1,15 @@
+
+=== 3.9.0 ===
+05/25/2020 Starting development for HotQuestion_410, New mode request to limit
+    number of votes per round.
+05/25/2020 HotQuestion_410, New mode request to limit number of votes per round,
+    added code for site settings, activity settings, and modified install.xml.
+05/26/2020 HotQuestion_491, Need to add missing fields to backup_hotquestion_stepslib.php,
+    Added missing fields.
+05/26/2020 HotQuestion_491, Need to verify backup includes all information, and a
+    restore seems to include everything as expected.
+
+
 === 3.8.2 ===
 05/22/2020 Started dev on v 3.8.2 and began moving tickets from User Support
 Tracker into Hot Question Support Tracker.
@@ -32,8 +44,26 @@ Tracker into Hot Question Support Tracker.
     added to Behat Tests.
 05/22/2020 Converted TRK1_82 to HotQuestion_489, Need Behat Tests for Approval Testing.
 05/25/2020 HotQuestion_402, Admin download needs to use appropriate column labels,
-completed and pushed to github. 
-
+    changed to resolved.
+05/25/2020 HotQuestion_477, locallib.php need SQL fixes, changed to resolved. 
+05/25/2020 HotQuestion_401, Teacher/Manager download needs to use new column labels,
+    changed to resolved. 
+05/25/2020 HotQuestion_476, $this->instance->id should NOT be concatenated directly
+    to SQL, changed to resolved. 
+05/25/2020 HotQuestion_400, Approved column heading on view.php should be an
+    activity setting, changed to resolved. 
+05/25/2020 HotQuestion_399, Remove column heading on view.php should be an
+    activity setting, changed to resolved.
+05/25/2020 HotQuestion_398, Heat column heading on view.php should be an
+    activity setting, changed to resolved.
+05/25/2020 HotQuestion_397, Priority column heading on view.php should be an
+    activity setting, changed to resolved.
+05/25/2020 HotQuestion_396, Questions column heading on view.php should be an
+    activity setting, changed to resolved.
+05/25/2020 HotQuestion_403, CSV download headings Hotquestion, Questions and
+    Content are incorrect, changed to resolved.
+05/25/2020 HotQuestion_405, Need to remove this instance id in heading row,
+    column L, changed to resolved.
 
 === 3.8.1 ===
 04/30/2020 Got an email regarding issue #39 on github for Hot Question.
