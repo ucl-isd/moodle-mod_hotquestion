@@ -214,9 +214,10 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
                 // Check heat column visibilty settings.
                 if ($heatvisibility) {
                     // 20200512 Changed from fixed string to new heatlabel column setting.
-                    // Heat column is visible, so show the label.
-                    //$table->head[] .= get_string('heat', 'hotquestion');
-                    $table->head[] .= $this->hotquestion->instance->heatlabel;
+                    // 20200526 Show heatlimit setting and how many heat/votes remain for current user.
+//print_object($USER->id);
+                    $table->head[] .= $this->hotquestion->instance->heatlabel.' '.$this->hotquestion->instance->heatlimit.'/'.$this->hotquestion->heat_tally($hq, $USER->id);
+
                 } else {
                     // Heat column is not visible, so replace label with a space.
                     $table->head[] .= ' ';
@@ -247,7 +248,12 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
                     // 20200512 Changed from fixed string to new heatlabel column setting.
                     // Heat column is visible, so show the label.
                     //$table->head[] .= get_string('heat', 'hotquestion');
-                    $table->head[] .= $this->hotquestion->instance->heatlabel;
+                    //$table->head[] .= $this->hotquestion->instance->heatlabel;
+                    //$table->head[] .= $this->hotquestion->instance->heatlabel.' '.$this->hotquestion->heat_tally($hq, $USER->id);
+//print_object($USER->id);
+
+                    $table->head[] .= $this->hotquestion->instance->heatlabel.' '.$this->hotquestion->instance->heatlimit.'/'.$this->hotquestion->heat_tally($hq, $USER->id);
+
                 } else {
                     // Heat column is not visible, so replace label with a space.
                     $table->head[] .= ' ';
@@ -262,6 +268,9 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
             } else {
                 $groups = '';
             }
+
+            // 20200528 Added variable for remaining votes to use as a test for showing vote icon for current user.
+            $remaining = ($this->hotquestion->heat_tally($hq, $USER->id));
 
             foreach ($questions as $question) {
                 $line = array();
@@ -326,8 +335,8 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
                             $line[] = ' ';
                         }
 
-                        // Print the vote cron case.
-                        if ($allowvote && $this->hotquestion->can_vote_on($question)) {
+                        // Print the vote cron case. 20200528 Added check for votes remaining.
+                        if ($allowvote && $this->hotquestion->can_vote_on($question) && !($remaining < 1)) {
                             if (!$this->hotquestion->has_voted($question->id)) {
                                 $heat .= '&nbsp;<a href="view.php?id='
                                       .$this->hotquestion->cm->id

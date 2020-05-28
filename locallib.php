@@ -81,6 +81,7 @@ class mod_hotquestion {
     /**
      * Return whether the user has voted on specified question.
      *
+     * Called from function vote_on($question).
      * @param int $question question id
      * @param int $user user id. -1 means current user
      * @return boolean
@@ -142,7 +143,8 @@ class mod_hotquestion {
     /**
      * Vote on question.
      *
-     * @param int $question the question id
+     * Called from view.php.
+     * @param int $question The question id.
      */
     public function vote_on($question) {
         global $CFG, $DB, $USER;
@@ -151,6 +153,7 @@ class mod_hotquestion {
         $question = $DB->get_record('hotquestion_questions', array('id' => $question));
         if ($question && $this->can_vote_on($question)) {
 
+            // Trigger and log a vote event.
             if ($CFG->version > 2014051200) { // If newer than Moodle 2.7+ use new event logging.
                 $params = array(
                     'objectid' => $this->cm->id,
@@ -181,6 +184,8 @@ class mod_hotquestion {
      */
     public function can_vote_on($question, $user = null) {
         global $USER, $DB;
+//print_object('printing question');
+//print_object($question);
 
         if (is_int($question)) {
             $question = $DB->get_record('hotquestion_questions', array('id' => $question));
@@ -195,6 +200,71 @@ class mod_hotquestion {
         $inlastround = $question->time >= $lastround->starttime;
 
         return $question->userid != $user->id && $inlastround;
+    }
+
+    /**
+     * Total Heat available and total heat used, by this user in this round.
+     *
+     * @param int $hq
+     */
+    public function heat_tally($hq, $user = null) {
+        global $USER, $CFG, $DB;
+//print_object($USER->id);
+//print_object('printing $hq->instance->id');
+//print_object($hq->instance->id);
+//print_object('printing $hq->currentround');
+//print_object($hq->currentround);
+//print_object($hq->currentround->starttime);
+
+
+/*
+        if ($hq->currentround->endtime == 0) {
+           // $hq->currentround->endtime = 0xFFFFFFFF;  // Hack.
+        }
+*/
+        $params = array( $hq->currentround->id, $hq->currentround->hotquestion, $hq->currentround->endtime,$USER->id);
+//print_object($params);
+
+        $sql = "SELECT hqq.id AS questionid,
+                       COUNT(hqv.voter) AS heat,
+                       hqq.hotquestion hotquestionid,
+                       hqr.id AS round,
+                       hqq.content content,
+                       hqq.userid userid,
+                       hqv.voter voter,
+         FROM_UNIXTIME(hqq.time) AS time,
+                       hqq.anonymous anonymous,
+                       hqq.tpriority AS tpriority,
+                       hqq.approved AS approved
+                  FROM {hotquestion_rounds} hqr 
+             LEFT JOIN {hotquestion_questions} hqq ON hqr.hotquestion=hqq.hotquestion
+             LEFT JOIN {hotquestion_votes} hqv ON hqv.question=hqq.id
+                  JOIN {user} u ON u.id = hqq.userid
+                 WHERE hqr.id = ?
+                   AND hqr.hotquestion = ?
+                   AND hqr.endtime = ?
+                   AND hqv.voter = ?
+              GROUP BY hqq.id
+              ORDER BY hqq.hotquestion ASC, tpriority DESC, heat DESC";
+
+//print_object($sql);
+//print_object('printing $params');
+//print_object($params);
+
+//exit;
+        //$tally = $DB->count_records_sql($sql, $params);
+        $tally = count($DB->get_records_sql($sql, $params));
+//print_object('printing $tally');
+//print_object($tally);
+
+    // Will need to replace the 0 in next line with the number of votes used by the current user.
+    // Will need to cycle through the questions, see if current user has voted, and keep a tally.
+    //$tally = '2';
+    // May need to do the left half and / in renderer.php as I think I will need the tally by itself in other places too.
+    //$results = $hq->instance->heatlimit.'/'.($hq->instance->heatlimit - $tally);
+    // Since the heatlimit is just a setting, add it to the output in the renderer.php file.
+    $results = ($hq->instance->heatlimit - $tally);
+    return $results;
     }
 
     /**

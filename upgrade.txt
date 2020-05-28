@@ -8,7 +8,8 @@
     Added missing fields.
 05/26/2020 HotQuestion_491, Need to verify backup includes all information, and a
     restore seems to include everything as expected.
-
+05/28/2020 HotQuestion_410, New mode request to limit number of votes per round, is
+    ready for testing.
 
 === 3.8.2 ===
 05/22/2020 Started dev on v 3.8.2 and began moving tickets from User Support
