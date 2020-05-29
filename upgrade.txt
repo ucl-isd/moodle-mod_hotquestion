@@ -10,6 +10,8 @@
     restore seems to include everything as expected.
 05/28/2020 HotQuestion_410, New mode request to limit number of votes per round, is
     ready for testing.
+05/29/2020 HotQuestion_410, New mode request to limit number of votes per round, fixed
+    sql that was allowing to count ALL votes instead of just current round votes.
 
 === 3.8.2 ===
 05/22/2020 Started dev on v 3.8.2 and began moving tickets from User Support
