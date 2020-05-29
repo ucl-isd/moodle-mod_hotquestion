@@ -184,8 +184,6 @@ class mod_hotquestion {
      */
     public function can_vote_on($question, $user = null) {
         global $USER, $DB;
-//print_object('printing question');
-//print_object($question);
 
         if (is_int($question)) {
             $question = $DB->get_record('hotquestion_questions', array('id' => $question));
