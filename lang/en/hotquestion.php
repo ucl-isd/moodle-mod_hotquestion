@@ -62,9 +62,8 @@ $string['heat'] = 'Heat';
 $string['heatlabel'] = 'Heat column label';
 $string['heatlabel_descr'] = 'Enter a default label for the Heat column.';
 $string['heatlimit'] = 'Heat default limit';
-$string['heatlimit_descr'] = 'Enter a default for the number of times you can apply heat/vote, per round.';
-$string['heatlimit_help'] = 'Enter a default for the number of times you can apply heat/vote, per round.';
-
+$string['heatlimit_descr'] = 'Enter a default for the number of times users can apply heat/vote, per round. Zero disables heat/voting.';
+$string['heatlimit_help'] = 'Enter a default for the number of times you can apply heat/vote, per round. Zero disables heat/voting.';
 $string['heatvisibility'] = 'Heat column visibility';
 $string['heatvisibility_help'] = 'If enabled, the Heat column is visible.';
 $string['heatvisibility_descr'] = 'If enabled, the Heat column is visible, otherwise it is hidden.';
