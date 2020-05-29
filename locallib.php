@@ -213,13 +213,13 @@ class mod_hotquestion {
 
         $sql = "SELECT hqq.id AS questionid,
                        COUNT(hqv.voter) AS heat,
-                       hqq.hotquestion hotquestionid,
+                       hqq.hotquestion AS hotquestionid,
                        hqr.id AS round,
-                       hqq.content content,
-                       hqq.userid userid,
-                       hqv.voter voter,
-         FROM_UNIXTIME(hqq.time) AS time,
-                       hqq.anonymous anonymous,
+                       hqq.content AS content,
+                       hqq.userid AS userid,
+                       hqv.voter AS voter,
+                       hqq.time AS time,
+                       hqq.anonymous AS anonymous,
                        hqq.tpriority AS tpriority,
                        hqq.approved AS approved
                   FROM {hotquestion_rounds} hqr 
@@ -231,7 +231,7 @@ class mod_hotquestion {
                    AND hqq.time > hqr.starttime
                    AND hqr.endtime = 0
                    AND hqv.voter = ?
-              GROUP BY hqq.id
+              GROUP BY hqq.id, hqr.id, hqv.voter
               ORDER BY hqq.hotquestion ASC, tpriority DESC, heat DESC";
 
 
