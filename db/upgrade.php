@@ -244,7 +244,7 @@ function xmldb_hotquestion_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2020051000, 'hotquestion');
     }
 
-    if ($oldversion < 2020052500) {
+    if ($oldversion < 2020052800) {
 
         // Define field heatlimit to be added to hotquestion.
         $table = new xmldb_table('hotquestion');
@@ -256,7 +256,7 @@ function xmldb_hotquestion_upgrade($oldversion=0) {
         }
 
         // Hotquestion savepoint reached.
-        upgrade_mod_savepoint(true, 2020052500, 'hotquestion');
+        upgrade_mod_savepoint(true, 2020052800, 'hotquestion');
     }
 
     return $result;
