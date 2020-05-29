@@ -203,27 +203,15 @@ class mod_hotquestion {
     }
 
     /**
-     * Total Heat available and total heat used, by this user in this round.
+     * Calculates number of remain votes (heat) available to this user in the current round.
      *
+     * Added 20200529.
      * @param int $hq
      */
     public function heat_tally($hq, $user = null) {
         global $USER, $CFG, $DB;
-//print_object($USER->id);
-//print_object('printing $hq->instance->id');
-//print_object($hq->instance->id);
-//print_object('printing $hq->currentround');
-//print_object($hq->currentround);
-//print_object($hq->currentround->starttime);
 
-
-/*
-        if ($hq->currentround->endtime == 0) {
-           // $hq->currentround->endtime = 0xFFFFFFFF;  // Hack.
-        }
-*/
-        $params = array( $hq->currentround->id, $hq->currentround->hotquestion, $hq->currentround->endtime,$USER->id);
-//print_object($params);
+        $params = array( $hq->currentround->id, $hq->currentround->hotquestion, $USER->id);
 
         $sql = "SELECT hqq.id AS questionid,
                        COUNT(hqv.voter) AS heat,
@@ -242,29 +230,17 @@ class mod_hotquestion {
                   JOIN {user} u ON u.id = hqq.userid
                  WHERE hqr.id = ?
                    AND hqr.hotquestion = ?
-                   AND hqr.endtime = ?
+                   AND hqq.time > hqr.starttime
+                   AND hqr.endtime = 0
                    AND hqv.voter = ?
               GROUP BY hqq.id
               ORDER BY hqq.hotquestion ASC, tpriority DESC, heat DESC";
 
-//print_object($sql);
-//print_object('printing $params');
-//print_object($params);
 
-//exit;
-        //$tally = $DB->count_records_sql($sql, $params);
         $tally = count($DB->get_records_sql($sql, $params));
-//print_object('printing $tally');
-//print_object($tally);
 
-    // Will need to replace the 0 in next line with the number of votes used by the current user.
-    // Will need to cycle through the questions, see if current user has voted, and keep a tally.
-    //$tally = '2';
-    // May need to do the left half and / in renderer.php as I think I will need the tally by itself in other places too.
-    //$results = $hq->instance->heatlimit.'/'.($hq->instance->heatlimit - $tally);
-    // Since the heatlimit is just a setting, add it to the output in the renderer.php file.
-    $results = ($hq->instance->heatlimit - $tally);
-    return $results;
+        $results = ($hq->instance->heatlimit - $tally);
+        return $results;
     }
 
     /**
