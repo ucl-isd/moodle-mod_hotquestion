@@ -18,8 +18,7 @@
  * This file contains a renderer for the hotquestion module.
  *
  * @package   mod_hotquestion
- * @copyright 2012 Zhang Anzhen
- * @copyright 2016 onwards AL Rachels drachels@drachels.com
+ * @copyright 2019 onwards AL Rachels drachels@drachels.com
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die();
@@ -28,8 +27,7 @@ defined('MOODLE_INTERNAL') || die();
  * A custmom renderer class that extends the plugin_renderer_base and is used by the hotquestion module.
  *
  * @package   mod_hotquestion
- * @copyright 2012 Zhang Anzhen
- * @copyright 2016 onwards AL Rachels drachels@drachels.com
+ * @copyright 2019 onwards AL Rachels drachels@drachels.com
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mod_hotquestion_renderer extends plugin_renderer_base {
@@ -69,6 +67,8 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
      * return alist of links
      */
     public function toolbar($shownew = true) {
+        global $DB, $CFG, $USER;
+
         $output = '';
         $toolbuttons = array();
         $roundp = new stdClass();
@@ -111,24 +111,46 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
         }
 
         // Print new round toolbutton.
+        // Added new round confirm 6/24/19.
         if ($shownew) {
             $options = array();
             $options['id'] = $this->hotquestion->cm->id;
             $options['action'] = 'newround';
-            $url = new moodle_url('/mod/hotquestion/view.php', $options);
-            $toolbuttons[] = html_writer::link($url, $this->pix_icon('t/add'
-                , get_string('newround', 'hotquestion')), array('class' => 'toolbutton'));
+            if ($CFG->branch > 32) {
+                $rtemp = $this->image_url('t/add');
+            } else {
+                $rtemp = $this->pix_url('t/add');
+            }
+            $url = '&nbsp;<a onclick="return confirm(\''.get_string('newroundconfirm', 'hotquestion').'\')" href="view.php?id='
+                .$this->hotquestion->cm->id.'&action=newround&round='
+                .$this->hotquestion->get_currentround()->id
+                .'"><img src="'.$rtemp.'" title="'
+                .get_string('newround', 'hotquestion') .'" alt="'
+                .get_string('newround', 'hotquestion') .'"/></a>';
+            $toolbuttons[] = $url;
         }
 
         // Print remove round toolbutton.
+        // Added remove round confirm 2/10/19.
         if ($shownew) {
             $options = array();
             $options['id'] = $this->hotquestion->cm->id;
             $options['action'] = 'removeround';
             $options['round'] = $this->hotquestion->get_currentround()->id;
-            $url = new moodle_url('/mod/hotquestion/view.php', $options);
-            $toolbuttons[] = html_writer::link($url, $this->pix_icon('t/less'
-            , get_string('removeround', 'hotquestion')), array('class' => 'toolbutton'));
+
+            if ($CFG->branch > 32) {
+                $rtemp = $this->image_url('t/delete');
+            } else {
+                $rtemp = $this->pix_url('t/delete');
+            }
+            $url = '&nbsp;<a onclick="return confirm(\''.get_string('deleteroundconfirm', 'hotquestion').'\')" href="view.php?id='
+                .$this->hotquestion->cm->id.'&action=removeround&round='
+                .$this->hotquestion->get_currentround()->id
+                .'"><img src="'.$rtemp.'" title="'
+                .get_string('removeround', 'hotquestion') .'" alt="'
+                .get_string('removeround', 'hotquestion') .'"/></a>';
+
+            $toolbuttons[] = $url;
         }
 
         // Print refresh toolbutton.
@@ -156,6 +178,9 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
         $a = new stdClass();
         // Search questions in current round.
         $questions = $this->hotquestion->get_questions();
+        // Set column visibility flags for Priority and Heat.
+        $teacherpriorityvisibility = $this->hotquestion->instance->teacherpriorityvisibility;
+        $heatvisibility = $this->hotquestion->instance->heatvisibility;
 
         // Added for Remove capability.
         $id = required_param('id', PARAM_INT);
@@ -171,18 +196,68 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
             $table->class = 'generaltable';
             $table->width = '100%';
             $table->align = array ('left', 'center', 'center', 'center', 'center');
-            // Teacher table shows questions, priority, heat, remove and approved headings.
+            // Admin, manager and teachers headings for questions, priority, heat, remove and approved headings.
             if (has_capability('mod/hotquestion:manageentries', $context)) {
-                $table->head = array(get_string('question', 'hotquestion')
-                    , get_string('teacherpriority', 'hotquestion')
-                    , get_string('heat', 'hotquestion')
-                    , get_string('questionremove', 'hotquestion')
-                    , get_string('approvedyes', 'hotquestion'));
+                // 20200512 Changed from fixed string to new questionlabel column setting.
+                //$table->head = array(get_string('questions', 'hotquestion'));
+                $table->head = array($this->hotquestion->instance->questionlabel);
+                // Check teacher priority column visibilty settings.
+                if ($teacherpriorityvisibility) {
+                    // Priority column is visible, so show the label.
+                    // 20200512 Changed from fixed string to new prioritylable column setting.
+                    //$table->head[] .= get_string('teacherpriority', 'hotquestion');
+                    $table->head[] .= $this->hotquestion->instance->teacherprioritylabel;
+                } else {
+                    // Priority column is not visible, so replace label with a space.
+                    $table->head[] .= ' ';
+                }
+                // Check heat column visibilty settings.
+                if ($heatvisibility) {
+                    // 20200512 Changed from fixed string to new heatlabel column setting.
+                    // 20200526 Show heatlimit setting and how many heat/votes remain for current user.
+//print_object($USER->id);
+                    $table->head[] .= $this->hotquestion->instance->heatlabel.' '.$this->hotquestion->instance->heatlimit.'/'.$this->hotquestion->heat_tally($hq, $USER->id);
+
+                } else {
+                    // Heat column is not visible, so replace label with a space.
+                    $table->head[] .= ' ';
+                }
+                    // 20200512 Changed from fixed string to new removelabel column setting.
+                    //$table->head[] .= get_string('questionremove', 'hotquestion');
+                    $table->head[] .= $this->hotquestion->instance->removelabel;
+                    // 20200512 Changed from fixed string to new approvallabel column setting.
+                    //$table->head[] .= get_string('approvedyes', 'hotquestion');
+                    $table->head[] .= $this->hotquestion->instance->approvallabel;
             } else {
                 // Students only see headings for questions, priority, and heat columns.
-                $table->head = array(get_string('question', 'hotquestion')
-                    , get_string('teacherpriority', 'hotquestion')
-                    , get_string('heat', 'hotquestion'));
+                // 20200512 Changed from fixed string to new questionlabel column setting.
+                //$table->head = array(get_string('questions', 'hotquestion'));
+                $table->head = array($this->hotquestion->instance->questionlabel);
+                // Check teacher priority column visibilty settings.
+                if ($teacherpriorityvisibility) {
+                    // 20200512 Changed from fixed string to new prioritylabel column setting.
+                    // Priority column is visible, so show the label.
+                    //$table->head[] .= get_string('teacherpriority', 'hotquestion');
+                    $table->head[] .= $this->hotquestion->instance->teacherprioritylabel;
+                } else {
+                    // Priority column is not visible, so replace label with a space.
+                    $table->head[] .= ' ';
+                }
+                // Check heat column visibilty settings.
+                if ($heatvisibility) {
+                    // 20200512 Changed from fixed string to new heatlabel column setting.
+                    // Heat column is visible, so show the label.
+                    //$table->head[] .= get_string('heat', 'hotquestion');
+                    //$table->head[] .= $this->hotquestion->instance->heatlabel;
+                    //$table->head[] .= $this->hotquestion->instance->heatlabel.' '.$this->hotquestion->heat_tally($hq, $USER->id);
+//print_object($USER->id);
+
+                    $table->head[] .= $this->hotquestion->instance->heatlabel.' '.$this->hotquestion->instance->heatlimit.'/'.$this->hotquestion->heat_tally($hq, $USER->id);
+
+                } else {
+                    // Heat column is not visible, so replace label with a space.
+                    $table->head[] .= ' ';
+                }
             }
 
             // Check to see if groups are being used here.
@@ -193,6 +268,9 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
             } else {
                 $groups = '';
             }
+
+            // 20200528 Added variable for remaining votes to use as a test for showing vote icon for current user.
+            $remaining = ($this->hotquestion->heat_tally($hq, $USER->id));
 
             foreach ($questions as $question) {
                 $line = array();
@@ -237,8 +315,9 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
                                        .$this->hotquestion->cm->id.'&action=tpriority&u=1&q='
                                        .$question->id.'" class="hotquestion_vote" id="question_'
                                        .$question->id.'"><img src="'.$ttemp1.'" title="'
-                                       .get_string('teacherpriority', 'hotquestion') .'" alt="'
-                                       .get_string('teacherpriority', 'hotquestion') .'" style="width:16px;height:16px;"/></a><br> &nbsp;';
+                                       .get_string('teacherpriority', 'hotquestion').'" alt="'
+                                       .get_string('teacherpriority', 'hotquestion')
+                                       .'" style="width:16px;height:16px;"/></a><br> &nbsp;';
                             $tpriority .= '&nbsp; &nbsp;<a href="view.php?id='
                                        .$this->hotquestion->cm->id.'&action=tpriority&u=0&q='
                                        .$question->id.'" class="hotquestion_vote" id="question_'
@@ -246,10 +325,18 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
                                        .get_string('teacherpriority', 'hotquestion') .'" alt="'
                                        .get_string('teacherpriority', 'hotquestion') .'" style="width:16px;height:16px;"/></a>';
                         }
-                        $line[] = $tpriority;
 
-                        // Print the vote cron case.
-                        if ($allowvote && $this->hotquestion->can_vote_on($question)) {
+                        // Check teacher priority column visibilty settings.
+                        if ($teacherpriorityvisibility) {
+                            // The priority column is visible, so show the data.
+                            $line[] = $tpriority;
+                        } else {
+                            // The priority column is not visible, so replace the data with a space.
+                            $line[] = ' ';
+                        }
+
+                        // Print the vote cron case. 20200528 Added check for votes remaining.
+                        if ($allowvote && $this->hotquestion->can_vote_on($question) && !($remaining < 1)) {
                             if (!$this->hotquestion->has_voted($question->id)) {
                                 $heat .= '&nbsp;<a href="view.php?id='
                                       .$this->hotquestion->cm->id
@@ -260,7 +347,15 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
                                       .'" alt="'.get_string('vote', 'hotquestion').'" style="width:16px;height:16px;"/></a>';
                             }
                         }
-                        $line[] = $heat;
+                        // Check heat column visibilty settings.
+                        if ($heatvisibility) {
+                            // The heat column is visible, so show the data.
+                            $line[] = $heat;
+                        } else {
+                            // The heat column is not visible, so replace the data with a space.
+                            $line[] = ' ';
+                        }
+
                         // Set code for remove picture based on Moodle version.
                         if ($CFG->branch > 32) {
                             $rtemp = $this->image_url('t/delete');
@@ -270,13 +365,17 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
                         // Print the remove and approve case option for teacher and manager.
                         if (has_capability('mod/hotquestion:manageentries', $context)) {
                             // Process remove column.
-                            $remove .= '&nbsp;<a href="view.php?id='
+                            // Added delete confirm 2/8/19.
+                            $remove .= '&nbsp;<a onclick="return confirm(\''
+                                    .get_string('deleteentryconfirm', 'hotquestion')
+                                    .'\')" href="view.php?id='
                                     .$this->hotquestion->cm->id.'&action=remove&q='
                                     .$question->id.'" class="hotquestion_vote" id="question_'
                                     .$question->id.'"><img src="'.$rtemp.'" title="'
                                     .get_string('questionremove', 'hotquestion') .'" alt="'
                                     .get_string('questionremove', 'hotquestion') .'"/></a>';
                             $line[] = $remove;
+
                             // Process approval column.
                             // Set code for approve toggle picture based on Moodle version.
                             if ($CFG->branch > 32) {

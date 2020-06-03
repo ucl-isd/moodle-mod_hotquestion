@@ -23,6 +23,8 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use \mod_hotquestion\event\course_module_instance_list_viewed;
+
 require(__DIR__ . "/../../config.php");
 require_once(__DIR__ . '/locallib.php');
 
@@ -86,27 +88,27 @@ foreach ($hotquestions as $hotquestion) {
 
     // Section.
     $printsection = '';
-    if ($hotquestion->section !== $currentsection) {
-        if ($hotquestion->section) {
-            $printsection = get_section_name($course, $sections[$hotquestion->section]);
-        }
+    if (get_section_name($course, $sections[$hotquestion->section])) {
+        $printsection = get_section_name($course, $sections[$hotquestion->section]);
         if ($currentsection !== '') {
             $table->data[$i] = 'hr';
             $i++;
         }
         $currentsection = $hotquestion->section;
     }
+    // List topic/section name.
     if ($usesections) {
         $table->data[$i][] = $printsection;
     }
 
-    // Link to Hot Question activities.
+    // Link to Hot Question activity names.
     if (!$hotquestion->visible) {
-        // Show dimmed if the mod is hidden.
+        // Show dimmed link with slashed eye, if the activity is hidden.
         $table->data[$i][] = "<a class=\"dimmed\" href=\"view.php?id=$hotquestion->coursemodule\">"
-                             .format_string($hotquestion->name, true)."</a>";
+                             .format_string($hotquestion->name, true)
+                             .' <i class="icon fa fa-eye-slash fa-fw " aria-hidden="true"></a>';
     } else {
-        // Show normal if the mod is visible.
+        // Show normal link if the activity is visible.
         $table->data[$i][] = "<a href=\"view.php?id=$hotquestion->coursemodule\">".format_string($hotquestion->name, true)."</a>";
     }
 
@@ -147,10 +149,8 @@ echo "<br />";
 echo html_writer::table($table);
 
 // Trigger course module instance list event.
-$params = array(
-    'context' => context_course::instance($course->id)
-);
-$event = \mod_hotquestion\event\course_module_instance_list_viewed::create($params);
+$params = array('context' => context_course::instance($course->id));
+$event = course_module_instance_list_viewed::create($params);
 $event->add_record_snapshot('course', $course);
 $event->trigger();
 

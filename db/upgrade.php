@@ -168,5 +168,96 @@ function xmldb_hotquestion_upgrade($oldversion=0) {
         // Hotquestion savepoint reached.
         upgrade_mod_savepoint(true, 2018010100, 'hotquestion');
     }
+
+    if ($oldversion < 2019112100) {
+
+        // Define field teacherpriorityvisibility to be added to hotquestion.
+        $table = new xmldb_table('hotquestion');
+        $field = new xmldb_field('teacherpriorityvisibility', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, '1', 'timeclose');
+
+        // Conditionally launch add field id.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define field heatvisibility to be added to hotquestion.
+        $table = new xmldb_table('hotquestion');
+        $field = new xmldb_field('heatvisibility', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, '1',
+            'teacherpriorityvisibility');
+
+        // Conditionally launch add field id.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Hotquestion savepoint reached.
+        upgrade_mod_savepoint(true, 2019112200, 'hotquestion');
+    }
+    if ($oldversion < 2020051000) {
+
+        // Define field questionlabel to be added to hotquestion.
+        $table = new xmldb_table('hotquestion');
+        $field = new xmldb_field('questionlabel', XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null, 'Questions', 'timeclose');
+
+        // Conditionally launch add field id.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define field teacherprioritylabel to be added to hotquestion.
+        $table = new xmldb_table('hotquestion');
+        $field = new xmldb_field('teacherprioritylabel', XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null, 'Priority', 'teacherpriorityvisibility');
+
+        // Conditionally launch add field id.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define field heatlabel to be added to hotquestion.
+        $table = new xmldb_table('hotquestion');
+        $field = new xmldb_field('heatlabel', XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null, 'Heat', 'heatvisibility');
+
+        // Conditionally launch add field id.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define field approvallabel to be added to hotquestion.
+        $table = new xmldb_table('hotquestion');
+        $field = new xmldb_field('approvallabel', XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null, 'Approved', 'approval');
+
+        // Conditionally launch add field id.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define field removelabel to be added to hotquestion.
+        $table = new xmldb_table('hotquestion');
+        $field = new xmldb_field('removelabel', XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null, 'Remove', 'approvallabel');
+
+        // Conditionally launch add field id.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Hotquestion savepoint reached.
+        upgrade_mod_savepoint(true, 2020051000, 'hotquestion');
+    }
+
+    if ($oldversion < 2020052800) {
+
+        // Define field heatlimit to be added to hotquestion.
+        $table = new xmldb_table('hotquestion');
+        $field = new xmldb_field('heatlimit', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, '0', 'heatlabel');
+
+        // Conditionally launch add field heatlimit.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Hotquestion savepoint reached.
+        upgrade_mod_savepoint(true, 2020052800, 'hotquestion');
+    }
+
     return $result;
 }

@@ -46,13 +46,16 @@ function hotquestion_add_instance($hotquestion) {
     require_once($CFG->dirroot.'/mod/hotquestion/locallib.php');
 
     $hotquestion->timecreated = time();
+    // Fixed instance error 02/15/19.
+    $hotquestion->id = $DB->insert_record('hotquestion', $hotquestion);
 
     // You may have to add extra stuff in here.
+    // Added next line for behat test 2/11/19.
+    $cmid = $hotquestion->coursemodule;
 
-    $id = $DB->insert_record('hotquestion', $hotquestion);
     hotquestion_update_calendar($hotquestion, $cmid);
 
-    return $id;
+    return $hotquestion->id;
 }
 
 /**
@@ -382,13 +385,13 @@ function hotquestion_supports($feature) {
         case FEATURE_GROUPS:
             return true;
         case FEATURE_GROUPINGS:
-            return false;
+            return true;
         case FEATURE_GROUPMEMBERSONLY:
-            return false;
+            return true;
         case FEATURE_MOD_INTRO:
             return true;
         case FEATURE_COMPLETION_TRACKS_VIEWS:
-            return false;
+            return true;
         case FEATURE_COMPLETION_HAS_RULES:
             return false;
         case FEATURE_GRADE_HAS_GRADE:
