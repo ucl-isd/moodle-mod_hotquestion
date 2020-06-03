@@ -9,7 +9,7 @@ Feature: Users can vote on named or anonymous entries to hotquestion
       | fullname | shortname | category | groupmode |
       | Course 1 | C1 | 0 | 1 |
     And the following "users" exist:
-      | username | firstname | lastname | email            |	  
+      | username | firstname | lastname | email            |
       | teacher1 | Teacher   | 1        | teacher1@asd.com |
 	  | teacher2 | Teacher   | 2        | teacher2@asd.com |
 	  | manager1 | Manager   | 1        | manager@asd.com |
@@ -27,7 +27,7 @@ Feature: Users can vote on named or anonymous entries to hotquestion
       | hotquestion  | Test hotquestion name  | Hotquestion intro | C1     | hotquestion1 | Submit your question here: |
   Scenario: A user follows vote to increase heat
     # Student 1 adds posts and votes.
-	Given I log in as "student1"
+    Given I log in as "student1"
     When I am on "Course 1" course homepage
     And I follow "Test hotquestion name"
     And I set the following fields to these values:
@@ -35,54 +35,54 @@ Feature: Users can vote on named or anonymous entries to hotquestion
     And I press "Click to post"
     And I set the following fields to these values:
       | Submit your question here: | Second question by student 1 |
-	And I set the field "Display as anonymous" to "1"
+    And I set the field "Display as anonymous" to "1"
     And I press "Click to post"
-	Then I should see "Second question by student 1"
-	And I should see "Posted by Anonymous"
-	Then I should see "First question by student 1"
+    Then I should see "Second question by student 1"
+    And I should see "Posted by Anonymous"
+    Then I should see "First question by student 1"
     And I should see "Posted by Student 1"
-	And I click on "Vote" "link" in the "Anonymous" "table_row"
+    And I click on "Vote" "link" in the "Anonymous" "table_row"
     Then I should see "1" in the "Anonymous" "table_row"
     Then I log out
     # Admin 1 votes.
-	Given I log in as "admin"
+    Given I log in as "admin"
     When I am on "Course 1" course homepage
     And I follow "Test hotquestion name"
     And I click on "Vote" "link" in the "Anonymous" "table_row"
     Then I should see "2" in the "Anonymous" "table_row"
-	And I click on "Vote" "link" in the "Student 1" "table_row"
-	Then I should see "1" in the "Student 1" "table_row"
+    And I click on "Vote" "link" in the "Student 1" "table_row"
+    Then I should see "1" in the "Student 1" "table_row"
     Then I log out
 	# Teacher 1 votes.
-	Given I log in as "teacher1"
+    Given I log in as "teacher1"
     When I am on "Course 1" course homepage
     And I follow "Test hotquestion name"
     And I click on "Vote" "link" in the "Anonymous" "table_row"
     Then I should see "3" in the "Anonymous" "table_row"
-	And I click on "Vote" "link" in the "Student 1" "table_row"
-	Then I should see "2" in the "Student 1" "table_row"
+    And I click on "Vote" "link" in the "Student 1" "table_row"
+    Then I should see "2" in the "Student 1" "table_row"
     Then I log out
 	#Manager 1 votes.
-	Given I log in as "manager1"
+    Given I log in as "manager1"
     When I am on "Course 1" course homepage
     And I follow "Test hotquestion name"
     And I click on "Vote" "link" in the "Anonymous" "table_row"
     Then I should see "4" in the "Anonymous" "table_row"
-	And I click on "Vote" "link" in the "Student 1" "table_row"
-	Then I should see "3" in the "Student 1" "table_row"
+    And I click on "Vote" "link" in the "Student 1" "table_row"
+    Then I should see "3" in the "Student 1" "table_row"
     Then I log out
 	#Teacher 2 votes.
-	Given I log in as "teacher2"
+    Given I log in as "teacher2"
     When I am on "Course 1" course homepage
     And I follow "Test hotquestion name"
     And I click on "Vote" "link" in the "Anonymous" "table_row"
     Then I should see "5" in the "Anonymous" "table_row"
-	And I click on "Vote" "link" in the "Student 1" "table_row"
-	Then I should see "4" in the "Student 1" "table_row"
+    And I click on "Vote" "link" in the "Student 1" "table_row"
+    Then I should see "4" in the "Student 1" "table_row"
     # Teacher 2 verifies adding votes is logged for everyone.
     And I navigate to "Logs" in current page administration
     Then I should see "Teacher 2" in the "#report_log_r1_c1" "css_element"
-	And I should see "Updated vote" in the "#report_log_r1_c5" "css_element"
+    And I should see "Updated vote" in the "#report_log_r1_c5" "css_element"
     Then I should see "Teacher 2" in the "#report_log_r3_c1" "css_element"
     And I should see "Updated vote" in the "#report_log_r4_c5" "css_element"
 	# Check for two mangager votes.

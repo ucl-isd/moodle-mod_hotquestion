@@ -1,5 +1,5 @@
 @mod @mod_hotquestion
-Feature: Users can post named or anonymous entries to hotquestion
+Feature: Users can post named or anonymous entries to hotquestion approval required
   In order to use HotQuestion
   As a user
   I need to be able to post a hotquestion entry.
@@ -9,7 +9,7 @@ Feature: Users can post named or anonymous entries to hotquestion
       | fullname | shortname | category | groupmode |
       | Course 1 | C1 | 0 | 1 |
     And the following "users" exist:
-      | username | firstname | lastname | email            |	  
+      | username | firstname | lastname | email            |
       | teacher1 | Teacher   | 1        | teacher1@asd.com |
 	  | teacher2 | Teacher   | 2        | teacher2@asd.com |
       | student1 | Student   | 1        | student1@asd.com |
@@ -25,70 +25,70 @@ Feature: Users can post named or anonymous entries to hotquestion
       | hotquestion  | Test hotquestion name  | Hotquestion intro | C1     | hotquestion1 | Submit your question here: | 1             | 1        |
   Scenario: A user posts named and anonymous entries
     # Admin User adds and approves posts.
-	Given I log in as "admin"
+    Given I log in as "admin"
     When I am on "Course 1" course homepage
     And I follow "Test hotquestion name"
     And I set the following fields to these values:
       | Submit your question here: | First question |
     And I press "Click to post"
-	And I follow "Not approved"
+    And I follow "Not approved"
     And I set the following fields to these values:
       | Submit your question here: | Second question |
     And I set the following fields to these values:
       | Submit your question here: | Second question |
-	And I set the field "Display as anonymous" to "1"
+    And I set the field "Display as anonymous" to "1"
     And I press "Click to post"
-	And I follow "Not approved"
+    And I follow "Not approved"
     Then I log out
     #Teacher 1 adds and approves posts
-	Given I log in as "teacher1"
+    Given I log in as "teacher1"
     When I am on "Course 1" course homepage
     And I follow "Test hotquestion name"
     And I set the following fields to these values:
       | Submit your question here: | Third question |
     And I press "Click to post"
-	And I follow "Not approved"
+    And I follow "Not approved"
     And I set the following fields to these values:
       | Submit your question here: | Fourth question |
-	And I set the field "Display as anonymous" to "1"
+    And I set the field "Display as anonymous" to "1"
     And I press "Click to post"
-	And I follow "Not approved"
+    And I follow "Not approved"
     Then I log out
 	#Student 1 posts an entry
-	Given I log in as "student1"
+    Given I log in as "student1"
     When I am on "Course 1" course homepage
     And I follow "Test hotquestion name"
-	And I should see "Fourth question"
-	And I should see "Posted by Anonymous"
+    And I should see "Fourth question"
+    And I should see "Posted by Anonymous"
     And I should see "Third question"
     And I should see "Posted by Teacher 1"
-	And I should see "Second question"
-	And I should see "Posted by Anonymous"
+    And I should see "Second question"
+    And I should see "Posted by Anonymous"
 	And I should see "First question"
     And I should see "Posted by Admin User"
     And I set the following fields to these values:
       | Submit your question here: | Seventh question |
     And I press "Click to post"
-	Then I should see "This entry is not currently approved for viewing."
+    Then I should see "This entry is not currently approved for viewing."
     And I set the following fields to these values:
       | Submit your question here: | Eighth question |
-	And I set the field "Display as anonymous" to "1"
+    And I set the field "Display as anonymous" to "1"
     And I press "Click to post"
     Then I should see "This entry is not currently approved for viewing."
     Then I log out
      #Teacher 1 approves a students entries
-	Given I log in as "teacher1"
+    Given I log in as "teacher1"
     When I am on "Course 1" course homepage
     And I follow "Test hotquestion name"
-	And I follow "Not approved"
-	And I follow "Not approved"
+    And I follow "Not approved"
+    And I follow "Not approved"
     Then I log out
 	#Student 1 views his approved entries
-	Given I log in as "student1"
+    Given I log in as "student1"
     When I am on "Course 1" course homepage
     And I follow "Test hotquestion name"
-	And I should see "Eighth question"
-	And I should see "Posted by Anonymous"
+    And I should see "Eighth question"
+    And I should see "Posted by Anonymous"
     And I should see "Seventh question"
     And I should see "Posted by Student 1"
     Then I log out
