@@ -199,13 +199,11 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
             // Admin, manager and teachers headings for questions, priority, heat, remove and approved headings.
             if (has_capability('mod/hotquestion:manageentries', $context)) {
                 // 20200512 Changed from fixed string to new questionlabel column setting.
-                //$table->head = array(get_string('questions', 'hotquestion'));
                 $table->head = array($this->hotquestion->instance->questionlabel);
                 // Check teacher priority column visibilty settings.
                 if ($teacherpriorityvisibility) {
                     // Priority column is visible, so show the label.
                     // 20200512 Changed from fixed string to new prioritylable column setting.
-                    //$table->head[] .= get_string('teacherpriority', 'hotquestion');
                     $table->head[] .= $this->hotquestion->instance->teacherprioritylabel;
                 } else {
                     // Priority column is not visible, so replace label with a space.
@@ -215,29 +213,26 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
                 if ($heatvisibility) {
                     // 20200512 Changed from fixed string to new heatlabel column setting.
                     // 20200526 Show heatlimit setting and how many heat/votes remain for current user.
-//print_object($USER->id);
-                    $table->head[] .= $this->hotquestion->instance->heatlabel.' '.$this->hotquestion->instance->heatlimit.'/'.$this->hotquestion->heat_tally($hq, $USER->id);
+                    $table->head[] .= $this->hotquestion->instance->heatlabel
+                                   .' '.$this->hotquestion->instance->heatlimit
+                                   .'/'.$this->hotquestion->heat_tally($hq, $USER->id);
 
                 } else {
                     // Heat column is not visible, so replace label with a space.
                     $table->head[] .= ' ';
                 }
                     // 20200512 Changed from fixed string to new removelabel column setting.
-                    //$table->head[] .= get_string('questionremove', 'hotquestion');
                     $table->head[] .= $this->hotquestion->instance->removelabel;
                     // 20200512 Changed from fixed string to new approvallabel column setting.
-                    //$table->head[] .= get_string('approvedyes', 'hotquestion');
                     $table->head[] .= $this->hotquestion->instance->approvallabel;
             } else {
                 // Students only see headings for questions, priority, and heat columns.
                 // 20200512 Changed from fixed string to new questionlabel column setting.
-                //$table->head = array(get_string('questions', 'hotquestion'));
                 $table->head = array($this->hotquestion->instance->questionlabel);
                 // Check teacher priority column visibilty settings.
                 if ($teacherpriorityvisibility) {
                     // 20200512 Changed from fixed string to new prioritylabel column setting.
                     // Priority column is visible, so show the label.
-                    //$table->head[] .= get_string('teacherpriority', 'hotquestion');
                     $table->head[] .= $this->hotquestion->instance->teacherprioritylabel;
                 } else {
                     // Priority column is not visible, so replace label with a space.
@@ -247,12 +242,9 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
                 if ($heatvisibility) {
                     // 20200512 Changed from fixed string to new heatlabel column setting.
                     // Heat column is visible, so show the label.
-                    //$table->head[] .= get_string('heat', 'hotquestion');
-                    //$table->head[] .= $this->hotquestion->instance->heatlabel;
-                    //$table->head[] .= $this->hotquestion->instance->heatlabel.' '.$this->hotquestion->heat_tally($hq, $USER->id);
-//print_object($USER->id);
-
-                    $table->head[] .= $this->hotquestion->instance->heatlabel.' '.$this->hotquestion->instance->heatlimit.'/'.$this->hotquestion->heat_tally($hq, $USER->id);
+                    $table->head[] .= $this->hotquestion->instance->heatlabel
+                                   .' '.$this->hotquestion->instance->heatlimit
+                                   .'/'.$this->hotquestion->heat_tally($hq, $USER->id);
 
                 } else {
                     // Heat column is not visible, so replace label with a space.

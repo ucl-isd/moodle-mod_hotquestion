@@ -205,6 +205,7 @@ class mod_hotquestion {
      *
      * Added 20200529.
      * @param int $hq
+     * @param int $user
      */
     public function heat_tally($hq, $user = null) {
         global $USER, $CFG, $DB;
@@ -222,7 +223,7 @@ class mod_hotquestion {
                        hqq.anonymous AS anonymous,
                        hqq.tpriority AS tpriority,
                        hqq.approved AS approved
-                  FROM {hotquestion_rounds} hqr 
+                  FROM {hotquestion_rounds} hqr
              LEFT JOIN {hotquestion_questions} hqq ON hqr.hotquestion=hqq.hotquestion
              LEFT JOIN {hotquestion_votes} hqv ON hqv.question=hqq.id
                   JOIN {user} u ON u.id = hqq.userid
@@ -233,7 +234,6 @@ class mod_hotquestion {
                    AND hqv.voter = ?
               GROUP BY hqq.id, hqr.id, hqv.voter
               ORDER BY hqq.hotquestion ASC, tpriority DESC, heat DESC";
-
 
         $tally = count($DB->get_records_sql($sql, $params));
 
@@ -487,7 +487,7 @@ class mod_hotquestion {
 
     /**
      * Download questions.
-     * @param array $array
+     * @param array $chq
      * @param string $filename - The filename to use.
      * @param string $delimiter - The character to use as a delimiter.
      * @return nothing
@@ -536,7 +536,12 @@ class mod_hotquestion {
             $csv->filename = clean_filename(get_string('exportfilenamep1', 'hotquestion'));
 
             // 20200524 Add info to our data array and denote this is ALL site questions.
-            $activityinfo = array(null,null,null,null,null,null,null,null,null,null, get_string('exportfilenamep1', 'hotquestion').get_string('exportfilenamep2', 'hotquestion').gmdate("Ymd_Hi").get_string('for', 'hotquestion').$CFG->wwwroot);
+            $activityinfo = array(null, null, null, null, null,
+                                  null, null, null, null, null,
+                                  get_string('exportfilenamep1', 'hotquestion').
+                                  get_string('exportfilenamep2', 'hotquestion').
+                                  gmdate("Ymd_Hi").get_string('for', 'hotquestion').
+                                  $CFG->wwwroot);
             $csv->add_data($activityinfo);
         } else {
             // Add fields with the column labels for ONLY the current HQ activity.
@@ -559,7 +564,10 @@ class mod_hotquestion {
             $csv->filename = clean_filename(($this->course->shortname).'_');
             $csv->filename .= clean_filename(($this->instance->name));
             // 20200513 Add the course shortname and the HQ activity name to our data array.
-            $activityinfo = array(get_string('course').': '.$this->course->shortname,get_string('activity').': '.$this->instance->name);
+            $activityinfo = array(get_string('course').': '
+                                  .$this->course->shortname,
+                                  get_string('activity').': '
+                                  .$this->instance->name);
             $csv->add_data($activityinfo);
         }
 
@@ -568,7 +576,7 @@ class mod_hotquestion {
         // Add the column headings to our data array.
         $csv->add_data($fields);
         // Now add this instance id that's needed in the sql for teachers and managers downloads.
-        $fields = array($fields,'thisinstid' => $this->instance->id);
+        $fields = array($fields, 'thisinstid' => $this->instance->id);
 
         if ($CFG->dbtype == 'pgsql') {
             $sql = "SELECT hq.id AS question,

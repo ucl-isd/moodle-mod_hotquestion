@@ -106,7 +106,11 @@ class mod_hotquestion_mod_form extends moodleform_mod {
         $mform->setDefault('teacherpriorityvisibility', '1');
 
         // Add Priority label text field here.
-        $mform->addElement('text', 'teacherprioritylabel', get_string('teacherprioritylabel', 'hotquestion'), array('size' => '20'));
+        $mform->addElement('text',
+                           'teacherprioritylabel',
+                           get_string('teacherprioritylabel', 'hotquestion'),
+                           array('size' => '20')
+                           );
         if (!empty($CFG->formatstringstriptags)) {
             $mform->setType('teacherprioritylabel', PARAM_TEXT);
         } else {
