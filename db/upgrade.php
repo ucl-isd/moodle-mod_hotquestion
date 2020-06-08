@@ -191,7 +191,7 @@ function xmldb_hotquestion_upgrade($oldversion=0) {
         }
 
         // Hotquestion savepoint reached.
-        upgrade_mod_savepoint(true, 2019112200, 'hotquestion');
+        upgrade_mod_savepoint(true, 2019112100, 'hotquestion');
     }
     if ($oldversion < 2020051000) {
 
