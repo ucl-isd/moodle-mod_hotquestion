@@ -12,6 +12,16 @@
     ready for testing.
 05/29/2020 HotQuestion_410, New mode request to limit number of votes per round, fixed
     sql that was allowing to count ALL votes instead of just current round votes.
+06/08/2020 Started work on HotQuestion_496, HotQuestion - Need a Remove my vote capability.
+    Added language string, $string['removevote'] = 'Remove my vote';
+    Added code in render.php to show the remove icon for any question for
+    which the user has voted.
+    Added public function remove_vote($question) in locallib.php.
+    Added trigger event for remove vote.
+    Added classes/event/remove_vote.php file for log.
+    Added eventremovevote string
+    Votes can be removed and the event is logged.
+06/08/2020 HotQuestion_496, HotQuestion - Need a Remove my vote capability is being tested.
 
 === 3.8.2 ===
 05/22/2020 Started dev on v 3.8.2 and began moving tickets from User Support

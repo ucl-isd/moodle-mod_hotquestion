@@ -27,6 +27,7 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use \mod_hotquestion\event\remove_vote;
 use \mod_hotquestion\event\update_vote;
 use \mod_hotquestion\event\add_question;
 use \mod_hotquestion\event\add_round;
@@ -97,7 +98,7 @@ class mod_hotquestion {
     /**
      * Add a new question to current round.
      *
-     * @param object $fromform from ask form
+     * @param object $fromform From ask form.
      */
     public function add_new_question($fromform) {
         global $USER, $CFG, $DB;
@@ -175,6 +176,43 @@ class mod_hotquestion {
             }
         }
     }
+
+    /**
+     * Remove vote on question.
+     *
+     * Called from view.php.
+     * @param int $question The question id.
+     */
+    public function remove_vote($question) {
+        global $CFG, $DB, $USER;
+        $votes = new StdClass();
+        $context = context_module::instance($this->cm->id);
+        $question = $DB->get_record('hotquestion_questions', array('id' => $question));
+        if ($question && $this->can_vote_on($question)) {
+
+            // Trigger and log a remove_vote event.
+            if ($CFG->version > 2014051200) { // If newer than Moodle 2.7+ use new event logging.
+                $params = array(
+                    'objectid' => $this->cm->id,
+                    'context' => $context,
+                );
+                $event = remove_vote::create($params);
+                $event->trigger();
+            } else {
+                add_to_log($this->course->id, 'hotquestion', 'remove vote'
+                    , "view.php?id={$this->cm->id}", $question->id, $this->cm->id);
+            }
+
+            if (!$this->has_voted($question->id)) {
+                $votes->question = $question->id;
+                $votes->voter = $USER->id;
+                $DB->insert_record('hotquestion_votes', $votes);
+            } else {
+                $DB->delete_records('hotquestion_votes', array('question' => $question->id, 'voter' => $USER->id));
+            }
+        }
+    }
+
 
     /**
      * Whether can vote on the question.

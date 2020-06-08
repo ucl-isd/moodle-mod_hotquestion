@@ -295,9 +295,11 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
                         if ($CFG->branch > 32) {
                             $ttemp1 = $this->image_url('s/yes');
                             $ttemp2 = $this->image_url('s/no');
+                            $ttemp3 = $this->image_url('t/delete');
                         } else {
                             $ttemp1 = $this->pix_url('s/yes');
                             $ttemp2 = $this->pix_url('s/no');
+                            $ttemp3 = $this->pix_url('t/delete');
                         }
                         // Process priority code here.
                         // Had to add width/height to priority and heat due to now using svg in Moodle 3.6.
@@ -328,6 +330,8 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
                         }
 
                         // Print the vote cron case. 20200528 Added check for votes remaining.
+
+
                         if ($allowvote && $this->hotquestion->can_vote_on($question) && !($remaining < 1)) {
                             if (!$this->hotquestion->has_voted($question->id)) {
                                 $heat .= '&nbsp;<a href="view.php?id='
@@ -337,6 +341,15 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
                                       .$question->id.'"><img src="'.$ttemp1
                                       .'" title="'.get_string('vote', 'hotquestion')
                                       .'" alt="'.get_string('vote', 'hotquestion').'" style="width:16px;height:16px;"/></a>';
+                            } else if ($this->hotquestion->has_voted($question->id)) {
+                                // 20200608 Added remove vote capability.
+                                $heat .= '&nbsp;<a href="view.php?id='
+                                      .$this->hotquestion->cm->id
+                                      .'&action=removevote&q='.$question->id
+                                      .'" class="hotquestion_remove_vote" id="question_'
+                                      .$question->id.'"> <img src="'.$ttemp3
+                                      .'" title="'.get_string('removevote', 'hotquestion')
+                                      .'" alt="'.get_string('removevote', 'hotquestion').'" "/></a>';
                             }
                         }
                         // Check heat column visibilty settings.

@@ -139,6 +139,13 @@ if (!empty($action)) {
                 redirect('view.php?id='.$hq->cm->id, null); // Needed to prevent heat toggle on page reload.
             }
             break;
+        case 'removevote':
+            if (has_capability('mod/hotquestion:vote', $context)) {
+                $q = required_param('q',  PARAM_INT);  // Question id to vote.
+                $hq->remove_vote($q);
+                redirect('view.php?id='.$hq->cm->id, null); // Needed to prevent heat toggle on page reload.
+            }
+            break;
         case 'newround':
             if (has_capability('mod/hotquestion:manage', $context)) {
                 $hq->add_new_round();
