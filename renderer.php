@@ -203,6 +203,16 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
             $table->class = 'generaltable';
             $table->width = '100%';
             $table->align = array ('left', 'center', 'center', 'center', 'center');
+
+
+            // 20200611 If teacher changes heat setting to lower than the number of heat votes already applied by a user, those users will see an error message.
+            if ($this->hotquestion->heat_tally($hq, $USER->id) < 0) {
+                $temp = get_string('heaterror', 'hotquestion').$this->hotquestion->heat_tally($hq, $USER->id);
+            } else {
+                $temp = $this->hotquestion->heat_tally($hq, $USER->id);
+            }
+
+
             // Admin, manager and teachers headings for questions, priority, heat, remove and approved headings.
             if (has_capability('mod/hotquestion:manageentries', $context)) {
                 // 20200512 Changed from fixed string to new questionlabel column setting.
@@ -216,20 +226,14 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
                     // Priority column is not visible, so replace label with a space.
                     $table->head[] .= ' ';
                 }
-                // Check heat column visibilty settings.
+                // Check heat column visibilty settings for teachers.
                 if ($heatvisibility) {
-                    // 20200609 Teacher set heat lower than the number of heat votes already applied by a user.
-                    if ($this->hotquestion->heat_tally($hq, $USER->id) <= 0) {
-                        $temp = get_string('heaterror', 'hotquestion').$this->hotquestion->heat_tally($hq, $USER->id);
-                    } else {
-                        $temp = $this->hotquestion->heat_tally($hq, $USER->id);
-                    }
-
                     // 20200512 Changed from fixed string to new heatlabel column setting.
                     // 20200526 Show heatlimit setting and how many heat/votes remain for current user.
                     $table->head[] .= $this->hotquestion->instance->heatlabel
                                    .' '.$this->hotquestion->instance->heatlimit
                                    .'/'.$temp;
+
 
                 } else {
                     // Heat column is not visible, so replace label with a space.
@@ -252,14 +256,13 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
                     // Priority column is not visible, so replace label with a space.
                     $table->head[] .= ' ';
                 }
-                // Check heat column visibilty settings.
+                // Check heat column visibilty settings for students.
                 if ($heatvisibility) {
                     // 20200512 Changed from fixed string to new heatlabel column setting.
                     // Heat column is visible, so show the label.
                     $table->head[] .= $this->hotquestion->instance->heatlabel
                                    .' '.$this->hotquestion->instance->heatlimit
-                                   .'/'.$this->hotquestion->heat_tally($hq, $USER->id);
-
+                                   .'/'.$temp;
                 } else {
                     // Heat column is not visible, so replace label with a space.
                     $table->head[] .= ' ';
