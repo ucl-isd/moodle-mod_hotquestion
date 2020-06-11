@@ -176,6 +176,7 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
         $output = '';
         $formatoptions = new stdClass();
         $a = new stdClass();
+        $heatvisibility = new stdClass();
         // Search questions in current round.
         $questions = $this->hotquestion->get_questions();
         // Set column visibility flags for Priority and Heat.
@@ -183,7 +184,7 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
 
         // 20200609 Auto hide heat column if vote limit is zero.
         if ($this->hotquestion->instance->heatlimit == 0) {
-            $heatvisibility == 0;
+            $heatvisibility = '0';
         } else {
             $heatvisibility = $this->hotquestion->instance->heatvisibility;
         }
@@ -218,7 +219,8 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
                 // Check heat column visibilty settings.
                 if ($heatvisibility) {
                     // 20200609 Teacher set heat lower than the number of heat votes already applied by a user. 
-                    if ($this->hotquestion->heat_tally($hq, $USER->id) <= 0) {
+                   // if ($this->hotquestion->heat_tally($hq, $USER->id) <= 0) {
+                    if ($this->hotquestion->heat_tally($hq, $USER->id) < 0) {
                         $temp = get_string('heaterror', 'hotquestion').$this->hotquestion->heat_tally($hq, $USER->id);
                     } else {
                         $temp = $this->hotquestion->heat_tally($hq, $USER->id);
