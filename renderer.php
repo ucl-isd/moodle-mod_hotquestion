@@ -218,9 +218,8 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
                 }
                 // Check heat column visibilty settings.
                 if ($heatvisibility) {
-                    // 20200609 Teacher set heat lower than the number of heat votes already applied by a user. 
-                   // if ($this->hotquestion->heat_tally($hq, $USER->id) <= 0) {
-                    if ($this->hotquestion->heat_tally($hq, $USER->id) < 0) {
+                    // 20200609 Teacher set heat lower than the number of heat votes already applied by a user.
+                    if ($this->hotquestion->heat_tally($hq, $USER->id) <= 0) {
                         $temp = get_string('heaterror', 'hotquestion').$this->hotquestion->heat_tally($hq, $USER->id);
                     } else {
                         $temp = $this->hotquestion->heat_tally($hq, $USER->id);
@@ -231,7 +230,6 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
                     $table->head[] .= $this->hotquestion->instance->heatlabel
                                    .' '.$this->hotquestion->instance->heatlimit
                                    .'/'.$temp;
-                              //     .'/'.$this->hotquestion->heat_tally($hq, $USER->id);
 
                 } else {
                     // Heat column is not visible, so replace label with a space.
@@ -347,7 +345,7 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
 
                         // Print the vote cron case. 20200528 Added check for votes remaining.
                         if ($allowvote && $this->hotquestion->can_vote_on($question) && ($remaining >= 0)) {
-                            if (!$this->hotquestion->has_voted($question->id)) {
+                            if (!$this->hotquestion->has_voted($question->id) && ($remaining >= 1)) {
                                 $heat .= '&nbsp;<a href="view.php?id='
                                       .$this->hotquestion->cm->id
                                       .'&action=vote&q='.$question->id

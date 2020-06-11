@@ -206,7 +206,8 @@ function xmldb_hotquestion_upgrade($oldversion=0) {
 
         // Define field teacherprioritylabel to be added to hotquestion.
         $table = new xmldb_table('hotquestion');
-        $field = new xmldb_field('teacherprioritylabel', XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL, null, 'Priority', 'teacherpriorityvisibility');
+        $field = new xmldb_field('teacherprioritylabel', XMLDB_TYPE_CHAR, '20', null, XMLDB_NOTNULL,
+            null, 'Priority', 'teacherpriorityvisibility');
 
         // Conditionally launch add field id.
         if (!$dbman->field_exists($table, $field)) {
