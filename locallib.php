@@ -248,7 +248,7 @@ class mod_hotquestion {
     public function heat_tally($hq, $user = null) {
         global $USER, $CFG, $DB;
 
-        $params = array( $hq->currentround->id, $hq->currentround->hotquestion, $USER->id);
+        $params = array($hq->currentround->id, $hq->currentround->hotquestion, $USER->id);
 
         $sql = "SELECT hqq.id AS questionid,
                        COUNT(hqv.voter) AS heat,

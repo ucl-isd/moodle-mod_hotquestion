@@ -1,5 +1,5 @@
 @mod @mod_hotquestion
-Feature: Users can post named or anonymous entries to hotquestion
+Feature: Users can post anonymous or named entries to hotquestion
   In order to use HotQuestion
   As a user
   I need to be able to post a hotquestion entry.

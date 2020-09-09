@@ -64,7 +64,7 @@ Feature: Users can post named or anonymous entries to hotquestion approval requi
     And I should see "Posted by Teacher 1"
     And I should see "Second question"
     And I should see "Posted by Anonymous"
-	And I should see "First question"
+    And I should see "First question"
     And I should see "Posted by Admin User"
     And I set the following fields to these values:
       | Submit your question here: | Seventh question |

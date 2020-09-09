@@ -204,14 +204,13 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
             $table->width = '100%';
             $table->align = array ('left', 'center', 'center', 'center', 'center');
 
-
-            // 20200611 If teacher changes heat setting to lower than the number of heat votes already applied by a user, those users will see an error message.
+            // 20200611 If teacher changes heat setting to lower than the number of heat
+            // votes already applied by a user, those users will see an error message.
             if ($this->hotquestion->heat_tally($hq, $USER->id) < 0) {
                 $temp = get_string('heaterror', 'hotquestion').$this->hotquestion->heat_tally($hq, $USER->id);
             } else {
                 $temp = $this->hotquestion->heat_tally($hq, $USER->id);
             }
-
 
             // Admin, manager and teachers headings for questions, priority, heat, remove and approved headings.
             if (has_capability('mod/hotquestion:manageentries', $context)) {
@@ -233,7 +232,6 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
                     $table->head[] .= $this->hotquestion->instance->heatlabel
                                    .' '.$this->hotquestion->instance->heatlimit
                                    .'/'.$temp;
-
 
                 } else {
                     // Heat column is not visible, so replace label with a space.
