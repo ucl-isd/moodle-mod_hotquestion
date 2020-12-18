@@ -153,6 +153,11 @@ class mod_hotquestion_mod_form extends moodleform_mod {
         $mform->addHelpButton('anonymouspost', 'allowanonymouspost', 'hotquestion');
         $mform->setDefault('anonymouspost', '1');
 
+        // Adding 'authorhide' field.
+        $mform->addElement('selectyesno', 'authorhide', get_string('allowauthorinfohide', 'hotquestion'));
+        $mform->addHelpButton('authorhide', 'allowauthorinfohide', 'hotquestion');
+        $mform->setDefault('authorhide', '0');
+
         // Add 'requireapproval' field.
         $mform->addElement('selectyesno', 'approval', get_string('requireapproval', 'hotquestion'));
         $mform->addHelpButton('approval', 'requireapproval', 'hotquestion');

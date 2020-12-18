@@ -90,6 +90,12 @@ if ($ADMIN->fulltree) {
         get_string('allowanonymouspost_descr', 'hotquestion'),
         array('value' => 0, 'adv' => false)));
 
+    // Default allow hide author info from students.
+    $settings->add(new admin_setting_configcheckbox_with_advanced('mod_hotquestion/allowauthorinfohide',
+        get_string('allowauthorinfohide', 'hotquestion'),
+        get_string('allowauthorinfohide_descr', 'hotquestion'),
+        array('value' => 0, 'adv' => false)));
+
     // Default heading removelabel setting.
     $settings->add(new admin_setting_configtext('mod_hotquestion/removelabel',
         new lang_string('removelabel', 'hotquestion'),

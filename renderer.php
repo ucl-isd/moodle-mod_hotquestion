@@ -182,6 +182,9 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
         // Set column visibility flags for Priority and Heat.
         $teacherpriorityvisibility = $this->hotquestion->instance->teacherpriorityvisibility;
 
+        // Flag for authors name visibility.
+        $authorinfohide = $this->hotquestion->instance->authorhide;
+
         // 20200609 Auto hide heat column if vote limit is zero.
         if ($this->hotquestion->instance->heatlimit == 0) {
             $heatvisibility = '0';
@@ -298,7 +301,12 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
                         // Process the time part of the row entry.
                         $a->time = userdate($question->time).'&nbsp('.get_string('ago', 'hotquestion'
                             , format_time(time() - $question->time)).')';
-                        $info = '<div class="author">'.get_string('authorinfo', 'hotquestion', $a).'</div>';
+                        // 20201217 Added capability to hide authors name from students.
+                        if (!$authorinfohide || (has_capability('mod/hotquestion:manageentries', $context))) {
+                            $info = '<div class="author">'.get_string('authorinfo', 'hotquestion', $a).'</div>';
+                        } else {
+                            $info = '<div class="author">'.get_string('authorinfohide', 'hotquestion', $a).'</div>';
+                        }
                         $line[] = $content.$info;
                         // Get current priority value to show.
                         $tpriority = $question->tpriority;
