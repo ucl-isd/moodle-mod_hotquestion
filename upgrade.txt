@@ -1,3 +1,6 @@
+=== 3.9.1 ===
+20201217 HotQuestion_661, Github issue 45 feature request - hide student names.
+    implemented new setting for this. Actual code is in renderer.php.
 
 === 3.9.0 ===
 05/25/2020 Starting development for HotQuestion_410, New mode request to limit
