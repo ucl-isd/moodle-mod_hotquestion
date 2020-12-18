@@ -55,7 +55,7 @@ class backup_hotquestion_activity_structure_step extends backup_activity_structu
             'name', 'intro', 'introformat', 'submitdirections', 'timecreated',
             'timemodified', 'timeopen', 'timeclose', 'questionlabel', 'teacherpriorityvisibility',
             'teacherprioritylabel', 'heatvisibility', 'heatlabel', 'heatlimit', 'anonymouspost',
-            'approval', 'approvallabel', 'removelabel'));
+            'authorhide', 'approval', 'approvallabel', 'removelabel'));
 
         $questions = new backup_nested_element('questions');
 
