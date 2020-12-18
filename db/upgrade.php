@@ -274,7 +274,5 @@ function xmldb_hotquestion_upgrade($oldversion=0) {
         // Hotquestion savepoint reached.
         upgrade_mod_savepoint(true, 2020121700, 'hotquestion');
     }
-
-
     return $result;
 }
