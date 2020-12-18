@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="mod/hotquestion/db" VERSION="20200525" COMMENT="XMLDB file for Moodle mod/hotquestion"
+<XMLDB PATH="mod/hotquestion/db" VERSION="20201217" COMMENT="XMLDB file for Moodle mod/hotquestion"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -23,6 +23,7 @@
         <FIELD NAME="heatlabel" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="Heat" SEQUENCE="false" COMMENT="Change default heat heading label as desired."/>
         <FIELD NAME="heatlimit" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Vote limit."/>
         <FIELD NAME="anonymouspost" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
+        <FIELD NAME="authorhide" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="approval" TYPE="int" LENGTH="4" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="approvallabel" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="Approved" SEQUENCE="false" COMMENT="Change default heading approvallabel as desired."/>
         <FIELD NAME="removelabel" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="Remove" SEQUENCE="false" COMMENT="Change the default remove heading label as desired."/>
