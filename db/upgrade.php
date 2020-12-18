@@ -260,5 +260,21 @@ function xmldb_hotquestion_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2020052800, 'hotquestion');
     }
 
+    if ($oldversion < 2020121700) {
+
+        // Define field authorhide to be added to hotquestion.
+        $table = new xmldb_table('hotquestion');
+        $field = new xmldb_field('authorhide', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, '0', 'anonymouspost');
+
+        // Conditionally launch add field authorhide.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Hotquestion savepoint reached.
+        upgrade_mod_savepoint(true, 2020121700, 'hotquestion');
+    }
+
+
     return $result;
 }
