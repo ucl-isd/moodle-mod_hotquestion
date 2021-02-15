@@ -72,9 +72,10 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
         $output = '';
         $toolbuttons = array();
         $roundp = new stdClass();
-        $round = '';
-        $roundn = '';
-        $roundp = '';
+        $round = ''; // Initialize current round.
+        $roundn = ''; // Initialize next round.
+        $roundp = ''; // Initialize previous round.
+        $roundcount = ''; // Initialize total count of rounds in this Hot Question.
 
         // Print export to .csv file toolbutton.
         if ($shownew) {
@@ -99,6 +100,23 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
             $toolbuttons[] = html_writer::tag('span', $this->pix_icon('t/collapsed_empty_rtl', '')
                 , array('class' => 'dis_toolbutton'));
         }
+
+        if ($this->hotquestion->get_roundcount() != null) {
+            if ($this->hotquestion->get_currentroundx() != null) {
+                $var = array_keys($this->hotquestion->get_currentroundx());
+                $cx = array_shift($var);
+
+                // Showing round x of n rounds. X = current round being looked at and n = total number of rounds.
+                //$text = ($cx + 1)." of ".$this->hotquestion->get_roundcount();
+                $text = ($cx + 1).get_string('xofn', 'hotquestion').$this->hotquestion->get_roundcount();
+            } else {
+                 $text = $this->hotquestion->get_roundcount().get_string('xofn', 'hotquestion').$this->hotquestion->get_roundcount();
+            }
+        } else {
+                 $text = $this->hotquestion->get_roundcount().get_string('xofn', 'hotquestion').$this->hotquestion->get_roundcount();
+        }
+        $toolbuttons[] = html_writer::label($text, null, null);
+
         if ($this->hotquestion->get_nextround() != null) {
             $roundn = $this->hotquestion->get_nextround()->id;
             $roundp = '';

@@ -1,3 +1,8 @@
+=== 3.9.2 ===
+20210215 HotQuestion_669, Need round indicator between the round nav icons. Completed
+    development. Needs further testing and cleanup. Added string, xofn = " of ". Code
+    in locallib.php and render.php.
+
 === 3.9.1 ===
 20201217 HotQuestion_661, Github issue 45 feature request - hide student names.
     implemented new setting for this. Actual code is in renderer.php.

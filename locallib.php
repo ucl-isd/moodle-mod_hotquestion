@@ -61,6 +61,10 @@ class mod_hotquestion {
     protected $prevround;
     /** @var int callback arg - the id of next round of questions */
     protected $nextround;
+    /** @var int callback arg - the total round count in this hot question */
+    protected $roundcount;
+    /** @var int callback arg - the round being looked at in this hot question */
+    protected $currentroundx;
 
     /**
      * Constructor for the base hotquestion class.
@@ -317,9 +321,12 @@ class mod_hotquestion {
      * @param int $roundid
      */
     public function set_currentround($roundid = -1) {
-        global $DB;
+        global $DB, $CFG;
 
         $rounds = $DB->get_records('hotquestion_rounds', array('hotquestion' => $this->instance->id), 'id ASC');
+        // 20210214 Get trotal number of rounds in the current Hot Question activity.
+        $this->roundcount = (count($rounds));
+
         if (empty($rounds)) {
             // Create the first round.
             $round = new StdClass();
@@ -332,6 +339,17 @@ class mod_hotquestion {
 
         if ($roundid != -1 && array_key_exists($roundid, $rounds)) {
             $this->currentround = $rounds[$roundid];
+
+            // 20210214 Count the number of rounds before the one currently being looked at.
+            $params = array($roundid, $this->instance->id);
+            $sql = "SELECT COUNT(id) AS cx
+                      FROM ".$CFG->prefix."hotquestion_rounds as hqr
+                     WHERE id < ?
+                       AND hqr.hotquestion = ?
+                  ORDER BY id ASC LIMIT 0, 1";
+            // 20210214 The virtual number - 1 of the current round being looked at.
+            // In the render, the virtual number gets corrected by adding 1, just before it gets displayed.
+            $this->currentroundx = $DB->get_records_sql($sql, $params);
 
             $ids = array_keys($rounds);
             // Search previous round.
@@ -381,6 +399,24 @@ class mod_hotquestion {
      */
     public function get_nextround() {
         return $this->nextround;
+    }
+
+    /**
+     * Return next round.
+     *
+     * @return object
+     */
+    public function get_roundcount() {
+        return $this->roundcount;
+    }
+
+    /**
+     * Return next round.
+     *
+     * @return object
+     */
+    public function get_currentroundx() {
+        return $this->currentroundx;
     }
 
     /**

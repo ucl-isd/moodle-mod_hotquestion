@@ -165,3 +165,4 @@ $string['userid'] = 'Userid';
 $string['vote'] = 'Vote';
 $string['viewallentries'] = '{$a->ucount} user(s) posted {$a->qcount} question(s).';
 $string['viewentries'] = 'Participation in current round';
+$string['xofn'] = ' of ';
