@@ -101,20 +101,14 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
                 , array('class' => 'dis_toolbutton'));
         }
 
-        if ($this->hotquestion->get_roundcount() != null) {
-            if ($this->hotquestion->get_currentroundx() != null) {
-                $var = array_keys($this->hotquestion->get_currentroundx());
-                $cx = array_shift($var);
-
-                // Showing round x of n rounds. X = current round being looked at and n = total number of rounds.
-                //$text = ($cx + 1)." of ".$this->hotquestion->get_roundcount();
-                $text = ($cx + 1).get_string('xofn', 'hotquestion').$this->hotquestion->get_roundcount();
+        // 20200215 Label added to show x of n display in toolbar.
+        if (($this->hotquestion->get_roundcount() != null) && ($this->hotquestion->get_currentroundx() != null)) {
+            $cx = $this->hotquestion->get_currentroundx();
+            // Showing round x of n rounds. X = current round being looked at and n = total number of rounds.
+                $text = $cx.get_string('xofn', 'hotquestion').$this->hotquestion->get_roundcount();
             } else {
-                 $text = $this->hotquestion->get_roundcount().get_string('xofn', 'hotquestion').$this->hotquestion->get_roundcount();
+                $text = $this->hotquestion->get_roundcount().get_string('xofn', 'hotquestion').$this->hotquestion->get_roundcount();
             }
-        } else {
-                 $text = $this->hotquestion->get_roundcount().get_string('xofn', 'hotquestion').$this->hotquestion->get_roundcount();
-        }
         $toolbuttons[] = html_writer::label($text, null, null);
 
         if ($this->hotquestion->get_nextround() != null) {

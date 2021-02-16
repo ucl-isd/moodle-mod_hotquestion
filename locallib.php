@@ -321,12 +321,15 @@ class mod_hotquestion {
      * @param int $roundid
      */
     public function set_currentround($roundid = -1) {
-        global $DB, $CFG;
+        global $DB;
 
+        // Get all the rounds for this Hot Question.
         $rounds = $DB->get_records('hotquestion_rounds', array('hotquestion' => $this->instance->id), 'id ASC');
-        // 20210214 Get trotal number of rounds in the current Hot Question activity.
+
+        // 20210214 Get total number of rounds for the current Hot Question activity.
         $this->roundcount = (count($rounds));
 
+        // If there are no rounds, it is a new Hot Question activity and we need to create the first round for it. 
         if (empty($rounds)) {
             // Create the first round.
             $round = new StdClass();
@@ -339,26 +342,19 @@ class mod_hotquestion {
 
         if ($roundid != -1 && array_key_exists($roundid, $rounds)) {
             $this->currentround = $rounds[$roundid];
-
-            // 20210214 Count the number of rounds before the one currently being looked at.
-            $params = array($roundid, $this->instance->id);
-            $sql = "SELECT COUNT(id) AS cx
-                      FROM ".$CFG->prefix."hotquestion_rounds as hqr
-                     WHERE id < ?
-                       AND hqr.hotquestion = ?
-                  ORDER BY id ASC LIMIT 0, 1";
-            // 20210214 The virtual number - 1 of the current round being looked at.
-            // In the render, the virtual number gets corrected by adding 1, just before it gets displayed.
-            $this->currentroundx = $DB->get_records_sql($sql, $params);
-
             $ids = array_keys($rounds);
             // Search previous round.
             $currentkey = array_search($roundid, $ids);
+            // 20210215 $currentkey contains the virtual number - 1 of the current round being looked at.
+            // Correct the virtual number by adding 1.
+            $this->currentroundx = $currentkey + 1;
+
             if (array_key_exists($currentkey - 1, $ids)) {
                 $this->prevround = $rounds[$ids[$currentkey - 1]];
             } else {
                 $this->prevround = null;
             }
+
             // Search next round.
             if (array_key_exists($currentkey + 1, $ids)) {
                 $this->nextround = $rounds[$ids[$currentkey + 1]];
