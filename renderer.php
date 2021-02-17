@@ -92,7 +92,6 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
         if ($this->hotquestion->get_prevround() != null) {
             $roundp = $this->hotquestion->get_prevround()->id;
             $roundn = '';
-
             $url = new moodle_url('/mod/hotquestion/view.php', array('id' => $this->hotquestion->cm->id, 'round' => $roundp));
             $toolbuttons[] = html_writer::link($url, $this->pix_icon('t/collapsed_rtl'
                 , get_string('previousround', 'hotquestion')), array('class' => 'toolbutton'));
@@ -101,20 +100,18 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
                 , array('class' => 'dis_toolbutton'));
         }
 
-        // 20200215 Label added to show x of n display in toolbar.
+        // 20200215 Text added to show x of n display in toolbar.
         if (($this->hotquestion->get_roundcount() != null) && ($this->hotquestion->get_currentroundx() != null)) {
             $cx = $this->hotquestion->get_currentroundx();
             // Showing round x of n rounds. X = current round being looked at and n = total number of rounds.
-                $text = $cx.get_string('xofn', 'hotquestion').$this->hotquestion->get_roundcount();
+                $toolbuttons[] = $cx.get_string('xofn', 'hotquestion').$this->hotquestion->get_roundcount();
             } else {
-                $text = $this->hotquestion->get_roundcount().get_string('xofn', 'hotquestion').$this->hotquestion->get_roundcount();
+                $toolbuttons[] = $this->hotquestion->get_roundcount().get_string('xofn', 'hotquestion').$this->hotquestion->get_roundcount();
             }
-        $toolbuttons[] = html_writer::label($text, null, null);
 
         if ($this->hotquestion->get_nextround() != null) {
             $roundn = $this->hotquestion->get_nextround()->id;
             $roundp = '';
-
             $url = new moodle_url('/mod/hotquestion/view.php', array('id' => $this->hotquestion->cm->id, 'round' => $roundn));
             $toolbuttons[] = html_writer::link($url, $this->pix_icon('t/collapsed'
                 , get_string('nextround', 'hotquestion')), array('class' => 'toolbutton'));
