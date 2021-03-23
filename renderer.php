@@ -83,9 +83,9 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
             $options['id'] = $this->hotquestion->cm->id;
             $options['action'] = 'download';
             $url = new moodle_url('/mod/hotquestion/view.php', $options);
-            $toolbuttons[] = html_writer::link($url, $this->pix_icon('a/download_all'
-                , get_string('csvexport', 'hotquestion'))
-                , array('class' => 'toolbutton'));
+            $toolbuttons[] = html_writer::link($url, $this->pix_icon('a/download_all',
+                                 get_string('csvexport', 'hotquestion')),
+                                 array('class' => 'toolbutton'));
         }
 
         // Print prev/next round toolbuttons.
@@ -93,30 +93,36 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
             $roundp = $this->hotquestion->get_prevround()->id;
             $roundn = '';
             $url = new moodle_url('/mod/hotquestion/view.php', array('id' => $this->hotquestion->cm->id, 'round' => $roundp));
-            $toolbuttons[] = html_writer::link($url, $this->pix_icon('t/collapsed_rtl'
-                , get_string('previousround', 'hotquestion')), array('class' => 'toolbutton'));
+            $toolbuttons[] = html_writer::link($url, $this->pix_icon('t/collapsed_rtl',
+                                 get_string('previousround', 'hotquestion')),
+                                 array('class' => 'toolbutton'));
         } else {
-            $toolbuttons[] = html_writer::tag('span', $this->pix_icon('t/collapsed_empty_rtl', '')
-                , array('class' => 'dis_toolbutton'));
+            $toolbuttons[] = html_writer::tag('span', $this->pix_icon('t/collapsed_empty_rtl', ''),
+                                 array('class' => 'dis_toolbutton'));
         }
 
         // 20200215 Text added to show x of n display in toolbar.
         if (($this->hotquestion->get_roundcount() != null) && ($this->hotquestion->get_currentroundx() != null)) {
             $cx = $this->hotquestion->get_currentroundx();
             // Showing round x of n rounds. X = current round being looked at and n = total number of rounds.
-                $toolbuttons[] = $cx.get_string('xofn', 'hotquestion').$this->hotquestion->get_roundcount();
-            } else {
-                $toolbuttons[] = $this->hotquestion->get_roundcount().get_string('xofn', 'hotquestion').$this->hotquestion->get_roundcount();
-            }
+            $toolbuttons[] = $cx.get_string('xofn', 'hotquestion').
+                                 $this->hotquestion->get_roundcount();
+        } else {
+            $toolbuttons[] = $this->hotquestion->get_roundcount().
+                                 get_string('xofn', 'hotquestion').
+                                 $this->hotquestion->get_roundcount();
+        }
 
         if ($this->hotquestion->get_nextround() != null) {
             $roundn = $this->hotquestion->get_nextround()->id;
             $roundp = '';
             $url = new moodle_url('/mod/hotquestion/view.php', array('id' => $this->hotquestion->cm->id, 'round' => $roundn));
-            $toolbuttons[] = html_writer::link($url, $this->pix_icon('t/collapsed'
-                , get_string('nextround', 'hotquestion')), array('class' => 'toolbutton'));
+            $toolbuttons[] = html_writer::link($url, $this->pix_icon('t/collapsed',
+                                 get_string('nextround', 'hotquestion')),
+                                 array('class' => 'toolbutton'));
         } else {
-            $toolbuttons[] = html_writer::tag('span', $this->pix_icon('t/collapsed_empty', ''), array('class' => 'dis_toolbutton'));
+            $toolbuttons[] = html_writer::tag('span', $this->pix_icon('t/collapsed_empty', ''),
+                                 array('class' => 'dis_toolbutton'));
         }
 
         // Print new round toolbutton.
@@ -164,7 +170,9 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
 
         // Print refresh toolbutton.
         $url = new moodle_url('/mod/hotquestion/view.php', array('id' => $this->hotquestion->cm->id));
-        $toolbuttons[] = html_writer::link($url, $this->pix_icon('t/reload', get_string('reload')), array('class' => 'toolbutton'));
+        $toolbuttons[] = html_writer::link($url, $this->pix_icon('t/reload',
+                             get_string('reload')),
+                             array('class' => 'toolbutton'));
 
         // Return all available toolbuttons.
         $output .= html_writer::alist($toolbuttons, array('id' => 'toolbar'));

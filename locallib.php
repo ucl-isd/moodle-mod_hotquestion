@@ -108,7 +108,9 @@ class mod_hotquestion {
         global $USER, $CFG, $DB;
         $data = new StdClass();
         $data->hotquestion = $this->instance->id;
-        $data->content = trim($fromform->question);
+        // 20210218 Switched code to use text editor instead of text area.
+        $data->content = ($fromform->text_editor['text']);
+        $data->format = ($fromform->text_editor['format']);
         $data->userid = $USER->id;
         $data->time = time();
         $data->tpriority = 0;
@@ -329,7 +331,7 @@ class mod_hotquestion {
         // 20210214 Get total number of rounds for the current Hot Question activity.
         $this->roundcount = (count($rounds));
 
-        // If there are no rounds, it is a new Hot Question activity and we need to create the first round for it. 
+        // If there are no rounds, it is a new Hot Question activity and we need to create the first round for it.
         if (empty($rounds)) {
             // Create the first round.
             $round = new StdClass();

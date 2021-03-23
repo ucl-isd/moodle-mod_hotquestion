@@ -274,5 +274,20 @@ function xmldb_hotquestion_upgrade($oldversion=0) {
         // Hotquestion savepoint reached.
         upgrade_mod_savepoint(true, 2020121700, 'hotquestion');
     }
+
+    if ($oldversion < 2021032300) {
+
+        // Define field format to be added to hotquestion_questions.
+        $table = new xmldb_table('hotquestion_questions');
+        $field = new xmldb_field('format', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '0', 'content');
+
+        // Conditionally launch add field format.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Hotquestion savepoint reached.
+        upgrade_mod_savepoint(true, 2021032300, 'hotquestion');
+    }
     return $result;
 }
