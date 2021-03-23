@@ -1,3 +1,9 @@
+=== 4.0.0 ===
+20210321 Hot Question_561 See about using editor text area to allow for formatting
+    and emoji's. Got it working in just a couple of hours, mostly looking for the
+    best place to add the code. Does not support audio and video recording. Will do
+    that, hopefully, in a later release.
+
 === 3.9.2 ===
 20210215 HotQuestion_669, Need round indicator between the round nav icons. Completed
     development. Needs further testing and cleanup. Added string, xofn = " of ". Code
