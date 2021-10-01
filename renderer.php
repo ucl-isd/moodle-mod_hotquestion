@@ -24,7 +24,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * A custmom renderer class that extends the plugin_renderer_base and is used by the hotquestion module.
+ * A custom renderer class that extends the plugin_renderer_base and is used by the hotquestion module.
  *
  * @package   mod_hotquestion
  * @copyright 2019 onwards AL Rachels drachels@drachels.com
@@ -54,6 +54,7 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
         $output = '';
         if (trim($this->hotquestion->instance->intro)) {
             $output .= $this->box_start('generalbox boxaligncenter', 'intro');
+            // Add the description for this activity.
             $output .= format_module_intro('hotquestion', $this->hotquestion->instance, $this->hotquestion->cm->id);
             $output .= $this->box_end();
         }
@@ -83,9 +84,9 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
             $options['id'] = $this->hotquestion->cm->id;
             $options['action'] = 'download';
             $url = new moodle_url('/mod/hotquestion/view.php', $options);
-            $toolbuttons[] = html_writer::link($url, $this->pix_icon('a/download_all',
-                                 get_string('csvexport', 'hotquestion')),
-                                 array('class' => 'toolbutton'));
+            $toolbuttons[] = html_writer::link($url, $this->pix_icon('a/download_all'
+                , get_string('csvexport', 'hotquestion'))
+                , array('class' => 'toolbutton'));
         }
 
         // Print prev/next round toolbuttons.
@@ -93,36 +94,32 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
             $roundp = $this->hotquestion->get_prevround()->id;
             $roundn = '';
             $url = new moodle_url('/mod/hotquestion/view.php', array('id' => $this->hotquestion->cm->id, 'round' => $roundp));
-            $toolbuttons[] = html_writer::link($url, $this->pix_icon('t/collapsed_rtl',
-                                 get_string('previousround', 'hotquestion')),
-                                 array('class' => 'toolbutton'));
+            $toolbuttons[] = html_writer::link($url, $this->pix_icon('t/collapsed_rtl'
+                , get_string('previousround', 'hotquestion'))
+                , array('class' => 'toolbutton'));
         } else {
-            $toolbuttons[] = html_writer::tag('span', $this->pix_icon('t/collapsed_empty_rtl', ''),
-                                 array('class' => 'dis_toolbutton'));
+            $toolbuttons[] = html_writer::tag('span', $this->pix_icon('t/collapsed_empty_rtl', '')
+                , array('class' => 'dis_toolbutton'));
         }
 
         // 20200215 Text added to show x of n display in toolbar.
         if (($this->hotquestion->get_roundcount() != null) && ($this->hotquestion->get_currentroundx() != null)) {
             $cx = $this->hotquestion->get_currentroundx();
             // Showing round x of n rounds. X = current round being looked at and n = total number of rounds.
-            $toolbuttons[] = $cx.get_string('xofn', 'hotquestion').
-                                 $this->hotquestion->get_roundcount();
+            $toolbuttons[] = $cx.get_string('xofn', 'hotquestion').$this->hotquestion->get_roundcount();
         } else {
-            $toolbuttons[] = $this->hotquestion->get_roundcount().
-                                 get_string('xofn', 'hotquestion').
-                                 $this->hotquestion->get_roundcount();
+            $toolbuttons[] = $this->hotquestion->get_roundcount().get_string('xofn', 'hotquestion')
+                .$this->hotquestion->get_roundcount();
         }
 
         if ($this->hotquestion->get_nextround() != null) {
             $roundn = $this->hotquestion->get_nextround()->id;
             $roundp = '';
             $url = new moodle_url('/mod/hotquestion/view.php', array('id' => $this->hotquestion->cm->id, 'round' => $roundn));
-            $toolbuttons[] = html_writer::link($url, $this->pix_icon('t/collapsed',
-                                 get_string('nextround', 'hotquestion')),
-                                 array('class' => 'toolbutton'));
+            $toolbuttons[] = html_writer::link($url, $this->pix_icon('t/collapsed'
+                , get_string('nextround', 'hotquestion')), array('class' => 'toolbutton'));
         } else {
-            $toolbuttons[] = html_writer::tag('span', $this->pix_icon('t/collapsed_empty', ''),
-                                 array('class' => 'dis_toolbutton'));
+            $toolbuttons[] = html_writer::tag('span', $this->pix_icon('t/collapsed_empty', ''), array('class' => 'dis_toolbutton'));
         }
 
         // Print new round toolbutton.
@@ -170,9 +167,7 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
 
         // Print refresh toolbutton.
         $url = new moodle_url('/mod/hotquestion/view.php', array('id' => $this->hotquestion->cm->id));
-        $toolbuttons[] = html_writer::link($url, $this->pix_icon('t/reload',
-                             get_string('reload')),
-                             array('class' => 'toolbutton'));
+        $toolbuttons[] = html_writer::link($url, $this->pix_icon('t/reload', get_string('reload')), array('class' => 'toolbutton'));
 
         // Return all available toolbuttons.
         $output .= html_writer::alist($toolbuttons, array('id' => 'toolbar'));
@@ -234,51 +229,50 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
 
             // Admin, manager and teachers headings for questions, priority, heat, remove and approved headings.
             if (has_capability('mod/hotquestion:manageentries', $context)) {
-                // 20200512 Changed from fixed string to new questionlabel column setting.
-                $table->head = array($this->hotquestion->instance->questionlabel);
+                // 20210924 Changed to format_text questionlabel column setting.
+                $table->head = array(format_text($this->hotquestion->instance->questionlabel, $format = FORMAT_MOODLE, $options = null, $courseid_do_not_use = null));
                 // Check teacher priority column visibilty settings.
                 if ($teacherpriorityvisibility) {
                     // Priority column is visible, so show the label.
-                    // 20200512 Changed from fixed string to new prioritylable column setting.
-                    $table->head[] .= $this->hotquestion->instance->teacherprioritylabel;
+                    // 20210924 Changed to format_text prioritylabel column setting.
+                    $table->head[] .= format_text($this->hotquestion->instance->teacherprioritylabel, $format = FORMAT_MOODLE, $options = null, $courseid_do_not_use = null);
                 } else {
                     // Priority column is not visible, so replace label with a space.
                     $table->head[] .= ' ';
                 }
                 // Check heat column visibilty settings for teachers.
                 if ($heatvisibility) {
-                    // 20200512 Changed from fixed string to new heatlabel column setting.
+                    // 20210924 Changed to format_text heatlabel column setting.
                     // 20200526 Show heatlimit setting and how many heat/votes remain for current user.
-                    $table->head[] .= $this->hotquestion->instance->heatlabel
+                    $table->head[] .= format_text($this->hotquestion->instance->heatlabel, $format = FORMAT_MOODLE, $options = null, $courseid_do_not_use = null)
                                    .' '.$this->hotquestion->instance->heatlimit
                                    .'/'.$temp;
-
                 } else {
                     // Heat column is not visible, so replace label with a space.
                     $table->head[] .= ' ';
                 }
-                    // 20200512 Changed from fixed string to new removelabel column setting.
-                    $table->head[] .= $this->hotquestion->instance->removelabel;
-                    // 20200512 Changed from fixed string to new approvallabel column setting.
-                    $table->head[] .= $this->hotquestion->instance->approvallabel;
+                    // 20210924 Changed to format_text removelabel column setting.
+                    $table->head[] .= format_text($this->hotquestion->instance->removelabel, $format = FORMAT_MOODLE, $options = null, $courseid_do_not_use = null);
+                    // 20210924 Changed to format_text  approvallabel column setting.
+                    $table->head[] .= format_text($this->hotquestion->instance->approvallabel, $format = FORMAT_MOODLE, $options = null, $courseid_do_not_use = null);
             } else {
                 // Students only see headings for questions, priority, and heat columns.
-                // 20200512 Changed from fixed string to new questionlabel column setting.
-                $table->head = array($this->hotquestion->instance->questionlabel);
+                // 20210924 Changed to format_text questionlabel column setting.
+                $table->head = array(format_text($this->hotquestion->instance->questionlabel, $format = FORMAT_MOODLE, $options = null, $courseid_do_not_use = null));
                 // Check teacher priority column visibilty settings.
                 if ($teacherpriorityvisibility) {
-                    // 20200512 Changed from fixed string to new prioritylabel column setting.
+                    // 20210924 Changed to format_text prioritylabel column setting.
                     // Priority column is visible, so show the label.
-                    $table->head[] .= $this->hotquestion->instance->teacherprioritylabel;
+                    $table->head[] .= format_text($this->hotquestion->instance->teacherprioritylabel, $format = FORMAT_MOODLE, $options = null, $courseid_do_not_use = null);
                 } else {
                     // Priority column is not visible, so replace label with a space.
                     $table->head[] .= ' ';
                 }
                 // Check heat column visibilty settings for students.
                 if ($heatvisibility) {
-                    // 20200512 Changed from fixed string to new heatlabel column setting.
+                    // 20210924 Changed to format_text heatlabel column setting.
                     // Heat column is visible, so show the label.
-                    $table->head[] .= $this->hotquestion->instance->heatlabel
+                    $table->head[] .= format_text($this->hotquestion->instance->heatlabel, $format = FORMAT_MOODLE, $options = null, $courseid_do_not_use = null)
                                    .' '.$this->hotquestion->instance->heatlimit
                                    .'/'.$temp;
                 } else {
@@ -320,11 +314,11 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
                             , format_time(time() - $question->time)).')';
                         // 20201217 Added capability to hide authors name from students.
                         if (!$authorinfohide || (has_capability('mod/hotquestion:manageentries', $context))) {
-                            $info = '<div class="author">'.get_string('authorinfo', 'hotquestion', $a).'</div>';
+                            $authorinfo = '<div class="author">'.get_string('authorinfo', 'hotquestion', $a).'</div>';
                         } else {
-                            $info = '<div class="author">'.get_string('authorinfohide', 'hotquestion', $a).'</div>';
+                            $authorinfo = '<div class="author">'.get_string('authorinfohide', 'hotquestion', $a).'</div>';
                         }
-                        $line[] = $content.$info;
+                        $line[] = $content.$authorinfo;
                         // Get current priority value to show.
                         $tpriority = $question->tpriority;
                         // Get current heat total to show.
