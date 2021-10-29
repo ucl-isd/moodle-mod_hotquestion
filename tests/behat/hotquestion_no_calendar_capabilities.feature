@@ -4,28 +4,23 @@ Feature: HotQuestion with no calendar capabilites
   As a teacher
   I need to be able to create HotQuestion activities even when I cannot edit calendar events
 
-  Background:
-    Given the following "courses" exist:
-      | fullname | shortname | category | groupmode |
-      | Course 1 | C1 | 0 | 1 |
+  Scenario: Editing a HotQuestion with no calendar capabilites
     And the following "users" exist:
       | username | firstname | lastname | email |
       | teacher1 | Teacher | 1 | teacher1@example.com |
+    Given the following "courses" exist:
+      | fullname | shortname | category | groupmode |
+      | Course 1 | C1 | 0 | 1 |
     And the following "course enrolments" exist:
       | user | course | role |
       | teacher1 | C1 | editingteacher |
     And I log in as "admin"
-    And I am on "Course 1" course homepage
+    And I am on "Course 1" course homepage with editing mode on
     And I navigate to "Users > Permissions" in current page administration
     And I override the system permissions of "Teacher" role with:
       | capability | permission |
       | moodle/calendar:manageentries | Prohibit |
-    And I log out
-
-  Scenario: Editing a hotquestion
-    Given I log in as "admin"
-    And I am on "Course 1" course homepage with editing mode on
-    When I add a "Hotquestion" to section "1" and I fill the form with:
+    And I add a "Hotquestion" to section "1" and I fill the form with:
       | Hotquestion name | Test hotquestion name |
       | Description | Test hotquestion description |
       | id_timeopen_enabled | 1 |

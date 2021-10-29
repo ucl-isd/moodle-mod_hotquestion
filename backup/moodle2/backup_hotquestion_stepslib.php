@@ -53,12 +53,14 @@ class backup_hotquestion_activity_structure_step extends backup_activity_structu
         // Define each element separated.
         $hotquestion = new backup_nested_element('hotquestion', array('id'), array(
             'name', 'intro', 'introformat', 'submitdirections', 'timecreated',
-            'timemodified', 'anonymouspost', 'approval'));
+            'timemodified', 'timeopen', 'timeclose', 'questionlabel', 'teacherpriorityvisibility',
+            'teacherprioritylabel', 'heatvisibility', 'heatlabel', 'heatlimit', 'anonymouspost',
+            'authorhide', 'approval', 'approvallabel', 'removelabel'));
 
         $questions = new backup_nested_element('questions');
 
         $question = new backup_nested_element('question', array('id'), array(
-            'content', 'userid', 'time', 'anonymous', 'approved', 'tpriority'));
+            'content', 'format', 'userid', 'time', 'anonymous', 'approved', 'tpriority'));
 
         $rounds = new backup_nested_element('rounds');
 

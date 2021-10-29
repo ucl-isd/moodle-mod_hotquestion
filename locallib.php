@@ -27,6 +27,14 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use \mod_hotquestion\event\remove_vote;
+use \mod_hotquestion\event\update_vote;
+use \mod_hotquestion\event\add_question;
+use \mod_hotquestion\event\add_round;
+use \mod_hotquestion\event\remove_question;
+use \mod_hotquestion\event\remove_round;
+use \mod_hotquestion\event\download_questions;
+
 defined('MOODLE_INTERNAL') || die();
 define('HOTQUESTION_EVENT_TYPE_OPEN', 'open');
 define('HOTQUESTION_EVENT_TYPE_CLOSE', 'close');
@@ -53,6 +61,10 @@ class mod_hotquestion {
     protected $prevround;
     /** @var int callback arg - the id of next round of questions */
     protected $nextround;
+    /** @var int callback arg - the total round count in this hot question */
+    protected $roundcount;
+    /** @var int callback arg - the round being looked at in this hot question */
+    protected $currentroundx;
 
     /**
      * Constructor for the base hotquestion class.
@@ -74,6 +86,7 @@ class mod_hotquestion {
     /**
      * Return whether the user has voted on specified question.
      *
+     * Called from function vote_on($question).
      * @param int $question question id
      * @param int $user user id. -1 means current user
      * @return boolean
@@ -89,13 +102,15 @@ class mod_hotquestion {
     /**
      * Add a new question to current round.
      *
-     * @param object $fromform from ask form
+     * @param object $fromform From ask form.
      */
     public function add_new_question($fromform) {
         global $USER, $CFG, $DB;
         $data = new StdClass();
         $data->hotquestion = $this->instance->id;
-        $data->content = trim($fromform->question);
+        // 20210218 Switched code to use text editor instead of text area.
+        $data->content = ($fromform->text_editor['text']);
+        $data->format = ($fromform->text_editor['format']);
         $data->userid = $USER->id;
         $data->time = time();
         $data->tpriority = 0;
@@ -115,12 +130,12 @@ class mod_hotquestion {
         }
         if (!empty($data->content)) {
             $DB->insert_record('hotquestion_questions', $data);
-            if ($CFG->version > 2014051200) { // Moodle 2.7+.
+            if ($CFG->version > 2014051200) { // If newer than Moodle 2.7+ use new event logging.
                 $params = array(
                     'objectid' => $this->cm->id,
                     'context' => $context,
                 );
-                $event = \mod_hotquestion\event\add_question::create($params);
+                $event = add_question::create($params);
                 $event->trigger();
             } else {
                 add_to_log($this->course->id, "hotquestion", "add question"
@@ -135,7 +150,8 @@ class mod_hotquestion {
     /**
      * Vote on question.
      *
-     * @param int $question the question id
+     * Called from view.php.
+     * @param int $question The question id.
      */
     public function vote_on($question) {
         global $CFG, $DB, $USER;
@@ -144,12 +160,13 @@ class mod_hotquestion {
         $question = $DB->get_record('hotquestion_questions', array('id' => $question));
         if ($question && $this->can_vote_on($question)) {
 
-            if ($CFG->version > 2014051200) { // Moodle 2.7+.
+            // Trigger and log a vote event.
+            if ($CFG->version > 2014051200) { // If newer than Moodle 2.7+ use new event logging.
                 $params = array(
                     'objectid' => $this->cm->id,
                     'context' => $context,
                 );
-                $event = \mod_hotquestion\event\update_vote::create($params);
+                $event = update_vote::create($params);
                 $event->trigger();
             } else {
                 add_to_log($this->course->id, 'hotquestion', 'update vote'
@@ -165,6 +182,43 @@ class mod_hotquestion {
             }
         }
     }
+
+    /**
+     * Remove vote on question.
+     *
+     * Called from view.php.
+     * @param int $question The question id.
+     */
+    public function remove_vote($question) {
+        global $CFG, $DB, $USER;
+        $votes = new StdClass();
+        $context = context_module::instance($this->cm->id);
+        $question = $DB->get_record('hotquestion_questions', array('id' => $question));
+        if ($question && $this->can_vote_on($question)) {
+
+            // Trigger and log a remove_vote event.
+            if ($CFG->version > 2014051200) { // If newer than Moodle 2.7+ use new event logging.
+                $params = array(
+                    'objectid' => $this->cm->id,
+                    'context' => $context,
+                );
+                $event = remove_vote::create($params);
+                $event->trigger();
+            } else {
+                add_to_log($this->course->id, 'hotquestion', 'remove vote'
+                    , "view.php?id={$this->cm->id}", $question->id, $this->cm->id);
+            }
+
+            if (!$this->has_voted($question->id)) {
+                $votes->question = $question->id;
+                $votes->voter = $USER->id;
+                $DB->insert_record('hotquestion_votes', $votes);
+            } else {
+                $DB->delete_records('hotquestion_votes', array('question' => $question->id, 'voter' => $USER->id));
+            }
+        }
+    }
+
 
     /**
      * Whether can vote on the question.
@@ -191,6 +245,49 @@ class mod_hotquestion {
     }
 
     /**
+     * Calculates number of remain votes (heat) available to this user in the current round.
+     *
+     * Added 20200529.
+     * @param int $hq
+     * @param int $user
+     */
+    public function heat_tally($hq, $user = null) {
+        global $USER, $CFG, $DB;
+
+        $params = array($hq->currentround->id, $hq->currentround->hotquestion, $USER->id);
+
+        $sql = "SELECT hqq.id AS questionid,
+                       COUNT(hqv.voter) AS heat,
+                       hqq.hotquestion AS hotquestionid,
+                       hqr.id AS round,
+                       hqq.content AS content,
+                       hqq.userid AS userid,
+                       hqv.voter AS voter,
+                       hqq.time AS time,
+                       hqq.anonymous AS anonymous,
+                       hqq.tpriority AS tpriority,
+                       hqq.approved AS approved
+                  FROM {hotquestion_rounds} hqr
+             LEFT JOIN {hotquestion_questions} hqq ON hqr.hotquestion=hqq.hotquestion
+             LEFT JOIN {hotquestion_votes} hqv ON hqv.question=hqq.id
+                  JOIN {user} u ON u.id = hqq.userid
+                 WHERE hqr.id = ?
+                   AND hqr.hotquestion = ?
+                   AND hqq.time > hqr.starttime
+                   AND hqr.endtime = 0
+                   AND hqv.voter = ?
+              GROUP BY hqq.id, hqr.id, hqv.voter, hqq.hotquestion, hqq.content,
+                       hqq.userid, hqv.voter, hqq.time, hqq.anonymous, hqq.tpriority,
+                       hqq.approved
+              ORDER BY hqq.hotquestion ASC, tpriority DESC, heat DESC";
+
+        $tally = count($DB->get_records_sql($sql, $params));
+
+        $results = ($hq->instance->heatlimit - $tally);
+        return $results;
+    }
+
+    /**
      * Open a new round and close the old one.
      */
     public function add_new_round() {
@@ -210,13 +307,12 @@ class mod_hotquestion {
         $context = context_module::instance($this->cm->id);
         $rid = $DB->insert_record('hotquestion_rounds', $new);
 
-        if ($CFG->version > 2014051200) { // Moodle 2.7+.
+        if ($CFG->version > 2014051200) { // If newer than Moodle 2.7+ use new event logging.
             $params = array(
                 'objectid' => $this->cm->id,
                 'context' => $context,
             );
-
-            $event = \mod_hotquestion\event\add_round::create($params);
+            $event = add_round::create($params);
             $event->trigger();
         } else {
             add_to_log($this->course->id, 'hotquestion', 'add round',
@@ -231,7 +327,13 @@ class mod_hotquestion {
     public function set_currentround($roundid = -1) {
         global $DB;
 
+        // Get all the rounds for this Hot Question.
         $rounds = $DB->get_records('hotquestion_rounds', array('hotquestion' => $this->instance->id), 'id ASC');
+
+        // 20210214 Get total number of rounds for the current Hot Question activity.
+        $this->roundcount = (count($rounds));
+
+        // If there are no rounds, it is a new Hot Question activity and we need to create the first round for it.
         if (empty($rounds)) {
             // Create the first round.
             $round = new StdClass();
@@ -244,15 +346,19 @@ class mod_hotquestion {
 
         if ($roundid != -1 && array_key_exists($roundid, $rounds)) {
             $this->currentround = $rounds[$roundid];
-
             $ids = array_keys($rounds);
             // Search previous round.
             $currentkey = array_search($roundid, $ids);
+            // 20210215 $currentkey contains the virtual number - 1 of the current round being looked at.
+            // Correct the virtual number by adding 1.
+            $this->currentroundx = $currentkey + 1;
+
             if (array_key_exists($currentkey - 1, $ids)) {
                 $this->prevround = $rounds[$ids[$currentkey - 1]];
             } else {
                 $this->prevround = null;
             }
+
             // Search next round.
             if (array_key_exists($currentkey + 1, $ids)) {
                 $this->nextround = $rounds[$ids[$currentkey + 1]];
@@ -296,6 +402,24 @@ class mod_hotquestion {
     }
 
     /**
+     * Return next round.
+     *
+     * @return object
+     */
+    public function get_roundcount() {
+        return $this->roundcount;
+    }
+
+    /**
+     * Return next round.
+     *
+     * @return object
+     */
+    public function get_currentroundx() {
+        return $this->currentroundx;
+    }
+
+    /**
      * Return questions according to $currentround.
      *
      * Sort order is priority descending, votecount descending,
@@ -308,15 +432,17 @@ class mod_hotquestion {
             $this->currentround->endtime = 0xFFFFFFFF;  // Hack.
         }
         $params = array($this->instance->id, $this->currentround->starttime, $this->currentround->endtime);
-        return $DB->get_records_sql('SELECT q.id, q.hotquestion, q.content, q.userid, q.time, q.anonymous, q.approved, q.tpriority, count(v.voter) as votecount
-                                     FROM {hotquestion_questions} q
-                                         LEFT JOIN {hotquestion_votes} v
-                                         ON v.question = q.id
-                                     WHERE q.hotquestion = ?
-                                        AND q.time >= ?
-                                        AND q.time <= ?
-                                     GROUP BY q.id, q.hotquestion, q.content, q.userid, q.time, q.anonymous, q.approved, q.tpriority
-                                     ORDER BY tpriority DESC, votecount DESC, q.time DESC', $params);
+        return $DB->get_records_sql('SELECT q.id, q.hotquestion, q.content, q.userid, q.time,
+            q.anonymous, q.approved, q.tpriority, count(v.voter) as votecount
+            FROM {hotquestion_questions} q
+            LEFT JOIN {hotquestion_votes} v
+            ON v.question = q.id
+            WHERE q.hotquestion = ?
+            AND q.time >= ?
+            AND q.time <= ?
+            GROUP BY q.id, q.hotquestion, q.content, q.userid, q.time,
+                     q.anonymous, q.approved, q.tpriority
+            ORDER BY tpriority DESC, votecount DESC, q.time DESC', $params);
     }
 
     /**
@@ -325,19 +451,26 @@ class mod_hotquestion {
      * @return object
      */
     public function remove_question() {
-        global $DB;
+        global $CFG, $DB;
 
         $data = new StdClass();
         $data->hotquestion = $this->instance->id;
         $context = context_module::instance($this->cm->id);
         // Trigger remove_question event.
-        $event = \mod_hotquestion\event\remove_question::create(array(
-            'objectid' => $data->hotquestion,
-            'context' => $context
-        ));
-        $event->trigger();
-        if (isset($_GET['q'])) {
-            $questionid = $_GET['q'];
+        if ($CFG->version > 2014051200) { // If newer than Moodle 2.7+ use new event logging.
+            $params = array(
+                'objectid' => $this->cm->id,
+                'context' => $context,
+            );
+            $event = remove_question::create($params);
+            $event->trigger();
+        } else {
+            add_to_log($this->course->id, 'hotquestion', 'remove question',
+                "view.php?id={$this->cm->id}&round=$rid", $rid, $this->cm->id);
+        }
+
+        if (null !== (required_param('q', PARAM_INT))) {
+            $questionid = required_param('q', PARAM_INT);
             $dbquestion = $DB->get_record('hotquestion_questions', array('id' => $questionid));
             $DB->delete_records('hotquestion_questions', array('id' => $dbquestion->id));
             // Get an array of all votes on the question that was just deleted, then delete them.
@@ -355,32 +488,40 @@ class mod_hotquestion {
      * @return nothing
      */
     public function remove_round() {
-        global $DB;
+        global $CFG, $DB;
 
         $data = new StdClass();
         $data->hotquestion = $this->instance->id;
         $context = context_module::instance($this->cm->id);
-        // Trigger remove_round event.
-        $event = \mod_hotquestion\event\remove_round::create(array(
-            'objectid' => $data->hotquestion,
-            'context' => $context
-        ));
-        $event->trigger();
+        // Trigger remove_question event.
+        if ($CFG->version > 2014051200) { // If newer than Moodle 2.7+ use new event logging.
+            $params = array(
+                'objectid' => $this->cm->id,
+                'context' => $context,
+            );
+            $event = remove_round::create($params);
+            $event->trigger();
+        } else {
+            add_to_log($this->course->id, 'hotquestion', 'remove round',
+                "view.php?id={$this->cm->id}&round=$rid", $rid, $this->cm->id);
+        }
 
-        $roundid = $_GET['round'];
+        $roundid = required_param('round', PARAM_INT);
         if ($this->currentround->endtime == 0) {
             $this->currentround->endtime = 0xFFFFFFFF;  // Hack.
         }
         $params = array($this->instance->id, $this->currentround->starttime, $this->currentround->endtime);
-        $questions = $DB->get_records_sql('SELECT q.id, q.hotquestion, q.content, q.userid, q.time, q.anonymous, q.approved, q.tpriority, count(v.voter) as votecount
-                                     FROM {hotquestion_questions} q
-                                         LEFT JOIN {hotquestion_votes} v
-                                         ON v.question = q.id
-                                     WHERE q.hotquestion = ?
-                                         AND q.time >= ?
-                                         AND q.time <= ?
-                                     GROUP BY q.id, q.hotquestion, q.content, q.userid, q.time, q.anonymous, q.approved, q.tpriority
-                                     ORDER BY votecount DESC, q.time DESC', $params);
+        $questions = $DB->get_records_sql('SELECT q.id, q.hotquestion, q.content, q.userid, q.time,
+            q.anonymous, q.approved, q.tpriority, count(v.voter) as votecount
+            FROM {hotquestion_questions} q
+            LEFT JOIN {hotquestion_votes} v
+            ON v.question = q.id
+            WHERE q.hotquestion = ?
+            AND q.time >= ?
+            AND q.time <= ?
+            GROUP BY q.id, q.hotquestion, q.content, q.userid, q.time, q.anonymous,
+                     q.approved, q.tpriority
+            ORDER BY votecount DESC, q.time DESC', $params);
 
         if ($questions) {
             foreach ($questions as $q) {
@@ -422,90 +563,143 @@ class mod_hotquestion {
 
     /**
      * Download questions.
-     * @param array $array
+     * @param array $chq
      * @param string $filename - The filename to use.
      * @param string $delimiter - The character to use as a delimiter.
      * @return nothing
      */
-    public function download_questions($array, $filename = "export.csv", $delimiter=";") {
+    public function download_questions($chq, $filename = "export.csv", $delimiter=";") {
         global $CFG, $DB, $USER;
         require_once($CFG->libdir.'/csvlib.class.php');
-        $data = new StdClass();
-        $data->hotquestion = $this->instance->id;
+
         $context = context_module::instance($this->cm->id);
         // Trigger download_questions event.
-        $event = \mod_hotquestion\event\download_questions::create(array(
-            'objectid' => $data->hotquestion,
-            'context' => $context
-        ));
-        $event->trigger();
+        if ($CFG->version > 2014051200) { // If newer than Moodle 2.7+ use new event logging.
+            $params = array(
+                'objectid' => $this->cm->id,
+                'context' => $context,
+            );
+            $event = download_questions::create($params);
+            $event->trigger();
+        } else {
+            add_to_log($this->course->id, 'hotquestion', 'download questions',
+                "view.php?id={$this->cm->id}&round=$rid", $rid, $this->cm->id);
+        }
 
-        // Construct sql query and filename based on admin or teacher.
+        // Construct sql query and filename based on admin or teacher/manager.
         // Add filename details based on course and HQ activity name.
         $csv = new csv_export_writer();
         $strhotquestion = get_string('hotquestion', 'hotquestion');
-        if (is_siteadmin($USER->id)) {
-            $whichhqs = ('AND hq.hotquestion > 0');
-            $csv->filename = clean_filename(get_string('exportfilenamep1', 'hotquestion'));
-        } else {
-            $whichhqs = ('AND hq.hotquestion = ');
-            $whichhqs .= ($this->instance->id);
-            $csv->filename = clean_filename(($this->course->shortname).'_');
-            $csv->filename .= clean_filename(($this->instance->name));
-        }
-        $csv->filename .= clean_filename(get_string('exportfilenamep2', 'hotquestion').gmdate("Ymd_Hi").'GMT.csv');
 
         $fields = array();
 
-        $fields = array(get_string('firstname'),
-                        get_string('lastname'),
-                        get_string('userid', 'hotquestion'),
-                        get_string('hotquestion', 'hotquestion'),
-                        get_string('question', 'hotquestion'),
-                        get_string('time', 'hotquestion'),
-                        get_string('anonymous', 'hotquestion'),
-                        get_string('teacherpriority', 'hotquestion'),
-                        get_string('heat', 'hotquestion'),
-                        get_string('approvedyes', 'hotquestion'),
-                        get_string('content', 'hotquestion'));
-        // Add the headings to our data array.
-        $csv->add_data($fields);
+        if (is_siteadmin($USER->id)) {
+            // Add fields with HQ default labels since admin will list ALL site questions.
+            $fields = array(get_string('firstname'),
+                            get_string('lastname'),
+                            get_string('userid', 'hotquestion'),
+                            get_string('hotquestion', 'hotquestion').' ID',
+                            get_string('question', 'hotquestion').' ID',
+                            get_string('time', 'hotquestion'),
+                            get_string('anonymous', 'hotquestion'),
+                            get_string('teacherpriority', 'hotquestion'),
+                            get_string('heat', 'hotquestion'),
+                            get_string('approvedyes', 'hotquestion'),
+                            get_string('content', 'hotquestion')
+                            );
+            // For admin we want every hotquestion activity.
+            $whichhqs = ('AND hq.hotquestion > 0');
+            $csv->filename = clean_filename(get_string('exportfilenamep1', 'hotquestion'));
 
-        $guestfirstname = "CONCAT(u.lastname, 'Anonymous')";
-        $questiontime = "FROM_UNIXTIME(hq.time)";
-        switch($CFG->dbtype) {
-            case 'pgsql':
-                $guestfirstname = "u.lastname || 'Anonymous'";
-                $questiontime = "to_char(to_timestamp(hq.time), 'YYYY-MM-DD HH24:MI:SS')";
-                break;
-            case 'sqlsrv':
-                $questiontime = "convert(varchar, DATEADD(second, (hq.time - DATEDIFF(second, GETDATE(), GETUTCDATE())), CAST('1970-01-01 00:00:00' as datetime)), 120)";
-                break;
+            // 20200524 Add info to our data array and denote this is ALL site questions.
+            $activityinfo = array(null, null, null, null, null,
+                                  null, null, null, null, null,
+                                  get_string('exportfilenamep1', 'hotquestion').
+                                  get_string('exportfilenamep2', 'hotquestion').
+                                  gmdate("Ymd_Hi").get_string('for', 'hotquestion').
+                                  $CFG->wwwroot);
+            $csv->add_data($activityinfo);
+        } else {
+            // Add fields with the column labels for ONLY the current HQ activity.
+            $fields = array(get_string('firstname'),
+                            get_string('lastname'),
+                            get_string('userid', 'hotquestion'),
+                            get_string('hotquestion', 'hotquestion').' ID',
+                            get_string('question', 'hotquestion').' ID',
+                            get_string('time', 'hotquestion'),
+                            get_string('anonymous', 'hotquestion'),
+                            $this->instance->teacherprioritylabel,
+                            $this->instance->heatlabel,
+                            $this->instance->approvallabel,
+                            $this->instance->questionlabel,
+                            );
+
+            $whichhqs = ('AND hq.hotquestion = ');
+            $whichhqs .= (':thisinstid');
+
+            $csv->filename = clean_filename(($this->course->shortname).'_');
+            $csv->filename .= clean_filename(($this->instance->name));
+            // 20200513 Add the course shortname and the HQ activity name to our data array.
+            $activityinfo = array(get_string('course').': '
+                                  .$this->course->shortname,
+                                  get_string('activity').': '
+                                  .$this->instance->name);
+            $csv->add_data($activityinfo);
         }
 
-        $sql = "SELECT hq.id AS question,
-                    CASE
-                        WHEN u.firstname = 'Guest user'
-                        THEN $guestfirstname
-                        ELSE u.firstname
-                    END AS 'firstname',
-                        u.lastname AS 'lastname',
-                        hq.hotquestion AS hotquestion,
-                        hq.content AS content,
-                        hq.userid AS userid,
-                        $questiontime AS TIME,
-                        hq.anonymous AS anonymous,
-                        hq.tpriority AS tpriority,
-                        COUNT(hv.voter) AS heat,
-                        hq.approved AS approved
-                    FROM {hotquestion_questions} hq
-                    LEFT JOIN {hotquestion_votes} hv ON hv.question=hq.id
-                    JOIN {user} u ON u.id = hq.userid
-                    WHERE hq.userid > 0";
+        $csv->filename .= clean_filename(get_string('exportfilenamep2', 'hotquestion').gmdate("Ymd_Hi").'GMT.csv');
+
+        // Add the column headings to our data array.
+        $csv->add_data($fields);
+        // Now add this instance id that's needed in the sql for teachers and managers downloads.
+        $fields = array($fields, 'thisinstid' => $this->instance->id);
+
+        if ($CFG->dbtype == 'pgsql') {
+            $sql = "SELECT hq.id AS question,
+                      CASE
+                           WHEN u.firstname = 'Guest user'
+                           THEN u.lastname || 'Anonymous'
+                           ELSE u.firstname
+                       END AS firstname,
+                           u.lastname AS lastname,
+                           hq.hotquestion AS hotquestion,
+                           hq.content AS content,
+                           hq.userid AS userid,
+                           to_char(to_timestamp(hq.time), 'YYYY-MM-DD HH24:MI:SS') AS time,
+                           hq.anonymous AS anonymous,
+                           hq.tpriority AS tpriority,
+                           COUNT(hv.voter) AS heat,
+                           hq.approved AS approved
+                     FROM {hotquestion_questions} hq
+                LEFT JOIN {hotquestion_votes} hv ON hv.question=hq.id
+                     JOIN {user} u ON u.id = hq.userid
+                    WHERE hq.userid > 0 ";
+        } else {
+            $sql = "SELECT hq.id AS question,
+                      CASE
+                           WHEN u.firstname = 'Guest user'
+                           THEN CONCAT(u.lastname, 'Anonymous')
+                           ELSE u.firstname
+                       END AS 'firstname',
+                           u.lastname AS 'lastname',
+                           hq.hotquestion AS hotquestion,
+                           hq.content AS content,
+                           hq.userid AS userid,
+                           FROM_UNIXTIME(hq.time) AS TIME,
+                           hq.anonymous AS anonymous,
+                           hq.tpriority AS tpriority,
+                           COUNT(hv.voter) AS heat,
+                           hq.approved AS approved
+                     FROM {hotquestion_questions} hq
+                LEFT JOIN {hotquestion_votes} hv ON hv.question=hq.id
+                     JOIN {user} u ON u.id = hq.userid
+                    WHERE hq.userid > 0 ";
+        }
 
         $sql .= ($whichhqs);
-        $sql .= "     GROUP BY u.lastname, u.firstname, hq.hotquestion, hq.id, hq.content, hq.userid, hq.time, hq.anonymous, hq.tpriority, hq.approved
-                      ORDER BY hq.hotquestion ASC, hq.id ASC, tpriority DESC, heat";
+        $sql .= " GROUP BY u.lastname, u.firstname, hq.hotquestion, hq.id, hq.content,
+                           hq.userid, hq.time, hq.anonymous, hq.tpriority, hq.approved
+                  ORDER BY hq.hotquestion ASC, hq.id ASC, tpriority DESC, heat";
 
         // Add the list of users and HotQuestions to our data array.
         if ($hqs = $DB->get_records_sql($sql, $fields)) {
@@ -570,12 +764,12 @@ class mod_hotquestion {
 /**
  * Count questions in current rounds.
  * Counts all the hotquestion entries (optionally in a given group)
+ * and is called from index.php.
  * @param var $hotquestion
  * @param int $groupid
  * @return nothing
  */
 function hotquestion_count_entries($hotquestion, $groupid = 0) {
-
     global $DB, $CFG, $USER;
 
     $cm = hotquestion_get_coursemodule($hotquestion->id);
@@ -583,44 +777,58 @@ function hotquestion_count_entries($hotquestion, $groupid = 0) {
     // Get the groupmode which should be 0, 1, or 2.
     $groupmode = ($hotquestion->groupmode);
 
-    // How many users and questions in each Hot Question activity current round?
+    // If user is in a group, how many users and questions in each Hot Question activity current round?
     if ($groupid && ($groupmode > '0')) {
+
         // Extract each group id from $groupid and process based on whether viewer is a member of the group.
         // Show user and question counts only if a member of the current group.
         foreach ($groupid as $gid) {
-            $sql = "SELECT COUNT(DISTINCT hq.userid) AS ucount, COUNT(DISTINCT hq.content) AS qcount FROM {hotquestion_questions} hq
-                JOIN {groups_members} g ON g.userid = hq.userid
-                JOIN {user} u ON u.id = g.userid
-                LEFT JOIN {hotquestion_rounds} hr ON hr.hotquestion=hq.hotquestion
-                WHERE hq.hotquestion = $hotquestion->id
-                    AND g.groupid = '$gid->id'
-                    AND hr.endtime=0
-                    AND hq.time>=hr.starttime
-                    AND hq.userid>0";
-            $hotquestions = $DB->get_records_sql($sql);
+            $sql = "SELECT COUNT(DISTINCT hq.userid) AS ucount,
+                     COUNT(DISTINCT hq.content) AS qcount
+                      FROM {hotquestion_questions} hq
+                      JOIN {groups_members} g ON g.userid = hq.userid
+                      JOIN {user} u ON u.id = g.userid
+                 LEFT JOIN {hotquestion_rounds} hr ON hr.hotquestion=hq.hotquestion
+                     WHERE hq.hotquestion = :hqid
+                           AND g.groupid = :gidid
+                           AND hr.endtime=0
+                           AND hq.time>=hr.starttime
+                           AND hq.userid>0";
+            $params = array();
+            $params = ['hqid' => $hotquestion->id] + ['gidid' => $gid->id];
+            $hotquestions = $DB->get_records_sql($sql, $params);
         }
+
     } else if (!$groupid && ($groupmode > '0')) {
+
         // Check all the entries from the whole course.
         // If not currently a group member, but group mode is set for separate groups or visible groups,
         // see if this user has posted anyway, posted before mode was changed or posted before removal from a group.
         $sql = "SELECT COUNT(DISTINCT hq.userid) AS ucount, COUNT(DISTINCT hq.content) AS qcount FROM {hotquestion_questions} hq
-                JOIN {user} u ON u.id = hq.userid
-                LEFT JOIN {hotquestion_rounds} hr ON hr.hotquestion=hq.hotquestion
-                WHERE hq.hotquestion = '$hotquestion->id'
-                    AND hr.endtime=0
-                    AND hq.time>=hr.starttime
-                    AND hq.userid='$USER->id'";
-        $hotquestions = $DB->get_records_sql($sql);
+                  JOIN {user} u ON u.id = hq.userid
+             LEFT JOIN {hotquestion_rounds} hr ON hr.hotquestion=hq.hotquestion
+                 WHERE hq.hotquestion = :hqid
+                       AND hr.endtime = 0
+                       AND hq.time >= hr.starttime
+                       AND hq.userid = :userid";
+
+        $params = array();
+        $params = ['hqid' => $hotquestion->id] + ['userid' => $USER->id];
+        $hotquestions = $DB->get_records_sql($sql, $params);
+
     } else {
+
         // Check all the users and entries from the whole course.
         $sql = "SELECT COUNT(DISTINCT hq.userid) AS ucount, COUNT(DISTINCT hq.content) AS qcount FROM {hotquestion_questions} hq
-                JOIN {user} u ON u.id = hq.userid
-                LEFT JOIN {hotquestion_rounds} hr ON hr.hotquestion=hq.hotquestion
-                WHERE hq.hotquestion = '$hotquestion->id'
-                    AND hr.endtime=0
-                    AND hq.time>=hr.starttime
-                    AND hq.userid>0";
-        $hotquestions = $DB->get_records_sql($sql);
+                  JOIN {user} u ON u.id = hq.userid
+             LEFT JOIN {hotquestion_rounds} hr ON hr.hotquestion=hq.hotquestion
+                 WHERE hq.hotquestion = :hqid
+                       AND hr.endtime = 0
+                       AND hq.time >= hr.starttime
+                       AND hq.userid > 0";
+        $params = array();
+        $params = ['hqid' => $hotquestion->id];
+        $hotquestions = $DB->get_records_sql($sql, $params);
     }
 
     if (!$hotquestions) {
@@ -628,6 +836,7 @@ function hotquestion_count_entries($hotquestion, $groupid = 0) {
     }
     $canadd = get_users_by_capability($context, 'mod/hotquestion:ask', 'u.id');
     $entriesmanager = get_users_by_capability($context, 'mod/hotquestion:manageentries', 'u.id');
+    // If not enrolled or not an admin, teacher, or manager, then return nothing.
     if ($canadd || $entriesmanager) {
         return ($hotquestions);
     } else {
@@ -649,16 +858,20 @@ function hq_available($hotquestion) {
 /**
  * Returns the hotquestion instance course_module id
  *
+ * Called from function hotquestion_count_entries().
  * @param var $hotquestionid
  * @return object
  */
 function hotquestion_get_coursemodule($hotquestionid) {
-
     global $DB;
-
-    return $DB->get_record_sql("SELECT cm.id FROM {course_modules} cm
-								JOIN {modules} m ON m.id = cm.module
-								WHERE cm.instance = '$hotquestionid' AND m.name = 'hotquestion'");
+    $sql = "SELECT cm.id
+              FROM {course_modules} cm
+              JOIN {modules} m ON m.id = cm.module
+             WHERE cm.instance = :hqid
+               AND m.name = 'hotquestion'";
+    $params = array();
+    $params = ['hqid' => $hotquestionid];
+    return $DB->get_record_sql($sql, $params);
 }
 
 /**
@@ -677,7 +890,9 @@ function hotquestion_update_calendar(stdClass $hotquestion, $cmid) {
     $event = new stdClass();
     $event->eventtype = HOTQUESTION_EVENT_TYPE_OPEN;
     // The HOTQUESTION_EVENT_TYPE_OPEN event should only be an action event if no close time is specified.
-    $event->type = empty($hotquestion->timeclose) ? CALENDAR_EVENT_TYPE_ACTION : CALENDAR_EVENT_TYPE_STANDARD;
+    if ($CFG->branch > 32) {
+        $event->type = empty($hotquestion->timeclose) ? CALENDAR_EVENT_TYPE_ACTION : CALENDAR_EVENT_TYPE_STANDARD;
+    }
     if ($event->id = $DB->get_field('event', 'id',
         array('modulename' => 'hotquestion', 'instance' => $hotquestion->id, 'eventtype' => $event->eventtype))) {
         if ((!empty($hotquestion->timeopen)) && ($hotquestion->timeopen > 0)) {
@@ -717,7 +932,9 @@ function hotquestion_update_calendar(stdClass $hotquestion, $cmid) {
 
     // Hotquestion end calendar events.
     $event = new stdClass();
-    $event->type = CALENDAR_EVENT_TYPE_ACTION;
+    if ($CFG->branch > 32) {
+        $event->type = CALENDAR_EVENT_TYPE_ACTION;
+    }
     $event->eventtype = HOTQUESTION_EVENT_TYPE_CLOSE;
     if ($event->id = $DB->get_field('event', 'id',
         array('modulename' => 'hotquestion', 'instance' => $hotquestion->id, 'eventtype' => $event->eventtype))) {
@@ -758,3 +975,4 @@ function hotquestion_update_calendar(stdClass $hotquestion, $cmid) {
 
     return true;
 }
+

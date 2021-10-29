@@ -1,0 +1,401 @@
+=== 4.0.1 ===
+20210516 Hot Question_695 - Invalid get_string() identifier: 'hotquestion:rate'.
+    Added the missing string.
+20210516 Hot Question_723 - Invalid get_string() identifier: 'hotquestion:comment'.
+    Added the missing string.
+20210823 Hot Question_751 - user_picture::fields() is deprecated. Please use the
+    \core_user\fields API instead. For compatibility, added an if check to use the new
+    code for Moodle > 3.0 the old code for 3.0 and below.
+20211001 Hot Question_752 - need to format_text of the submit directions. Changed the
+    code to include format_text, in mod_form.php down around line 236.
+
+=== 4.0.0 ===
+20210321 Hot Question_561 See about using editor text area to allow for formatting
+    and emoji's. Got it working in just a couple of hours, mostly looking for the
+    best place to add the code. Does not support audio and video recording. Will do
+    that, hopefully, in a later release.
+
+=== 3.9.2 ===
+20210215 HotQuestion_669, Need round indicator between the round nav icons. Completed
+    development. Needs further testing and cleanup. Added string, xofn = " of ". Code
+    in locallib.php and render.php.
+
+=== 3.9.1 ===
+20201217 HotQuestion_661, Github issue 45 feature request - hide student names.
+    implemented new setting for this. Actual code is in renderer.php.
+
+=== 3.9.0 ===
+05/25/2020 Starting development for HotQuestion_410, New mode request to limit
+    number of votes per round.
+05/25/2020 HotQuestion_410, New mode request to limit number of votes per round,
+    added code for site settings, activity settings, and modified install.xml.
+05/26/2020 HotQuestion_491, Need to add missing fields to backup_hotquestion_stepslib.php,
+    Added missing fields.
+05/26/2020 HotQuestion_491, Need to verify backup includes all information, and a
+    restore seems to include everything as expected.
+05/28/2020 HotQuestion_410, New mode request to limit number of votes per round, is
+    ready for testing.
+05/29/2020 HotQuestion_410, New mode request to limit number of votes per round, fixed
+    sql that was allowing to count ALL votes instead of just current round votes.
+06/08/2020 Started work on HotQuestion_496, HotQuestion - Need a Remove my vote capability.
+    Added language string, $string['removevote'] = 'Remove my vote';
+    Added code in render.php to show the remove icon for any question for
+    which the user has voted.
+    Added public function remove_vote($question) in locallib.php.
+    Added trigger event for remove vote.
+    Added classes/event/remove_vote.php file for log.
+    Added eventremovevote string
+    Votes can be removed and the event is logged.
+06/08/2020 HotQuestion_496, HotQuestion - Need a Remove my vote capability is being tested.
+
+=== 3.8.2 ===
+05/22/2020 Started dev on v 3.8.2 and began moving tickets from User Support
+Tracker into Hot Question Support Tracker.
+05/22/2020 Published all of the following tickets to Hot Question github.
+    HotQuestion_476 $this->instance->id should NOT be concatenated directly to SQL.
+    HotQuestion_405 Need to remove this instance id in heading row, column L.
+    HotQuestion_403 CSV download headings Hotquestion, Questions and Content are incorrect.
+    HotQuestion_401 Teacher/Manager download needs to use new column labels.
+    HotQuestion_400 Approved column heading on view.php should be an activity setting.
+    HotQuestion_399 Remove column heading on view.php should be an activity setting.
+    HotQuestion_398 Heat column heading on view.php should be an activity setting.
+    HotQuestion_397 Priority column heading on view.php should be an activity setting.
+    HotQuestion_396 Questions column heading on view.php should be an activity setting.
+05/22/2020 Converted TRK1_219 to HotQuestion_477, locallib.php need SQL fixes.
+05/22/2020 Converted TRK1_283 to HotQuestion_478, Need to add more info to events.
+05/22/2020 Converted TRK1_359 to HotQuestion_479, need to move locallib.php
+    functions to .../classes/...
+05/22/2020 Converted TRK1_383 to HotQuestion_480, Round does no seem to be
+    in csv download.
+05/22/2020 Converted TRK1_28 to HotQuestion_481, module.js errors and warnings
+    need to be fixed.
+05/22/2020 Converted TRK1_227 to HotQuestion_482, Need Who Voted toolbutton.
+05/22/2020 Converted TRK1_226 to HotQuestion_483, Investigate making old round
+    the current round.
+05/22/2020 Converted TRK1_128 to HotQuestion_484, Need to update GDPR Code.
+05/22/2020 Converted TRK1_142 to HotQuestion_485, Activity heading does not
+    include help.
+05/22/2020 Converted TRK1_136 to HotQuestion_486, Need to update Behat tests
+    for new remove confirmation
+05/22/2020 Converted TRK1_104 to HotQuestion_487, Need to implement Comments.
+05/22/2020 Converted TRK1_83 to HotQuestion_488, Need Groups and Priority
+    added to Behat Tests.
+05/22/2020 Converted TRK1_82 to HotQuestion_489, Need Behat Tests for Approval Testing.
+05/25/2020 HotQuestion_402, Admin download needs to use appropriate column labels,
+    changed to resolved.
+05/25/2020 HotQuestion_477, locallib.php need SQL fixes, changed to resolved. 
+05/25/2020 HotQuestion_401, Teacher/Manager download needs to use new column labels,
+    changed to resolved. 
+05/25/2020 HotQuestion_476, $this->instance->id should NOT be concatenated directly
+    to SQL, changed to resolved. 
+05/25/2020 HotQuestion_400, Approved column heading on view.php should be an
+    activity setting, changed to resolved. 
+05/25/2020 HotQuestion_399, Remove column heading on view.php should be an
+    activity setting, changed to resolved.
+05/25/2020 HotQuestion_398, Heat column heading on view.php should be an
+    activity setting, changed to resolved.
+05/25/2020 HotQuestion_397, Priority column heading on view.php should be an
+    activity setting, changed to resolved.
+05/25/2020 HotQuestion_396, Questions column heading on view.php should be an
+    activity setting, changed to resolved.
+05/25/2020 HotQuestion_403, CSV download headings Hotquestion, Questions and
+    Content are incorrect, changed to resolved.
+05/25/2020 HotQuestion_405, Need to remove this instance id in heading row,
+    column L, changed to resolved.
+
+=== 3.8.1 ===
+04/30/2020 Got an email regarding issue #39 on github for Hot Question.
+04/30/2020 Finished TRK1_384, Hot Question - Need to eliminate 3 occurrences
+of $_GET, all three are in locallib.php.
+05/02/2020 Finished TRK1_386, Hot Question - variables $hotquestion->id,
+$gid->id and $USER->id are concatenated directly to SQL, and pushed to github.
+05/03/2020 Finished TRK1_385, Hot Question - $this->instance->id should NOT be
+concatenated directly to SQL, and started testing nr HQ RC.
+05/03/2020 Finished TRK1_387, Hot Question - variable $hotquestionid is
+concatenated directly to SQL, and pushed to github.
+05/03/2020 Finished TRK1_390, Hot Question - Index.php, should add hidden
+label to hidden HQ's that adds a slashed eye in the list generated by 
+index.php, when the HQ activity is hidden from students or regular users.
+05/03/2020 Finished TRK1_389, Hot Question - index.php does not show Topic Name
+for topic zero. Old code was skipping name of topic zero. New code shows it.
+05/04/2020 Ran codehecker and phpchecker and fixed as needed. Pushed to github.
+05/11/2020 Added database fields to allow changing the column headings
+used on the view.php page.
+05/11/2020 Made needed changes to the settings.php and language strings
+the new column heading settings.
+05/12/2020 Made changes to mod_form.php, settings.php, hotquestion.php, and
+renderer.php to complete code changes needed for allowing each Hot Question
+activity to have column headings that more closely reflect what the activity
+is being used for. e.g. The regular, Questions, column on view.php, is more
+meaningful if it is changed to, Suggestions, when HQ is being used as
+a suggestion box.
+05/12/2020 TRKR_HQ_401 Modified code in locallib.php for the
+function download_questions to fix column heading errors for teachers.
+05/12/2020 TRKR_HQ_402, TRKR_HQ_403 Modified code in locallib.php for the
+function download_questions to fix column heading errors and to use the new
+headings elsewhere.
+
+
+
+TODO add settings to mod_form.php
+
+=== 3.8.0 ===
+11/21/19 Made changes in locallib.php to fix linelength error in two functions 
+Changed line 317 of function get_questions() - tested - still works.
+Changed line 395 of function remove_round() - tested - still works.
+11/21/19 In file upgrade.txt, I changed all the "\r\n" to just "\n" using replace all,
+without any apparent problems. I also made a bunch of line length changes due to
+codechecker recommendations. Made multiple entries to make sure I did not break something.
+11/22/19 Added settings for Teacher Priority visibility and for Heat visibility. This
+required some new language strings, two new fields in the mdl_hotquestion table,
+and multiple lines of new code in renderer.php. It also required changes in the
+install.xml file, the upgrade.php file, and the backup_hotquestion_stepslib.php file.
+11/23/19 Added the two new settings to the settings.php file. Ran codechecker and
+did code cleanup as needed.
+The final change was to bump the version to 3.8.0 and push to github.
+
+=== 3.7.0 ===
+10/31/19 Rewrote event code for the Hot Question index.php file.
+10/31/19 Rewrote event code for the Hot Question view.php file.
+10/31/19 Bumped version to 3.7.0.
+11/07/19 Pushed change to settings.php file. Wording error.
+11/07/19 Modified event code for update_vote and add_question in the
+locallib.php file, and pushed to github.
+11/09/19 Checked and modified as nescessary other event codes in the
+locallib.php file, and pushed the changes to github.
+
+=== 3.6.1 ===
+10/18/19 Added pull request from Vidalia to fix invalid GROUP BY issue
+with MSSQL/sqlsrv databases #37
+10/18/19 Pushed to github.
+
+=== 3.6.0 ===
+05/28/19 Removed duplicate blank line in lib.php.
+06/24/19 Accepted pull request, from lucaboesch, that added a new string for a
+link to, More Help info about Hot Question. Link is visible when adding a new
+Hot Question activity. The help is not available for M28, M29, and M30. The
+More help starts showing up in Moodle 3.1.
+06/24/19 Fix comment error in locallib.php line 333.
+06/24/19 Added code for "Confirm you want to start a new round?" in renderer.php.
+06/24/19 Pushed everything to github and released version 3.6.0.
+
+=== 3.5.3+ ===
+02/11/19 Released 3.5.3 with a couple of the wrong files so made + release.
+02/15/19 Discovered that the $mootyper->id was not being set at the correct
+point in the code which caused debug error when creating a new HotQuestion
+activity in a course. Created fix based off fixing the same problem in
+the code for MooTyper.
+02/16/19 Pushed changes to github and released another 3.5.3+ version.
+
+=== 3.5.3 ===
+02/08/19 Added code for "Confirm you want to delete this entry" in renderer.php.
+02/08/19 Added code for "Confirm you want to delete this round" in renderer.php.
+02/11/19 Pushed everything to github and released version 3.5.3.
+
+
+=== 3.5.2 ===
+06/25/18 Added code to turn on Automatic View activity completion.
+10/07/18 Removed whitespace in provider.php.
+10/07/18 Added phpdoc for parameter array $subcontext in line 214 provider.php.
+10/07/18 Replaced arguments.caller with whoCalled.caller in five places in module.js.
+10/10/18 Got emails regarding two issues when using PostgreSQL. Got a temporary
+fix for the quotes, concat, and timestamp issues. Will still need dev work for a
+release version. The other, language string issue, took about four hours just to
+find where the "Post" button and string was invoked at line 100 in mod_form.php.
+During the search for the string, I have discovered that I probably do NOT
+need the module.js file at all! 
+Also added Teacher Priority to question download CSV file.
+Also changed renderer.php to use pix_url or image_url as needed.
+11/18/18 Tower 1, Pi-6, 10.0.6.236/moodle33dev has my changes for now.
+11/23/18 Moodlexx is 3.4.5+ and the HQ on it is 3.5.1, but I have updated
+the behat tests on it for the change from "Post" to "Click to post" on the button.
+11/24/18 Pushed PostgreSQL fix and changed behat tests to github.
+11/27/18 Pushed latest SQL fixes to work with PostgreSQL and MariaDB/MySQL.
+Updated README.md file and pushed it. Added width and height styles to
+the thumbs up/down for tpriority and the thumbs up for heat so they
+appear normal 16x16 size in Moodle 3.6.
+11/28/18 Had to revise 5 Behat tests to make them work in Moodle 3.6. and
+other Moodle versions. Pushed to Github.
+11/28/18 Made test release version 3.5.2.
+
+
+=== 3.5.1 ===
+06/04/18 Fixed GDPR provider.php polyfill error.
+06/04/18 Pushed changes to github.
+06/04/18 Released version 3.5.1 with GDPR.
+
+=== 3.5.0 ===
+04/16/18 Began development of GDPR code for Hot Question
+05/01/18 Have GDPR for HQ giving results for questions. Now need to add votes.
+05/02/18 Added new strings needed for, Plugin privacy registry, listing.
+05/03/18 Modified $SQL in privacy.php.
+05/04/18 Reorganized and changed wording of new strings for Plugin privacy registry.
+05/24/18 Accidently deleted all GDPR changes and had to start over.
+05/25/18 Added back strings and got GDPR for questions data export working.
+05/26/18 Added code for votes data export.
+05/26/18 Added code for user data delete.
+05/26/18 Pushed changes to github.
+05/27/18 Code style cleanup and push to github.
+05/27/18 Changed export_user_data so data is separated into data.json,
+questions.json, and votes.json.
+05/27/18 Released version 3.5.0.
+
+=== 3.4.1 ===
+05/16/18 Changed, return YAHOO.lang.trim(question); in module.js line 99
+so it is now just, return trim(question); and it seems to work okay.
+Actually, does not seem to be needed. Just, return (question); seems fine.
+
+=== 3.4.0 ===
+12/16/17 Added code to check Moodle version then use correct code to get the
+correct picture for vote, remove, and approve.
+12/29/17 Got priority to work.
+12/31/17 Got groups to work.
+12/31/17 Checked on Moodle 2.8 and 2.9.
+01/01/18 Completed code cleanup.
+01/01/18 Created 3.4.0 for release.
+01/06/18 Last minute fixes for 3.4.0 release.
+
+
+=== 3.3.2 ===
+12/24/17 Added approval field to mdl-hotquestion table.
+12/24/17 Added approval setting to mod_form.php.
+12/24/17 Added approval and approvalhelp strings.
+12/24/17 Added approval field to backup_hotquestion_stepslib.php.
+Added case for approval to view.php.
+Added public function for approval in locallib.php. - still needs work.
+Added steps in render to add approval column.
+Modified render.php, locallib.php, and language file as needed to finish approval.
+12/25/17 Have individual question approval toggle working as of today.
+12/25/17 Released version 3.3.2.
+
+=== 3.3.1 ==
+10/26/17 Published new version for early bird Moodle 3.4.
+
+=== 3.3.0 ===
+6/28/17 Fixed a few code style errors in module.js.
+6/28/17 Fixed deprecated use of pix_url and changed them to image_url.
+6/28/17 Pushed new version to github.
+
+=== 3.2.2 ===
+6/25/17 Rewrote Export to csv code becasue of MS Excel bug when first record is "ID".
+6/26/17 Rewrote most of the Behat tests to add code that checks log entries. All pass,
+but the two download ones glitch once in a while. Probably need a wait, somewhere.
+6/26/17 Double checked and fixed as needed code style and php documentation.
+
+=== 3.2.1 ===
+5/14/17 Fixed additional code style and documentation that were missed during rush to publish 3.2.0.
+5/14/17 Moved Remove question log event to be fore the code doing the removal so the log entry was actually being made.
+5/15/17 Moved code for Remove question log event trigger from view.php to the remove_question
+function in locallib.php so that it works like the event for remove_round.
+
+5/15/17 Currently working on "Are you sure" code for Remove Question and Remove Round. deferred
+
+
+=== 3.2.0 ===
+5/3/17 Fixed error in backup. Line 54 of backup_hotquestion_stepslib.php was missing the new submitdirections field.
+5/4/17 Fixed missing spaces in sytles.css, lines 12, 17, and 22.
+5/4/17 Added missing semi colons in module.js, lines 39, 58, 64, 80, 85, 95, and 132.
+5/4/17 Removed whitespace at end of line 26 and 28 in backup_hotquestion_activity_task.class.php.
+5/4/17 Removed whitespace at end of line 26 in restore_hotquestion_stepslib.php.
+=== 3.1.1 ===
+2/11/17 Added Help button to Submit your question here: setting on edit page of the activity.
+4/27/17 Code doc cleanup lib.php, starting at line 358, switch/case, to get rid of warnings and errors.
+4/27/17 Code doc cleanup settings.php line 20&21 combined to correct verson line 20.
+4/27/17 Code doc cleanup renderer.php.
+4/27/17 Code style cleanup localib.php.
+4/27/17 Code style cleanup mod_form.php.
+4/27/17 Code doc and style cleanup upgrade.php.
+4/28/17 Code style cleanup add_round.php, remove_question.php and remove_round.php.
+4/30/17 Code style cleanup .../backup/moodle2/backup_hotquestion_activity_task.class.php.
+4/30/17 Code style cleanup .../backup/moodle2/backup_hotquestion_settingslib.php.
+4/30/17 Code style cleanup .../backup/moodle2/backup_hotquestion_stepslib.php.
+4/30/17 Code style cleanup .../backup/moodle2/restore_hotquestion_stepslib.php.
+4/30/17 Code style cleanup .../db/upgrade.php.
+4/30/17 Code style cleanup ...renderer.php
+4/30/17 Code style cleanup ...module.js
+4/30/17 Code doc cleanup ...renderer.php
+5/2/17 Code doc cleanup all the files in ...mod/hotquestion
+5/2/17 Code doc cleanup all the files in ...mod/hotquestion/classes
+5/2/17 Code doc cleanup all the files in ...mod/hotquestion/db
+5/3/17 Code doc cleanup all the files in ...mod/hotquestion/backup/Moodle2/
+
+=== 3.1.0 ===
+10/1/16 Added checkbox to the modedit.php page so that, "Display description on course page" is available.
+10/2/16 Added availability dates for Open time and Close time, which also added a number of new language strings.
+10/3/16 Updated the upgrade.php file to add timeopen and timeclose fields.
+10/4/16 Added code for a config setting for changing, "Submit your question here:" to whatever
+admin wants it to be for the whole site.
+10/5/16 Added code to include activity title when viewing the activity.
+10/5/16 Added code to allow teachers to change, "Submit your question here:" to whatever the
+teacher wants when creating a Hot Question activity, and it is now working.
+10/6/16 Added new alternate version of the activity icon (alticon.svg) provided by Kathrin84.
+To use it, remove icon.svg and change the name of alticon.svg to icon.svg. Clear cache to see the new icon.
+
+=== 3.0.3 ===
+04/15/16 Added "Participation in current round" column to the index.php list of Hot Question
+activities. For each HQ Activity it reports "X user(s) posted Y question(s)." in the new column.
+04/16/16 Bug fix. Added code to the remove_round function so that no matter which round you delete, you
+will always have an open round to add to. Before, if you deleted the current round, and typed in a question
+without starting a new round, it would just get lost.
+
+=== 3.0.2 ===
+3.0.2 (Build: 2016040100) (2016040100)Moodle 2.9, 3.0
+Release date: Saturday, 2 April 2016, 1:27 PM
+
+04/01/16 Converted both parts of the csv filename constant text to strings
+and modified code to use them.
+04/01/16 Added case handler, toolbutton, and renderer for remove_round capability.
+04/01/16 Pushed alpha code to master branch for remove_round. Just goes through
+the needed steps and works, except for the actual removal of data.
+04/02/16 Completed coding for remove_round along with adding new language strings,
+events, and triggers.
+Added details about new capabilities to READEME.md file
+04/02/16 Released MOODLE_302_STABLE branch.
+
+=== 3.0.1 ===
+3.0.1 (Build: 2016033000) (2016033000)Moodle 2.9, 3.0
+Release date: Thursday, March 31, 2016, 12:15 AM
+
+03/25/16 Added download button to the toolbar for Export to .csv file. Not working yet, though.
+03/26/16 Add a remove column to the renderer.php page that shows when viewing via view.php page.
+Does NOT show for students.
+03/26/16 Added action = remove, to the view.php page. Uses a X icon right now. 
+03/26/16 Removing a question also removes any/all votes for it.
+03/26/16 Added event and trigger for logging the removal of a question and it's votes.
+03/28/16 Added question download - currently downloads all questions.
+03/29/16 Modified question download - admin downloads all - teacher and manager downloads the
+current HQ activity.
+03/29/16 Added trigger and log event for downloading questions.
+03/29/16 Added details about new capabilities to READEME.md file.
+
+=== 3.0 ==
+3.0 (Build: 2016032500) (2016032500)Moodle 2.9, 3.0
+Release date: Friday, 25 March 2016, 10:36 AM
+
+=== 2.9 ===
+2.9 (Build: 2016032400) (2016032400)Moodle 2.9
+Release date: Thursday, 24 March 2016, 3:41 PM
+
+03/24/16 Changed mod_form.php to use $this->standard_intro_elements(); when adding the text
+editor and text area.
+
+=== 2.8 ===
+2.8 (Build: 2016032300) (2016032300)Moodle 2.7, 2.8
+Release date: Wednesday, 23 March 2016, 12:37 PM
+
+03/23/16 Deleted README.txt and added it's content to README.md
+03/23/16 Added redirect in view.php, about line 136, to reliably refresh page view for new round.
+
+=== 2.7 ===
+2.7 (Build: 2016031600) (2016031600)Moodle 2.7
+Release date: Wednesday, 16 March 2016, 3:32 PM
+
+03/16/16 Changed version and build numbers.
+03/16/16 Changed some permissions for manager and nonediting teacher.
+03/16/16 Updated version.php to use $plugin instead of $module.
+03/16/16 Added $plugin->component = 'mod_hotquestion';
+Fixed multiple occurances of Creating default object from empty value.
+
+=== 2.0 ===
+2.0 (20111022) (2011102200)Moodle 2.0, 2.1
+Release date: Friday, 21 October 2011, 9:22 PM

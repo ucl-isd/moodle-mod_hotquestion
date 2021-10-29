@@ -9,7 +9,7 @@ Feature: When viewing pevious rounds users can follow reload to go to current ro
       | fullname | shortname | category | groupmode |
       | Course 1 | C1 | 0 | 1 |
     And the following "users" exist:
-      | username | firstname | lastname | email            |	  
+      | username | firstname | lastname | email            |
       | teacher1 | Teacher   | 1        | teacher1@asd.com |
 	  | teacher2 | Teacher   | 2        | teacher2@asd.com |
       | student1 | Student   | 1        | student1@asd.com |
@@ -25,7 +25,7 @@ Feature: When viewing pevious rounds users can follow reload to go to current ro
       | hotquestion  | Test hotquestion name  | Hotquestion intro | C1     | hotquestion1 | Submit your question here: |
   Scenario: A user follows reload toolbutton to view current round
     # Student 1 adds posts.
-	Given I log in as "student1"
+    Given I log in as "student1"
     When I am on "Course 1" course homepage
     And I follow "Test hotquestion name"
     And I set the following fields to these values:
@@ -33,19 +33,19 @@ Feature: When viewing pevious rounds users can follow reload to go to current ro
     And I press "Click to post"
     And I set the following fields to these values:
       | Submit your question here: | Round 1 second question by student 1 |
-	And I set the field "Display as anonymous" to "1"
+    And I set the field "Display as anonymous" to "1"
     And I press "Click to post"
     Then I log out
 	# Teacher 1 adds new round.
-	Given I log in as "teacher1"
+    Given I log in as "teacher1"
     When I am on "Course 1" course homepage
     And I follow "Test hotquestion name"
     Then I should see "Round 1 second question by student 1"
-	And I should see "Round 1 first question by student 1"
-	And I follow "Open a new round"
+    And I should see "Round 1 first question by student 1"
+    And I follow "Open a new round"
     Then I log out
 	# Student 2 adds posts in new round.
-	Given I log in as "student2"
+    Given I log in as "student2"
     When I am on "Course 1" course homepage
     And I follow "Test hotquestion name"
     And I set the following fields to these values:
@@ -53,14 +53,14 @@ Feature: When viewing pevious rounds users can follow reload to go to current ro
     And I press "Click to post"
     And I set the following fields to these values:
       | Submit your question here: | Round 2 fourth question by student 2 |
-	And I set the field "Display as anonymous" to "1"
+    And I set the field "Display as anonymous" to "1"
     And I press "Click to post"
-	Then I should see "Round 2 fourth question by student 2"
-	And I should see "Round 2 third question by student 2"
-	And I follow "Previous round"
-	Then I should see "Round 1 second question by student 1"
-	And I should see "Round 1 first question by student 1"
-	And I follow "Reload"
-	Then I should see "Round 2 fourth question by student 2"
-	And I should see "Round 2 third question by student 2"
+    Then I should see "Round 2 fourth question by student 2"
+    And I should see "Round 2 third question by student 2"
+    And I follow "Previous round"
+    Then I should see "Round 1 second question by student 1"
+    And I should see "Round 1 first question by student 1"
+    And I follow "Reload"
+    Then I should see "Round 2 fourth question by student 2"
+    And I should see "Round 2 third question by student 2"
     Then I log out

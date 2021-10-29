@@ -26,6 +26,8 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use \mod_hotquestion\event\course_module_viewed;
+
 require_once("../../config.php");
 require_once("lib.php");
 require_once("locallib.php");
@@ -69,11 +71,8 @@ if (! $cw = $DB->get_record("course_sections", array("id" => $cm->section))) {
 
 // Trigger module viewed event.
 if ($CFG->version > 2014051200) { // Moodle 2.7+.
-    $params = array(
-        'objectid' => $hq->cm->id,
-        'context' => $context,
-    );
-    $event = \mod_hotquestion\event\course_module_viewed::create($params);
+    $params = array('objectid' => $hq->cm->id, 'context' => $context);
+    $event = course_module_viewed::create($params);
     $event->trigger();
 } else {
     add_to_log($hq->course->id, 'hotquestion', 'view', "view.php?id={$hq->cm->id}", $hq->instance->name, $hq->cm->id);
@@ -140,6 +139,13 @@ if (!empty($action)) {
                 redirect('view.php?id='.$hq->cm->id, null); // Needed to prevent heat toggle on page reload.
             }
             break;
+        case 'removevote':
+            if (has_capability('mod/hotquestion:vote', $context)) {
+                $q = required_param('q',  PARAM_INT);  // Question id to vote.
+                $hq->remove_vote($q);
+                redirect('view.php?id='.$hq->cm->id, null); // Needed to prevent heat toggle on page reload.
+            }
+            break;
         case 'newround':
             if (has_capability('mod/hotquestion:manage', $context)) {
                 $hq->add_new_round();
@@ -184,7 +190,7 @@ if (!empty($action)) {
 
 // Start print page.
 if (!$ajax) {
-    // Added 176 and 178 to include the activity name, 10/05/16.
+    // Added code to include the activity name, 10/05/16.
     $hotquestionname = format_string($hotquestion->name, true, array('context' => $context));
     echo $output->header();
     echo $OUTPUT->heading($hotquestionname);
