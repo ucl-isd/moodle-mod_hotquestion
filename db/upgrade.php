@@ -275,7 +275,52 @@ function xmldb_hotquestion_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2020121700, 'hotquestion');
     }
 
-    if ($oldversion < 2021032300) {
+    if ($oldversion < 2021022400) {
+
+        // Define field scale to be added to hotquestion.
+        $table = new xmldb_table('hotquestion');
+        $field = new xmldb_field('scale', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'removelabel');
+
+        // Conditionally launch add field scale.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define field assessed to be added to hotquestion.
+        $table = new xmldb_table('hotquestion');
+        $field = new xmldb_field('assessed', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'scale');
+
+        // Conditionally launch add field assessed.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define field assessedtimestart to be added to hotquestion.
+        $table = new xmldb_table('hotquestion');
+        $field = new xmldb_field('assessedtimestart', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'assessed');
+
+        // Conditionally launch add field assessedtimestart.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define field assessedtimefinish to be added to hotquestion.
+        $table = new xmldb_table('hotquestion');
+        $field = new xmldb_field('assessedtimefinish', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'assessedtimestart');
+
+        // Conditionally launch add field assessedtimefinish.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define field comments to be added to hotquestion.
+        $table = new xmldb_table('hotquestion');
+        $field = new xmldb_field('comments', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, '0', 'assesstimefinish');
+
+        // Conditionally launch add field comments.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
 
         // Define field format to be added to hotquestion_questions.
         $table = new xmldb_table('hotquestion_questions');
@@ -287,7 +332,7 @@ function xmldb_hotquestion_upgrade($oldversion=0) {
         }
 
         // Hotquestion savepoint reached.
-        upgrade_mod_savepoint(true, 2021032300, 'hotquestion');
+        upgrade_mod_savepoint(true, 2021022400, 'hotquestion');
     }
     return $result;
 }
