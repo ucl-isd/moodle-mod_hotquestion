@@ -108,27 +108,33 @@ class mod_hotquestion {
         global $USER, $CFG, $DB;
         $data = new StdClass();
         $data->hotquestion = $this->instance->id;
+
+        // $data->content = trim($fromform->question);
+        // print_object($fromform->question2);
         // 20210218 Switched code to use text editor instead of text area.
         $data->content = ($fromform->text_editor['text']);
         $data->format = ($fromform->text_editor['format']);
+
         $data->userid = $USER->id;
         $data->time = time();
         $data->tpriority = 0;
         // Check if approval is required for this HotQuestion activity.
         if (!($this->instance->approval)) {
-            // If approval is NOT required, then approve the question so everyone can see it.
+            // If approval is NOT required, then auto approve the question so everyone can see it.
             $data->approved = 1;
         } else {
             // If approval is required, then mark as not approved so only teachers can see it.
             $data->approved = 0;
         }
         $context = context_module::instance($this->cm->id);
+        // If marked anonymous and anonymous is allowed then change from actual userid to guest.
         if (isset($fromform->anonymous) && $fromform->anonymous && $this->instance->anonymouspost) {
             $data->anonymous = $fromform->anonymous;
             // Assume this user is guest.
             $data->userid = $CFG->siteguest;
         }
         if (!empty($data->content)) {
+            // If there is some actual content, then create a new record.
             $DB->insert_record('hotquestion_questions', $data);
             if ($CFG->version > 2014051200) { // If newer than Moodle 2.7+ use new event logging.
                 $params = array(
@@ -245,7 +251,7 @@ class mod_hotquestion {
     }
 
     /**
-     * Calculates number of remain votes (heat) available to this user in the current round.
+     * Calculates number of remaining votes (heat) available to this user in the current round.
      *
      * Added 20200529.
      * @param int $hq
@@ -276,9 +282,9 @@ class mod_hotquestion {
                    AND hqq.time > hqr.starttime
                    AND hqr.endtime = 0
                    AND hqv.voter = ?
-              GROUP BY hqq.id, hqr.id, hqv.voter, hqq.hotquestion, hqq.content,
-                       hqq.userid, hqv.voter, hqq.time, hqq.anonymous, hqq.tpriority,
-                       hqq.approved
+               GROUP BY hqq.id, hqr.id, hqv.voter, hqq.hotquestion, hqq.content,
+                        hqq.userid, hqv.voter, hqq.time, hqq.anonymous, hqq.tpriority,
+                        hqq.approved
               ORDER BY hqq.hotquestion ASC, tpriority DESC, heat DESC";
 
         $tally = count($DB->get_records_sql($sql, $params));
@@ -432,7 +438,8 @@ class mod_hotquestion {
             $this->currentround->endtime = 0xFFFFFFFF;  // Hack.
         }
         $params = array($this->instance->id, $this->currentround->starttime, $this->currentround->endtime);
-        return $DB->get_records_sql('SELECT q.id, q.hotquestion, q.content, q.userid, q.time,
+        // 20210306 Added format to the selection.
+        return $DB->get_records_sql('SELECT q.id, q.hotquestion, q.content, q.format, q.userid, q.time,
             q.anonymous, q.approved, q.tpriority, count(v.voter) as votecount
             FROM {hotquestion_questions} q
             LEFT JOIN {hotquestion_votes} v
@@ -698,7 +705,7 @@ class mod_hotquestion {
 
         $sql .= ($whichhqs);
         $sql .= " GROUP BY u.lastname, u.firstname, hq.hotquestion, hq.id, hq.content,
-                           hq.userid, hq.time, hq.anonymous, hq.tpriority, hq.approved
+                            hq.userid, hq.time, hq.anonymous, hq.tpriority, hq.approved
                   ORDER BY hq.hotquestion ASC, hq.id ASC, tpriority DESC, heat";
 
         // Add the list of users and HotQuestions to our data array.
@@ -759,220 +766,11 @@ class mod_hotquestion {
             $DB->update_record('hotquestion_questions', $question);
         }
     }
+
+
 }
 
-/**
- * Count questions in current rounds.
- * Counts all the hotquestion entries (optionally in a given group)
- * and is called from index.php.
- * @param var $hotquestion
- * @param int $groupid
- * @return nothing
- */
-function hotquestion_count_entries($hotquestion, $groupid = 0) {
-    global $DB, $CFG, $USER;
 
-    $cm = hotquestion_get_coursemodule($hotquestion->id);
-    $context = context_module::instance($cm->id);
-    // Get the groupmode which should be 0, 1, or 2.
-    $groupmode = ($hotquestion->groupmode);
 
-    // If user is in a group, how many users and questions in each Hot Question activity current round?
-    if ($groupid && ($groupmode > '0')) {
 
-        // Extract each group id from $groupid and process based on whether viewer is a member of the group.
-        // Show user and question counts only if a member of the current group.
-        foreach ($groupid as $gid) {
-            $sql = "SELECT COUNT(DISTINCT hq.userid) AS ucount,
-                     COUNT(DISTINCT hq.content) AS qcount
-                      FROM {hotquestion_questions} hq
-                      JOIN {groups_members} g ON g.userid = hq.userid
-                      JOIN {user} u ON u.id = g.userid
-                 LEFT JOIN {hotquestion_rounds} hr ON hr.hotquestion=hq.hotquestion
-                     WHERE hq.hotquestion = :hqid
-                           AND g.groupid = :gidid
-                           AND hr.endtime=0
-                           AND hq.time>=hr.starttime
-                           AND hq.userid>0";
-            $params = array();
-            $params = ['hqid' => $hotquestion->id] + ['gidid' => $gid->id];
-            $hotquestions = $DB->get_records_sql($sql, $params);
-        }
-
-    } else if (!$groupid && ($groupmode > '0')) {
-
-        // Check all the entries from the whole course.
-        // If not currently a group member, but group mode is set for separate groups or visible groups,
-        // see if this user has posted anyway, posted before mode was changed or posted before removal from a group.
-        $sql = "SELECT COUNT(DISTINCT hq.userid) AS ucount, COUNT(DISTINCT hq.content) AS qcount FROM {hotquestion_questions} hq
-                  JOIN {user} u ON u.id = hq.userid
-             LEFT JOIN {hotquestion_rounds} hr ON hr.hotquestion=hq.hotquestion
-                 WHERE hq.hotquestion = :hqid
-                       AND hr.endtime = 0
-                       AND hq.time >= hr.starttime
-                       AND hq.userid = :userid";
-
-        $params = array();
-        $params = ['hqid' => $hotquestion->id] + ['userid' => $USER->id];
-        $hotquestions = $DB->get_records_sql($sql, $params);
-
-    } else {
-
-        // Check all the users and entries from the whole course.
-        $sql = "SELECT COUNT(DISTINCT hq.userid) AS ucount, COUNT(DISTINCT hq.content) AS qcount FROM {hotquestion_questions} hq
-                  JOIN {user} u ON u.id = hq.userid
-             LEFT JOIN {hotquestion_rounds} hr ON hr.hotquestion=hq.hotquestion
-                 WHERE hq.hotquestion = :hqid
-                       AND hr.endtime = 0
-                       AND hq.time >= hr.starttime
-                       AND hq.userid > 0";
-        $params = array();
-        $params = ['hqid' => $hotquestion->id];
-        $hotquestions = $DB->get_records_sql($sql, $params);
-    }
-
-    if (!$hotquestions) {
-        return 0;
-    }
-    $canadd = get_users_by_capability($context, 'mod/hotquestion:ask', 'u.id');
-    $entriesmanager = get_users_by_capability($context, 'mod/hotquestion:manageentries', 'u.id');
-    // If not enrolled or not an admin, teacher, or manager, then return nothing.
-    if ($canadd || $entriesmanager) {
-        return ($hotquestions);
-    } else {
-        return 0;
-    }
-}
-
-    /**
-     * Returns availability status.
-     * Added 10/2/16.
-     * @param var $hotquestion
-     */
-function hq_available($hotquestion) {
-    $timeopen = $hotquestion->timeopen;
-    $timeclose = $hotquestion->timeclose;
-    return (($timeopen == 0 || time() >= $timeopen) && ($timeclose == 0 || time() < $timeclose));
-}
-
-/**
- * Returns the hotquestion instance course_module id
- *
- * Called from function hotquestion_count_entries().
- * @param var $hotquestionid
- * @return object
- */
-function hotquestion_get_coursemodule($hotquestionid) {
-    global $DB;
-    $sql = "SELECT cm.id
-              FROM {course_modules} cm
-              JOIN {modules} m ON m.id = cm.module
-             WHERE cm.instance = :hqid
-               AND m.name = 'hotquestion'";
-    $params = array();
-    $params = ['hqid' => $hotquestionid];
-    return $DB->get_record_sql($sql, $params);
-}
-
-/**
- * Update the calendar entries for this hotquestion activity.
- *
- * @param stdClass $hotquestion the row from the database table hotquestion.
- * @param int $cmid The coursemodule id
- * @return bool
- */
-function hotquestion_update_calendar(stdClass $hotquestion, $cmid) {
-    global $DB, $CFG;
-
-    require_once($CFG->dirroot.'/calendar/lib.php');
-
-    // Hotquestion start calendar events.
-    $event = new stdClass();
-    $event->eventtype = HOTQUESTION_EVENT_TYPE_OPEN;
-    // The HOTQUESTION_EVENT_TYPE_OPEN event should only be an action event if no close time is specified.
-    if ($CFG->branch > 32) {
-        $event->type = empty($hotquestion->timeclose) ? CALENDAR_EVENT_TYPE_ACTION : CALENDAR_EVENT_TYPE_STANDARD;
-    }
-    if ($event->id = $DB->get_field('event', 'id',
-        array('modulename' => 'hotquestion', 'instance' => $hotquestion->id, 'eventtype' => $event->eventtype))) {
-        if ((!empty($hotquestion->timeopen)) && ($hotquestion->timeopen > 0)) {
-            // Calendar event exists so update it.
-            $event->name = get_string('calendarstart', 'hotquestion', $hotquestion->name);
-            $event->description = format_module_intro('hotquestion', $hotquestion, $cmid);
-            $event->timestart = $hotquestion->timeopen;
-            $event->timesort = $hotquestion->timeopen;
-            $event->visible = instance_is_visible('hotquestion', $hotquestion);
-            $event->timeduration = 0;
-
-            $calendarevent = calendar_event::load($event->id);
-            $calendarevent->update($event, false);
-        } else {
-            // Calendar event is on longer needed.
-            $calendarevent = calendar_event::load($event->id);
-            $calendarevent->delete();
-        }
-    } else {
-        // Event doesn't exist so create one.
-        if ((!empty($hotquestion->timeopen)) && ($hotquestion->timeopen > 0)) {
-            $event->name = get_string('calendarstart', 'hotquestion', $hotquestion->name);
-            $event->description = format_module_intro('hotquestion', $hotquestion, $cmid);
-            $event->courseid = $hotquestion->course;
-            $event->groupid = 0;
-            $event->userid = 0;
-            $event->modulename = 'hotquestion';
-            $event->instance = $hotquestion->id;
-            $event->timestart = $hotquestion->timeopen;
-            $event->timesort = $hotquestion->timeopen;
-            $event->visible = instance_is_visible('hotquestion', $hotquestion);
-            $event->timeduration = 0;
-
-            calendar_event::create($event, false);
-        }
-    }
-
-    // Hotquestion end calendar events.
-    $event = new stdClass();
-    if ($CFG->branch > 32) {
-        $event->type = CALENDAR_EVENT_TYPE_ACTION;
-    }
-    $event->eventtype = HOTQUESTION_EVENT_TYPE_CLOSE;
-    if ($event->id = $DB->get_field('event', 'id',
-        array('modulename' => 'hotquestion', 'instance' => $hotquestion->id, 'eventtype' => $event->eventtype))) {
-        if ((!empty($hotquestion->timeclose)) && ($hotquestion->timeclose > 0)) {
-            // Calendar event exists so update it.
-            $event->name = get_string('calendarend', 'hotquestion', $hotquestion->name);
-            $event->description = format_module_intro('hotquestion', $hotquestion, $cmid);
-            $event->timestart = $hotquestion->timeclose;
-            $event->timesort = $hotquestion->timeclose;
-            $event->visible = instance_is_visible('hotquestion', $hotquestion);
-            $event->timeduration = 0;
-
-            $calendarevent = calendar_event::load($event->id);
-            $calendarevent->update($event, false);
-        } else {
-            // Calendar event is on longer needed.
-            $calendarevent = calendar_event::load($event->id);
-            $calendarevent->delete();
-        }
-    } else {
-        // Event doesn't exist so create one.
-        if ((!empty($hotquestion->timeclose)) && ($hotquestion->timeclose > 0)) {
-            $event->name = get_string('calendarend', 'hotquestion', $hotquestion->name);
-            $event->description = format_module_intro('hotquestion', $hotquestion, $cmid);
-            $event->courseid = $hotquestion->course;
-            $event->groupid = 0;
-            $event->userid = 0;
-            $event->modulename = 'hotquestion';
-            $event->instance = $hotquestion->id;
-            $event->timestart = $hotquestion->timeclose;
-            $event->timesort = $hotquestion->timeclose;
-            $event->visible = instance_is_visible('hotquestion', $hotquestion);
-            $event->timeduration = 0;
-
-            calendar_event::create($event, false);
-        }
-    }
-
-    return true;
-}
 
