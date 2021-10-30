@@ -23,6 +23,7 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use mod_hotquestion\local\results;
 use \mod_hotquestion\event\course_module_instance_list_viewed;
 
 require(__DIR__ . "/../../config.php");
@@ -30,10 +31,7 @@ require_once(__DIR__ . '/locallib.php');
 
 $id = required_param('id', PARAM_INT);   // Course.
 
-if (! $course = $DB->get_record("course", array("id" => $id))) {
-    print_error("Course ID is incorrect");
-}
-
+$course = $DB->get_record('course', array('id' => $id), '*', MUST_EXIST);
 require_course_login($course);
 
 // Header.
@@ -132,7 +130,7 @@ foreach ($hotquestions as $hotquestion) {
             }
         }
         // Go count the users and questions in the current round.
-        $entrycount = hotquestion_count_entries($hotquestion, groups_get_all_groups($course->id, $USER->id));
+        $entrycount = results::hotquestion_count_entries($hotquestion, groups_get_all_groups($course->id, $USER->id));
         // Extract the number of users and questions into the participation column.
         foreach ($entrycount as $ec) {
             $table->data[$i][] = "<a href=\"view.php?id=$hotquestion->coursemodule\">"
