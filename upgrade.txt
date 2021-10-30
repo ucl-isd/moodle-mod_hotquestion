@@ -1,3 +1,11 @@
+=== 4.0.2 ===
+20211029 Merged pull request #51 made by Vidalia.
+20211029 Ran codechecker.php.
+20211029 Hot Question_758 - According to codechececker.ph underscores in functions need
+    to be removed. Removed as indicated by codechecker.
+20211029  Hot Question - Line 35: Function print_error() has been deprecated; in index.php.
+    Switched to using the much simpler code as used in assign/index.php.
+
 === 4.0.1 ===
 20210516 Hot Question_695 - Invalid get_string() identifier: 'hotquestion:rate'.
     Added the missing string.
@@ -17,7 +25,7 @@
 
 === 3.9.2 ===
 20210215 HotQuestion_669, Need round indicator between the round nav icons. Completed
-    development. Needs further testing and cleanup. Added string, xofn = " of ". Code
+    development. Completed further testing and cleanup. Added string, xofn = " of ". Code
     in locallib.php and render.php.
 
 === 3.9.1 ===
