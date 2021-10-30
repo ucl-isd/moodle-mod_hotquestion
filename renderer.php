@@ -22,6 +22,7 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die();
+use mod_hotquestion\local\results;
 
 /**
  * A custom renderer class that extends the plugin_renderer_base and is used by the hotquestion module.
@@ -318,7 +319,68 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
                         } else {
                             $authorinfo = '<div class="author">'.get_string('authorinfohide', 'hotquestion', $a).'</div>';
                         }
+
+                        // Add rating and comments here.
+//print_object('Printing the $question.');
+//print_object($question);
+
+if ($question->approved) {
+
+    if ($user->id == $USER->id) {
+        $info = 'Ratings - Testing for placement of ratings here.';
+
+//print_object('Printing the $info.');
+//print_object($info);
+
+            // 20210306 Generate comment box using API.
+            if (!empty($CFG->usecomments)) {
+                require_once($CFG->dirroot  . '/comment/lib.php');
+                list($context, $course, $cm) = get_context_info_array($context->id);
+
+                // Initialize and then check to see how many comments for this question.
+                comment::init();
+                $info = new stdClass();
+                $info->data[] = array (get_string('totalcomments', 'hotquestion'), results::hotquestion_get_question_comment_count($question, $cm, $course));
+
+                //results::hotquestion_display_question_comments($question, $cm, $course);
+                $comment = results::hotquestion_display_question_comments($question, $cm, $context, $course);
+//print_object('Printing the $comment 1st time.');
+//print_object($comment);
+/*
+                $options = new stdClass();
+                $options->component = 'mod_hotquestion';
+                $options->context   = $context;
+                $options->course    = $course;
+                $options->cm        = $cm;
+                $options->area      = 'hotquestion_question';
+                $options->itemid    = $question->id;
+                $options->showcount = true;
+*/
+
+ //               $comment = new comment($comment);
+
+//print_object('Printing $info->data.');
+//print_object($info->data[0]);
+//print_object('Printing $comment 2nd time.');
+
+//print_object($comment);
+//echo 'testing1';
+//print_object($count);
+
+//print_object($comment);
+
+//$comment->output(true);
+//$comment->output(false);
+
+                //$replacement[] = $comment->output(true);
+                //$info[] .= $comment->output(true);
+//$comment->content;
+            }
+    }
+}
+//////////////////////////////////////////////////////Rating and comments should go in next line after authorinfo.
                         $line[] = $content.$authorinfo;
+                        //$line[] = $content;
                         // Get current priority value to show.
                         $tpriority = $question->tpriority;
                         // Get current heat total to show.
@@ -476,4 +538,25 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
         $output .= $this->output->box_end();
         return $output;
     }
+
+
+    /**
+     * Get the total number of comments for a specific question.
+     * @param object $question
+     * @param object $cm
+     * @return string
+     */
+/*
+    public function hotquestion_get_question_comment_count($question, $cm) {
+        global $DB;
+        $context = context_module::instance($cm->id);
+        if ($count = $DB->count_records('comments', array('itemid' => $question->id,
+                                                          'commentarea' => 'hotquestion_question',
+                                                          'contextid' => $context->id))) {
+            return $count;
+        } else {
+            return 0;
+        }
+    }
+*/
 }
