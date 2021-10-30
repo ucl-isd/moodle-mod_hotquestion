@@ -25,7 +25,7 @@
  * @copyright 2016 onwards AL Rachels (drachels@drachels.com)
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
+use mod_hotquestion\local\results;
 use \mod_hotquestion\event\course_module_viewed;
 
 require_once("../../config.php");
@@ -51,7 +51,8 @@ $hq = new mod_hotquestion($id, $roundid);
 
 // Confirm login.
 require_login($hq->course, true, $hq->cm);
-
+    require_once($CFG->dirroot . '/comment/lib.php');
+    comment::init();
 $context = context_module::instance($hq->cm->id);
 
 $entriesmanager = has_capability('mod/hotquestion:manageentries', $context);
@@ -108,16 +109,90 @@ require_capability('mod/hotquestion:view', $context);
 $output = $PAGE->get_renderer('mod_hotquestion');
 $output->init($hq);
 
-// Process submited question.
+print_object('spacer 1');
+print_object('spacer 2');
+print_object('spacer 3');
+print_object('spacer 4x');
+//print_object('Printing $hq');
+//print_object($hq);
+// die;
+
+///////////////////////////////////
+// put data processing here????
+//$data->id = $cm->id;
+/*
+list ($editoroptions, $attachmentoptions) = results::hotquestion_get_editor_and_attachment_options($course,
+                                                                                             $context,
+                                                                                             $entry);
+
+$data = file_prepare_standard_editor($data,
+                                     'text',
+                                     $editoroptions,
+                                     $context,
+                                     'mod_hotquestion',
+                                     'entry',
+                                     $data->entryid);
+$data = file_prepare_standard_filemanager($data,
+                                          'attachment',
+                                          $attachmentoptions,
+                                          $context,
+                                          'mod_hotquestion',
+                                          'attachment',
+                                          $data->entryid);
+
+// 20201119 Added $hotquestion->editdates setting.
+$form = new hotquestion_form(null, array(
+    'current' => $data,
+    'cm' => $cm,
+    'hotquestion' => $hotquestion->editdates,
+    'editoroptions' => $editoroptions,
+    'attachmentoptions' => $attachmentoptions
+));
+*/
+
+
+///////////////////////////////////
+
+// Process submitted question.
 if (has_capability('mod/hotquestion:ask', $context)) {
     $mform = new hotquestion_form(null, array($hq->instance->anonymouspost, $hq->cm));
     if ($fromform = $mform->get_data()) {
-        if (!$hq->add_new_question($fromform)) {
+        // If there is a post, $fromform will contain text, format, id, and submitbutton.
+        // 20210314 Prevent CSFR.
+        confirm_sesskey();
+        $timenow = time();
+
+    // This will be overwritten after we have the entryid.
+    $newentry = new stdClass();
+    $newentry->hotquestion = $hq->instance->id;
+    $newentry->content = $fromform->text_editor['text'];
+    $newentry->format = $fromform->text_editor['format'];
+    $newentry->userid = $USER->id;
+    $newentry->time = $timenow;
+    if($fromform->anonymous = NULL) {
+        $newentry->anonymous = $fromform->anonymous;
+    } else {
+        $newentry->anonymous = 0;
+    }
+    $newentry->approved = $hq->instance->approval;
+    $newentry->tpriority = 0;
+    $newentry->submitbutton = $fromform->submitbutton;
+
+//print_object('Printing $newentry');
+//print_object($newentry);
+//print_object('Printing $fromform');
+//print_object($fromform);
+//die;
+
+        if (!$hq->add_new_question($fromform)) { // Returns 1 if valid question submitted.
             redirect('view.php?id='.$hq->cm->id, get_string('invalidquestion', 'hotquestion'));
         }
         if (!$ajax) {
             redirect('view.php?id='.$hq->cm->id, get_string('questionsubmitted', 'hotquestion'));
         }
+print_object('Printing $fromform');
+print_object($fromform);
+die;
     }
 }
 
@@ -197,7 +272,7 @@ if (!$ajax) {
     // Allow access at any time to manager and editing teacher but prevent access to students.
     if (!(has_capability('mod/hotquestion:manage', $context))) {
         // Check availability timeopen and timeclose. Added 10/2/16.
-        if (!(hq_available($hotquestion))) {  // Availability restrictions.
+        if (!(results::hq_available($hotquestion))) {  // Availability restrictions.
             if ($hotquestion->timeclose != 0 && time() > $hotquestion->timeclose) {
                 echo $output->hotquestion_inaccessible(get_string('hotquestionclosed',
                     'hotquestion', userdate($hotquestion->timeclose)));
@@ -229,7 +304,7 @@ echo $output->container_start("toolbar");
 echo $output->toolbar(has_capability('mod/hotquestion:manageentries', $context));
 echo $output->container_end();
 
-// Print questions list.
+// Print questions list from the current round.
 echo $output->questions(has_capability('mod/hotquestion:vote', $context));
 echo $output->container_end();
 
