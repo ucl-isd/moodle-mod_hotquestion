@@ -276,7 +276,9 @@ class mod_hotquestion {
                    AND hqq.time > hqr.starttime
                    AND hqr.endtime = 0
                    AND hqv.voter = ?
-              GROUP BY hqq.id, hqr.id, hqv.voter
+              GROUP BY hqq.id, hqr.id, hqv.voter, hqq.hotquestion, hqq.content,
+                       hqq.userid, hqv.voter, hqq.time, hqq.anonymous, hqq.tpriority,
+                       hqq.approved
               ORDER BY hqq.hotquestion ASC, tpriority DESC, heat DESC";
 
         $tally = count($DB->get_records_sql($sql, $params));
@@ -438,7 +440,8 @@ class mod_hotquestion {
             WHERE q.hotquestion = ?
             AND q.time >= ?
             AND q.time <= ?
-            GROUP BY q.id
+            GROUP BY q.id, q.hotquestion, q.content, q.userid, q.time,
+                     q.anonymous, q.approved, q.tpriority
             ORDER BY tpriority DESC, votecount DESC, q.time DESC', $params);
     }
 
@@ -516,7 +519,8 @@ class mod_hotquestion {
             WHERE q.hotquestion = ?
             AND q.time >= ?
             AND q.time <= ?
-            GROUP BY q.id
+            GROUP BY q.id, q.hotquestion, q.content, q.userid, q.time, q.anonymous,
+                     q.approved, q.tpriority
             ORDER BY votecount DESC, q.time DESC', $params);
 
         if ($questions) {
@@ -693,7 +697,8 @@ class mod_hotquestion {
         }
 
         $sql .= ($whichhqs);
-        $sql .= " GROUP BY u.lastname, u.firstname, hq.hotquestion, hq.id
+        $sql .= " GROUP BY u.lastname, u.firstname, hq.hotquestion, hq.id, hq.content,
+                           hq.userid, hq.time, hq.anonymous, hq.tpriority, hq.approved
                   ORDER BY hq.hotquestion ASC, hq.id ASC, tpriority DESC, heat";
 
         // Add the list of users and HotQuestions to our data array.
@@ -970,3 +975,4 @@ function hotquestion_update_calendar(stdClass $hotquestion, $cmid) {
 
     return true;
 }
+
