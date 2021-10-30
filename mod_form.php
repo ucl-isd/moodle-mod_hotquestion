@@ -187,6 +187,12 @@ class mod_hotquestion_mod_form extends moodleform_mod {
         $mform->addRule('removelabel', null, 'required', null, 'client');
         $mform->addRule('removelabel', get_string('maximumchars', '', 20), 'maxlength', 20, 'client');
 
+        $mform->addElement('selectyesno', 'comments', get_string('allowcomments', 'hotquestion'));
+        if (empty($CFG->usecomments)) {
+            $mform->hardFreeze('comments');
+            $mform->setConstant('comments', 0);
+        }
+
         // Availability.
         $mform->addElement('header', 'availabilityhdr', get_string('availability'));
 
@@ -209,7 +215,7 @@ class mod_hotquestion_mod_form extends moodleform_mod {
 }
 
 /**
- * Standard base class for hotquestion_form for submitting question.
+ * Standard base class for hotquestion_form for typing and submitting a question.
  *
  * @package   mod_hotquestion
  * @copyright 2011 Sun Zhigang
@@ -230,7 +236,12 @@ class hotquestion_form extends moodleform {
 
         $mform =& $this->_form;
 
-        // 20210218 Changed to using a text editor instead of textarea.
+        // Next line is to retrieve submit instruction setting and creates the text post area.
+        // $mform->addElement('textarea', 'question', $temp->submitdirections, 'wrap="virtual" rows="3" cols="50"');
+        // $mform->setType('question', PARAM_TEXT);
+
+        // 20210218 Changed using a text editor instead of textarea.
+        //$mform->addElement('editor', 'text_editor', $temp->submitdirections, 'wrap="virtual" rows="5"');
         // Changed to format text which allows filters such as Gerico, etc. to work. 
         $mform->addElement('editor', 'text_editor', format_text($temp->submitdirections, $format = FORMAT_MOODLE, $options = null, $courseid_do_not_use = null), 'wrap="virtual" rows="5"');
         $mform->setType('text_editor', PARAM_RAW);
