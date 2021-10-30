@@ -30,6 +30,7 @@
  */
 
 defined('MOODLE_INTERNAL') || die();
+use mod_hotquestion\local\results;
 
 /**
  * Given an object containing all the necessary data,
@@ -53,7 +54,7 @@ function hotquestion_add_instance($hotquestion) {
     // Added next line for behat test 2/11/19.
     $cmid = $hotquestion->coursemodule;
 
-    hotquestion_update_calendar($hotquestion, $cmid);
+    results::hotquestion_update_calendar($hotquestion, $cmid);
 
     return $hotquestion->id;
 }
@@ -90,7 +91,7 @@ function hotquestion_update_instance($hotquestion) {
     $hotquestion->id = $hotquestion->instance;
 
     // You may have to add extra stuff in here.
-    hotquestion_update_calendar($hotquestion, $cmid);
+    results::hotquestion_update_calendar($hotquestion, $cmid);
 
     return $DB->update_record('hotquestion', $hotquestion);
 }
@@ -212,7 +213,13 @@ function hotquestion_print_recent_activity($course, $viewfullnames, $timestart) 
     global $CFG, $USER, $DB, $OUTPUT;
 
     $dbparams = array($timestart, $course->id, 'hotquestion');
-    $namefields = user_picture::fields('u', null, 'userid');
+
+    if ($CFG->branch > 30) { // If Moodle less than version 3.1 skip this.
+        $userfieldsapi = \core_user\fields::for_userpic();
+        $namefields = $userfieldsapi->get_sql('u', false, '', 'duserid', false)->selects;
+    } else {
+        $namefields = user_picture::fields('u', null, 'userid');
+    }
     $sql = "SELECT hqq.id, hqq.time, cm.id AS cmid, $namefields
          FROM {hotquestion_questions} hqq
               JOIN {hotquestion} hq         ON hq.id = hqq.hotquestion
