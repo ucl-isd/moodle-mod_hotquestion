@@ -40,11 +40,10 @@ $roundid = optional_param('round', -1, PARAM_INT);      // Round id.
 $changegroup = optional_param('group', -1, PARAM_INT);  // Choose the current group.
 
 if (! $cm = get_coursemodule_from_id('hotquestion', $id)) {
-    print_error("Course Module ID was incorrect");
+    throw new moodle_exception(get_string('incorrectmodule', 'hotquestion'));
 }
-if (! $course = $DB->get_record("course", array('id' => $cm->course))) {
-    print_error("Course is misconfigured");
-}
+
+$course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
 
 // Construct hotquestion instance.
 $hq = new mod_hotquestion($id, $roundid);
@@ -59,15 +58,15 @@ $entriesmanager = has_capability('mod/hotquestion:manageentries', $context);
 $canask = has_capability('mod/hotquestion:ask', $context);
 
 if (!$entriesmanager && !$canask) {
-    print_error('accessdenied', 'hotquestion');
+    throw new moodle_exception(get_string('accessdenied', 'hotquestion'));
 }
 
 if (! $hotquestion = $DB->get_record("hotquestion", array("id" => $cm->instance))) {
-    print_error("Course module is incorrect");
+    throw new moodle_exception(get_string('incorrectmodule', 'hotquestion'));
 }
 
 if (! $cw = $DB->get_record("course_sections", array("id" => $cm->section))) {
-    print_error("Course module is incorrect");
+    throw new moodle_exception(get_string('incorrectmodule', 'hotquestion'));
 }
 
 // Trigger module viewed event.
@@ -109,17 +108,17 @@ require_capability('mod/hotquestion:view', $context);
 $output = $PAGE->get_renderer('mod_hotquestion');
 $output->init($hq);
 
-print_object('spacer 1');
-print_object('spacer 2');
-print_object('spacer 3');
-print_object('spacer 4x');
-//print_object('Printing $hq');
-//print_object($hq);
+// print_object('spacer 1');
+// print_object('spacer 2');
+// print_object('spacer 3');
+// print_object('spacer 4x');
+// print_object('Printing $hq');
+// print_object($hq);
 // die;
 
 ///////////////////////////////////
 // put data processing here????
-//$data->id = $cm->id;
+// $data->id = $cm->id;
 /*
 list ($editoroptions, $attachmentoptions) = results::hotquestion_get_editor_and_attachment_options($course,
                                                                                              $context,
@@ -162,27 +161,27 @@ if (has_capability('mod/hotquestion:ask', $context)) {
         confirm_sesskey();
         $timenow = time();
 
-    // This will be overwritten after we have the entryid.
-    $newentry = new stdClass();
-    $newentry->hotquestion = $hq->instance->id;
-    $newentry->content = $fromform->text_editor['text'];
-    $newentry->format = $fromform->text_editor['format'];
-    $newentry->userid = $USER->id;
-    $newentry->time = $timenow;
-    if($fromform->anonymous = NULL) {
-        $newentry->anonymous = $fromform->anonymous;
-    } else {
-        $newentry->anonymous = 0;
-    }
-    $newentry->approved = $hq->instance->approval;
-    $newentry->tpriority = 0;
-    $newentry->submitbutton = $fromform->submitbutton;
+        // This will be overwritten after we have the entryid.
+        $newentry = new stdClass();
+        $newentry->hotquestion = $hq->instance->id;
+        $newentry->content = $fromform->text_editor['text'];
+        $newentry->format = $fromform->text_editor['format'];
+        $newentry->userid = $USER->id;
+        $newentry->time = $timenow;
+        if ($fromform->anonymous = null) {
+            $newentry->anonymous = $fromform->anonymous;
+        } else {
+            $newentry->anonymous = 0;
+        }
+        $newentry->approved = $hq->instance->approval;
+        $newentry->tpriority = 0;
+        $newentry->submitbutton = $fromform->submitbutton;
 
-//print_object('Printing $newentry');
-//print_object($newentry);
-//print_object('Printing $fromform');
-//print_object($fromform);
-//die;
+        // print_object('Printing $newentry');
+        // print_object($newentry);
+        // print_object('Printing $fromform');
+        // print_object($fromform);
+        // die;
 
         if (!$hq->add_new_question($fromform)) { // Returns 1 if valid question submitted.
             redirect('view.php?id='.$hq->cm->id, get_string('invalidquestion', 'hotquestion'));
@@ -190,9 +189,9 @@ if (has_capability('mod/hotquestion:ask', $context)) {
         if (!$ajax) {
             redirect('view.php?id='.$hq->cm->id, get_string('questionsubmitted', 'hotquestion'));
         }
-print_object('Printing $fromform');
-print_object($fromform);
-die;
+        print_object('Printing $fromform');
+        print_object($fromform);
+        die;
     }
 }
 

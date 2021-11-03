@@ -3,8 +3,30 @@
 20211029 Ran codechecker.php.
 20211029 Hot Question_758 - According to codechececker.ph underscores in functions need
     to be removed. Removed as indicated by codechecker.
-20211029  Hot Question - Line 35: Function print_error() has been deprecated; in index.php.
-    Switched to using the much simpler code as used in assign/index.php.
+20211029 Hot Question_759 - Line 35: Function print_error() has been deprecated; in
+    index.php. Switched to using the much simpler code as used in assign/index.php.
+    $course = $DB-&gt;get_record('course', array('id' =&gt; $cm-&gt;course), '*',
+    MUST_EXIST);
+20211102 Hot Question_761 - Line 214: Function print_error() has been deprecated;
+    in renderer.php. Switched to using the throw new moodle_exception(). Also had
+    add new language string for incorrectmodule.
+20211102 Hot Question_762 - Line 43: Function print_error() has been deprecated;
+    in view.php. Switched to using the throw new moodle_exception().
+20211102 Hot Question_763 - Line 46: Function print_error() has been deprecated;
+    in view.php. Switched to using the much simpler code as used in assign/index.php.
+    $course = $DB-&gt;get_record('course', array('id' =&gt; $cm-&gt;course), '*',
+    MUST_EXIST);
+20211103 Hot Question_764 - Line 61: Function print_error() has been deprecated;
+    in view.php. Switched to using the throw new moodle_exception(). Already
+    have the needed language string.
+20211103 Hot Question_765 - Line 65: Function print_error() has been deprecated;
+    in view.php. Switched to using the throw new moodle_exception(). Already
+    have the needed language string.
+20211103 Hot Question_766 - Line 69: Function print_error() has been deprecated;
+    in view.php. Switched to using the throw new moodle_exception(). Already
+    have the needed language string.
+
+
 
 === 4.0.1 ===
 20210516 Hot Question_695 - Invalid get_string() identifier: 'hotquestion:rate'.

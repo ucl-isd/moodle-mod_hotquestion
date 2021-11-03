@@ -89,6 +89,7 @@ $string['hotquestion:manageentries'] = 'View list of activities';
 $string['hotquestion:rate'] = 'Rate questions';
 $string['hotquestion:view'] = 'View questions';
 $string['hotquestion:vote'] = 'Vote on questions';
+$string['incorrectmodule'] = 'Course Module ID was incorrect';
 $string['id'] = 'ID';
 $string['inputquestion'] = 'Submit your question here:';
 $string['inputquestion_descr'] = 'Change submit directions to what you want them to be.';

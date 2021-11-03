@@ -241,9 +241,9 @@ class hotquestion_form extends moodleform {
         // $mform->setType('question', PARAM_TEXT);
 
         // 20210218 Changed using a text editor instead of textarea.
-        //$mform->addElement('editor', 'text_editor', $temp->submitdirections, 'wrap="virtual" rows="5"');
-        // Changed to format text which allows filters such as Gerico, etc. to work. 
-        $mform->addElement('editor', 'text_editor', format_text($temp->submitdirections, $format = FORMAT_MOODLE, $options = null, $courseid_do_not_use = null), 'wrap="virtual" rows="5"');
+        // $mform->addElement('editor', 'text_editor', $temp->submitdirections, 'wrap="virtual" rows="5"');
+        // Changed to format text which allows filters such as Gerico, etc. to work.
+        $mform->addElement('editor', 'text_editor', format_text($temp->submitdirections, $format = FORMAT_MOODLE, $options = null, $courseiddonotuse = null), 'wrap="virtual" rows="5"');
         $mform->setType('text_editor', PARAM_RAW);
 
         $mform->addElement('hidden', 'id', $cm->id, 'id="hotquestion_courseid"');
