@@ -1,4 +1,4 @@
-@mod @mod_hotquestion
+@mod @mod_hotquestion @javascript
 Feature: Users can vote on named or anonymous entries to hotquestion
   In order to vote on a question
   As a user

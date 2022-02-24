@@ -1,4 +1,4 @@
-@mod @mod_hotquestion
+@mod @mod_hotquestion @javascript
 Feature: Add HotQuestion activity
   In order to allow work effectively
   As a teacher
@@ -24,7 +24,7 @@ Feature: Add HotQuestion activity
     And I log out
     When I log in as "student1"
     And I am on "Course 1" course homepage
-    And I follow "Test hotquestion name"
+    And I follow "Test Hot Question name"
     And I set the following fields to these values:
       | Submit your question here: | First question |
     And I press "Click to post"
