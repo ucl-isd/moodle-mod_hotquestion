@@ -87,7 +87,7 @@ class provider implements
      * @param int $userid the userid.
      * @return contextlist the list of contexts containing user info for the user.
      */
-    public static function get_contexts_for_userid($userid) {
+    public static function get_contexts_for_userid(int $userid) {
         $contextlist = new \core_privacy\local\request\contextlist();
 
         $sql = "SELECT c.id
