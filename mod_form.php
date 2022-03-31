@@ -186,12 +186,22 @@ class mod_hotquestion_mod_form extends moodleform_mod {
         $mform->addHelpButton('removelabel', 'inputapprovallabel', 'hotquestion');
         $mform->addRule('removelabel', null, 'required', null, 'client');
         $mform->addRule('removelabel', get_string('maximumchars', '', 20), 'maxlength', 20, 'client');
-
-        $mform->addElement('selectyesno', 'comments', get_string('allowcomments', 'hotquestion'));
+/*
+        $mform->addElement('selectyesno', 'allowcomments', get_string('allowcomments', 'hotquestion'));
+        $mform->setDefault('allowcomments', $hotquestionconfig->allowcomments);
+        $mform->addHelpButton('allowcomments', 'allowcomments', 'hotquestion');
         if (empty($CFG->usecomments)) {
             $mform->hardFreeze('comments');
             $mform->setConstant('comments', 0);
         }
+*/
+        // Allow comments.
+        if ($hotquestionconfig->allowcomments) {
+            $mform->addElement('selectyesno', 'comments', get_string('allowcomments', 'hotquestion'));
+            $mform->addHelpButton('comments', 'allowcomments', 'hotquestion');
+            $mform->setDefault('comments', 0);
+        }
+
 
         // Availability.
         $mform->addElement('header', 'availabilityhdr', get_string('availability'));
@@ -236,14 +246,16 @@ class hotquestion_form extends moodleform {
 
         $mform =& $this->_form;
 
-        // Next line is to retrieve submit instruction setting and creates the text post area.
-        // $mform->addElement('textarea', 'question', $temp->submitdirections, 'wrap="virtual" rows="3" cols="50"');
-        // $mform->setType('question', PARAM_TEXT);
-
         // 20210218 Changed using a text editor instead of textarea.
         // $mform->addElement('editor', 'text_editor', $temp->submitdirections, 'wrap="virtual" rows="5"');
         // Changed to format text which allows filters such as Gerico, etc. to work.
-        $mform->addElement('editor', 'text_editor', format_text($temp->submitdirections, $format = FORMAT_MOODLE, $options = null, $courseiddonotuse = null), 'wrap="virtual" rows="5"');
+        $mform->addElement('editor'
+                           , 'text_editor'
+                           , format_text($temp->submitdirections
+                           , $format = FORMAT_MOODLE
+                           , $options = null
+                           , $courseiddonotuse = null)
+                           , 'wrap="virtual" rows="5"');
         $mform->setType('text_editor', PARAM_RAW);
 
         $mform->addElement('hidden', 'id', $cm->id, 'id="hotquestion_courseid"');
