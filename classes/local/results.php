@@ -25,7 +25,7 @@
  */
 namespace mod_hotquestion\local;
 
-defined('MOODLE_INTERNAL') || die();
+defined('MOODLE_INTERNAL') || die(); // @codingStandardsIgnoreLine
 define('DIARY_EVENT_TYPE_OPEN', 'open');
 define('DIARY_EVENT_TYPE_CLOSE', 'close');
 
@@ -34,6 +34,8 @@ use csv_export_writer;
 use html_writer;
 use context_module;
 use calendar_event;
+use comment;
+use \mod_hotquestion\event\comments_viewed;
 
 /**
  * Utility class for Hot Question results.
@@ -273,17 +275,39 @@ class results {
      */
     public static function hotquestion_get_question_comment_count($question, $cm, $course) {
         // 20210313 Not in use yet. Part of future development.
-        /*
         global $DB;
-        $context = context_module::instance($cm->id);
+
+        $debug['In results.php CP8a entering function hotquestion_get_question_comment_count $question: '] = $question;
+        $debug['In results.php CP8b showing $cm: '] = $cm;
+        $debug['In results.php CP8c showing $course: '] = $course;
+
+        //$context = context_module::instance($cm->id);
+
+        //$debug['In results.php CP8d showing $context: '] = $context;
+        $debug['In results.php CP8d showing itemid: '] = $question->id;
+        $debug['In results.php CP8d showing commentarea: '] = 'hotquestion_questions';
+        //$debug['In results.php CP8d showing $context->id: '] = $context->id;
+
+
+        $debug['In results.php CP8DB showing $DB->count_records: '] = ($DB->count_records('comments', array('itemid' => $question->id,
+                                                          'commentarea' => 'hotquestion_questions',
+                                                          'contextid' => $cm->id))) ;
+
+
         if ($count = $DB->count_records('comments', array('itemid' => $question->id,
-                                                          'commentarea' => 'hotquestion_question',
-                                                          'contextid' => $context->id))) {
+                                                          'commentarea' => 'hotquestion_questions',
+                                                          'contextid' => $cm->id))) {
+        $debug['In results.php CP8e showing $count: '] = $count;
+        print_object($debug);
+
             return $count;
         } else {
+        $debug['In results.php CP8f showing $count: '] = $count;
+
+        print_object($debug);
+
             return 0;
         }
-        */
     }
 
     /**
@@ -296,26 +320,60 @@ class results {
      */
     public static function hotquestion_display_question_comments($question, $cm, $context, $course) {
         // 20210313 Not in use yet. Part of future development.
-        /*
         global $CFG, $USER, $OUTPUT, $DB;
-        $options = new stdClass();
-        // $options->component = 'mod_hotquestion';
-        $options->context = $context;
-        $options->course = $course;
-        $options->cm      = $cm;
-        $options->component = 'mod_hotquestion';
-        $options->area    = 'hotquestion_question';
-        // $options->commentarea    = 'hotquestion_question';
-        $options->itemid  = $question->id;
-        $options->userid  = $USER->id;
-        // $options->timecreated  = $timecreated;
-        // $options->content    = 'hotquestion_question';
+        $html = '';
 
-        $options->showcount = true;
+        if ($question->approved) {
+            // Get question comments and display the comment box.
+            $context = context_module::instance($cm->id);
+            //require_once($CFG->dirroot.'/comment/lib.php');
+            $cmt = new stdClass();
+            $cmt->component = 'mod_hotquestion';
+            $cmt->context   = $context;
+            $cmt->course    = $course;
+            $cmt->cm        = $cm;
+            $cmt->area      = 'hotquestion_questions';
+            $cmt->itemid    = $question->id;
+            $cmt->showcount = true;
+            $comment = new comment($cmt);
 
-        // $comment = new comment($options);
-        return $options;
-        */
+            $debug['In results.php tracking comments dev cp 6data showing $course->id: '] = $course->id;
+            $debug['In results.php tracking comments dev cp 6data showing $cmt->component: '] = $cmt->component;
+            $debug['In results.php tracking comments dev cp 6data showing $cmt->context: '] = $cmt->context;
+            $debug['In results.php tracking comments dev cp 6data showing $cmt->course: '] = $cmt->course;
+            $debug['In results.php tracking comments dev cp 6data showing $cmt->cm: '] = $cmt->cm;
+            $debug['In results.php tracking comments dev cp 6data showing $cmt->area: '] = $cmt->area;
+            $debug['In results.php tracking comments dev cp 6data showing $cmt->itemid: '] = $cmt->itemid;
+
+            // 20220215 All three of these show the comment interface, but it is non-responsive, at the moment.
+            //$html = html_writer::tag('div', $comment->output(true), array('class' => 'hotquestion-comments'));
+            $html = $comment->output(true);
+            // This third one, shows the comment in the wrong place. Still non-responsive.
+            //$html = $comment->output(false);
+
+
+            //$debug['In results.php tracking comments dev cp 6A showing $cmt: '] = $cmt;
+            //$debug['In results.php tracking comments dev cp 6A showing $html: '] = $html;
+
+
+            // 20220216 Thought about putting comments_viewed event here, but changed my mind.
+            // When this is excuted you are NOT viewing the comments.
+            // The interface is on the page, but it is closed and you cannot read any comments.
+
+
+        } else {
+        //$html = html_writer::tag('div', get_string("nocommentuntilapproved", "pcast"), array('class' => 'pcast-episode-notice'));
+        $html = html_writer::tag('div', get_string("nocommentuntilapproved", "hotquestion"));
+//print_object('///////////////////////////////////////////////////////////////////////////////////////');
+
+        $debug['In results.php tracking comments dev cp 6B showing $html: '] = $html;
+
+    }
+
+        $debug['In results.php tracking comments dev cp 6C showing $html: '] = $html;
+        //print_object($debug);
+        return $html;
+        //return $comment;
     }
 
     /**
@@ -336,72 +394,10 @@ class results {
      * @return array
      */
     public static function hotquestion_comment_permissions($commentparam) {
-        // 20210313 Not in use yet. Part of future development.
          return array('ask' => true, 'view' => true);
     }
 
-    /**
-     * Validate comment parameter before perform other comments actions.
-     *
-     * @param stdClass $commentparam {
-     *              context  => context the context object
-     *              courseid => int course id
-     *              cm       => stdClass course module object
-     *              commentarea => string comment area
-     *              itemid      => int itemid
-     * }
-     * @return boolean
-     */
-    public static function hotquestion_comment_validate($commentparam) {
-        global $DB;
-        // 20210313 Not in use yet. Part of future development.
-
-        // Validate comment area.
-        if ($commentparam->commentarea != 'hotquestion_question') {
-            throw new comment_exception('invalidcommentarea');
-        }
-        if (!$record = $DB->get_record('hotquestion_questions', array('id' => $commentparam->itemid))) {
-            throw new comment_exception('invalidcommentitemid');
-        }
-        if (!$hotquestion = $DB->get_record('hotquestion', array('id' => $record->hotquestionid))) {
-            throw new comment_exception('invalidid', 'data');
-        }
-        if (!$course = $DB->get_record('course', array('id' => $hotquestion->course))) {
-            throw new comment_exception('coursemisconf');
-        }
-        if (!$cm = get_coursemodule_from_instance('hotquestion', $hotquestion->id, $course->id)) {
-            throw new comment_exception('invalidcoursemodule');
-        }
-        $context = context_module::instance($cm->id);
-
-        if ($hotquestion->requireapproval and !$record->approved and !has_capability('mod/hotquestion:approve', $context)) {
-            throw new comment_exception('notapproved', 'hotquestion');
-        }
-        // Validate context id.
-        if ($context->id != $commentparam->context->id) {
-            throw new comment_exception('invalidcontext');
-        }
-        // Validation for comment deletion.
-        if (!empty($commentparam->commentid)) {
-            if ($comment = $DB->get_record('comments', array('id' => $commentparam->commentid))) {
-                if ($comment->commentarea != 'hotquestion_episode') {
-                    throw new comment_exception('invalidcommentarea');
-                }
-                if ($comment->contextid != $commentparam->context->id) {
-                    throw new comment_exception('invalidcontext');
-                }
-                if ($comment->itemid != $commentparam->itemid) {
-                    throw new comment_exception('invalidcommentitemid');
-                }
-            } else {
-                throw new comment_exception('invalidcommentid');
-            }
-        }
-        return true;
-
-    }
-
-    /**
+     /**
      * Return the editor and attachment options when creating a Hot Question question.
      *
      * @param stdClass $course Course object.
@@ -460,7 +456,7 @@ class results {
             // If approval is required, then mark as not approved so only teachers can see it.
             $data->approved = 0;
         }
-        // $context = context_module::instance($this->cm->id);
+        // ...$context = context_module::instance($this->cm->id);...
         $context = context_module::instance($fromform->cm->id);
         // If marked anonymous and anonymous is allowed then change from actual userid to guest.
         if (isset($fromform->anonymous) && $fromform->anonymous && $fromform->instance->anonymouspost) {
@@ -487,5 +483,4 @@ class results {
             return false;
         }
     }
-
 }
