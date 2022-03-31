@@ -131,6 +131,7 @@ foreach ($hotquestions as $hotquestion) {
         }
         // Go count the users and questions in the current round.
         $entrycount = results::hotquestion_count_entries($hotquestion, groups_get_all_groups($course->id, $USER->id));
+
         // Extract the number of users and questions into the participation column.
         foreach ($entrycount as $ec) {
             $table->data[$i][] = "<a href=\"view.php?id=$hotquestion->coursemodule\">"
