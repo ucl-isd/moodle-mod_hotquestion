@@ -29,7 +29,7 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+defined('MOODLE_INTERNAL') || die(); // @codingStandardsIgnoreLine
 use mod_hotquestion\local\results;
 
 /**
@@ -384,35 +384,176 @@ function hotquestion_reset_course_form_definition(&$mform) {
  * @uses FEATURE_COMPLETION_HAS_RULES
  * @uses FEATURE_GRADE_HAS_GRADE
  * @uses FEATURE_GRADE_OUTCOMES
+ * @uses FEATURE_RATE
+ * @uses FEATURE_SHOW_DESCRIPTION
+ * @uses FEATURE_BACKUP_MOODLE2
+ * @uses FEATURE_COMMENT
  * @param string $feature
  * @return mixed True if yes (some features may use other values)
  */
 function hotquestion_supports($feature) {
-    switch($feature) {
-        case FEATURE_GROUPS:
-            return true;
-        case FEATURE_GROUPINGS:
-            return true;
-        case FEATURE_GROUPMEMBERSONLY:
-            return true;
-        case FEATURE_MOD_INTRO:
-            return true;
-        case FEATURE_COMPLETION_TRACKS_VIEWS:
-            return true;
-        case FEATURE_COMPLETION_HAS_RULES:
-            return false;
-        case FEATURE_GRADE_HAS_GRADE:
-            return false;
-        case FEATURE_GRADE_OUTCOMES:
-            return false;
-        case FEATURE_RATE:
-            return false;
-        case FEATURE_SHOW_DESCRIPTION:
-            return true;
-        case FEATURE_BACKUP_MOODLE2:
-            return true;
+    global $CFG;
+    if ($CFG->branch > 311) {
+        switch($feature) {
+            case FEATURE_MOD_PURPOSE:
+                return MOD_PURPOSE_COLLABORATION;
+            case FEATURE_BACKUP_MOODLE2:
+                return true;
+            case FEATURE_COMMENT:
+                return true;
+            case FEATURE_COMPLETION_HAS_RULES:
+                return false;
+            case FEATURE_COMPLETION_TRACKS_VIEWS:
+                return true;
+            case FEATURE_GRADE_HAS_GRADE:
+                return false;
+            case FEATURE_GRADE_OUTCOMES:
+                return false;
+            case FEATURE_GROUPS:
+                return true;
+            case FEATURE_GROUPINGS:
+                return true;
+            case FEATURE_GROUPMEMBERSONLY:
+                return true;
+            case FEATURE_MOD_INTRO:
+                return true;
+            case FEATURE_RATE:
+                return false;
+            case FEATURE_SHOW_DESCRIPTION:
+                return true;
 
-        default:
-            return null;
+            default:
+                return null;
+        }
+    } else {
+        switch($feature) {
+            case FEATURE_BACKUP_MOODLE2:
+                return true;
+            case FEATURE_COMMENT:
+                return true;
+            case FEATURE_COMPLETION_HAS_RULES:
+                return false;
+            case FEATURE_COMPLETION_TRACKS_VIEWS:
+                return true;
+            case FEATURE_GRADE_HAS_GRADE:
+                return false;
+            case FEATURE_GRADE_OUTCOMES:
+                return false;
+            case FEATURE_GROUPS:
+                return true;
+            case FEATURE_GROUPINGS:
+                return true;
+            case FEATURE_GROUPMEMBERSONLY:
+                return true;
+            case FEATURE_MOD_INTRO:
+                return true;
+            case FEATURE_RATE:
+                return false;
+            case FEATURE_SHOW_DESCRIPTION:
+                return true;
+
+            default:
+                return null;
+        }
     }
+}
+    /**
+     * Validate comment parameter before perform other comments actions.
+     *
+     * @param stdClass $commentparam {
+     *              context  => context the context object
+     *              courseid => int course id
+     *              cm       => stdClass course module object
+     *              commentarea => string comment area
+     *              itemid      => int itemid
+     * }
+     * @return boolean
+     */
+function hotquestion_comment_validate($commentparam) {
+    global $DB;
+    $debug['lib.php Tracking hotquestion_comment_validate enter: '] = 'Made it to the validation function in HQ lib.php file!';
+    $debug['lib.php Tracking hotquestion_comment_validate $commentparam: '] = $commentparam;
+    // Validate comment area.
+    if ($commentparam->commentarea != 'hotquestion_questions') {
+        throw new comment_exception('invalidcommentarea');
+    }
+    if (!$record = $DB->get_record('hotquestion_questions', array('id' => $commentparam->itemid))) {
+        throw new comment_exception('invalidcommentitemid');
+    }
+    if (!$hotquestion = $DB->get_record('hotquestion', array('id' => $record->hotquestion))) {
+        throw new comment_exception('invalidid', 'data');
+    }
+    if (!$course = $DB->get_record('course', array('id' => $hotquestion->course))) {
+        throw new comment_exception('coursemisconf');
+    }
+    if (!$cm = get_coursemodule_from_instance('hotquestion', $hotquestion->id, $course->id)) {
+        throw new comment_exception('invalidcoursemodule');
+    }
+    $context = context_module::instance($cm->id);
+
+    if ($hotquestion->approval and !$record->approved and !has_capability('mod/hotquestion:approve', $context)) {
+        throw new comment_exception('notapproved', 'hotquestion');
+    }
+    // Validate context id.
+    if ($context->id != $commentparam->context->id) {
+        throw new comment_exception('invalidcontext');
+    }
+    // Validation for comment deletion.
+    if (!empty($commentparam->commentid)) {
+        if ($comment = $DB->get_record('comments', array('id' => $commentparam->commentid))) {
+            if ($comment->commentarea != 'hotquestion_episode') {
+                throw new comment_exception('invalidcommentarea');
+            }
+            if ($comment->contextid != $commentparam->context->id) {
+                throw new comment_exception('invalidcontext');
+            }
+            if ($comment->itemid != $commentparam->itemid) {
+                throw new comment_exception('invalidcommentitemid');
+            }
+        } else {
+            throw new comment_exception('invalidcommentid');
+        }
+    }
+    $debug['lib.php Tracking hotquestion_comment_validate exit: '] = 'Returning true validation in function in HQ lib.php file!';
+
+    //print_object($debug);
+
+    return true;
+}
+
+/**
+ * Running addtional permission check on plugin, for example, plugins
+ * may have switch to turn on/off comments option, this callback will
+ * affect UI display, not like pluginname_comment_validate only throw
+ * exceptions.
+ * Capability check has been done in comment->check_permissions(), we
+ * don't need to do it again here.
+ *
+ * @param stdClass $commentparam {
+ *              context  => context the context object
+ *              courseid => int course id
+ *              cm       => stdClass course module object
+ *              commentarea => string comment area
+ *              itemid      => int itemid
+ * }
+ * @return array
+ */
+function hotquestion_comment_permissions($commentparam) {
+//print_object('///////////////////////////////////////////////////////////////////////');
+//print_object('In Hot Question lib.php file at line 504 checking comment permissions.');
+//print_object(array('post' => true, 'view' => true));
+//print_object('///////////////////////////////////////////////////////////////////////');
+    return array('post' => true, 'view' => true);
+}
+
+/**
+ * Returns all other caps used in module.
+ * @return array
+ */
+function hotquestion_get_extra_capabilities() {
+    return array('moodle/comment:post',
+                 'moodle/comment:view',
+                 'moodle/site:viewfullnames',
+                 'moodle/site:trustcontent',
+                 'moodle/site:accessallgroups');
 }
