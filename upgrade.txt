@@ -1,32 +1,50 @@
+This files describes changes in the Hot Question code.
+
 === 4.0.2 ===
 20211029 Merged pull request #51 made by Vidalia.
 20211029 Ran codechecker.php.
-20211029 Hot Question_758 - According to codechececker.ph underscores in functions need
+20211029 HotQuestion_758 - According to codechececker.php underscores in functions need
     to be removed. Removed as indicated by codechecker.
-20211029 Hot Question_759 - Line 35: Function print_error() has been deprecated; in
+20211029 HotQuestion_759 - Line 35: Function print_error() has been deprecated; in
     index.php. Switched to using the much simpler code as used in assign/index.php.
     $course = $DB-&gt;get_record('course', array('id' =&gt; $cm-&gt;course), '*',
     MUST_EXIST);
-20211102 Hot Question_761 - Line 214: Function print_error() has been deprecated;
+20211102 HotQuestion_761 - Line 214: Function print_error() has been deprecated;
     in renderer.php. Switched to using the throw new moodle_exception(). Also had
     add new language string for incorrectmodule.
-20211102 Hot Question_762 - Line 43: Function print_error() has been deprecated;
+20211102 HotQuestion_762 - Line 43: Function print_error() has been deprecated;
     in view.php. Switched to using the throw new moodle_exception().
-20211102 Hot Question_763 - Line 46: Function print_error() has been deprecated;
+20211102 HotQuestion_763 - Line 46: Function print_error() has been deprecated;
     in view.php. Switched to using the much simpler code as used in assign/index.php.
     $course = $DB-&gt;get_record('course', array('id' =&gt; $cm-&gt;course), '*',
     MUST_EXIST);
-20211103 Hot Question_764 - Line 61: Function print_error() has been deprecated;
+20211103 HotQuestion_764 - Line 61: Function print_error() has been deprecated;
     in view.php. Switched to using the throw new moodle_exception(). Already
     have the needed language string.
-20211103 Hot Question_765 - Line 65: Function print_error() has been deprecated;
+20211103 HotQuestion_765 - Line 65: Function print_error() has been deprecated;
     in view.php. Switched to using the throw new moodle_exception(). Already
     have the needed language string.
-20211103 Hot Question_766 - Line 69: Function print_error() has been deprecated;
+20211103 HotQuestion_766 - Line 69: Function print_error() has been deprecated;
     in view.php. Switched to using the throw new moodle_exception(). Already
     have the needed language string.
-
-
+20211104 HotQuestion_487 - Need to implement Comments. Restarted dev work on this.
+    There is a proposal to greatly change comments at:
+    https://docs.moodle.org/dev/Rewrite_Comment_API. This will need to be watched!
+20211219 HotQuestion_790 - Would be nice to have, View all Hot Questions link on
+    view.php page. Added code for an href link to view.php file about line 290.
+    Also had to add one new string, viewallhotquestions. 
+20220220 HotQuestion_484 - Need to update GDPR Code. Made changes as needed until
+    the code ran without errors when I ran: php adhoc_task.php --execute.
+20220225 Merged pull request #52 made by ehsan42. Entered info into another
+    behat ticket,  HotQuestion_486 - Need to update Behat tests for new remove
+    confirmation.
+20220301 HotQuestion_827 - Need to implement Activity Completion for View. Made
+    changes and code addition as needed to lib.php, view.php, and renderer.php.
+    See the ticket for details.
+20220321 Hot Question_834 - Need new hotquestion_supports($feature) for Moodle 4.0.
+    Created two versions of the switch ($feature), and added a branch check to
+    control which is used. The first switch includes the needed new feature,
+    while the second, does not. 
 
 === 4.0.1 ===
 20210516 Hot Question_695 - Invalid get_string() identifier: 'hotquestion:rate'.
