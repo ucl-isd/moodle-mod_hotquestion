@@ -23,7 +23,7 @@
  */
 
 namespace mod_hotquestion\event;
-defined('MOODLE_INTERNAL') || die();
+defined('MOODLE_INTERNAL') || die(); // @codingStandardsIgnoreLine
 
 /**
  * The mod_hotquestion comments viewed event class.
@@ -51,8 +51,8 @@ class comments_viewed extends \core\event\comments_viewed {
      * @return string
      */
     public function get_description() {
-        return "The user with id '$this->userid' viewed a comment with id '$this->objectid' on the  the podcast episode with id ".
-            "'$this->objectid' for the podcast activity with course module id '$this->contextinstanceid'.";
+        return "The user with id '$this->userid' viewed a comment with id '{$this->other['comment']}' in the course with id ".
+            "'{$this->other['comment']}' for the hot question activity with course module id '$this->contextinstanceid'.";
     }
 
     /**
