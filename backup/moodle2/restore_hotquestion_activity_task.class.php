@@ -22,7 +22,7 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+defined('MOODLE_INTERNAL') || die(); // @codingStandardsIgnoreLine
 
 require_once($CFG->dirroot . '/mod/hotquestion/backup/moodle2/restore_hotquestion_stepslib.php'); // Because it exists (must).
 
