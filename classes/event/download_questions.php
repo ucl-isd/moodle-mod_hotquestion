@@ -23,7 +23,7 @@
  */
 
 namespace mod_hotquestion\event;
-defined('MOODLE_INTERNAL') || die();
+defined('MOODLE_INTERNAL') || die(); // @codingStandardsIgnoreLine
 
 /**
  * The mod_hotquestion download questions class.
