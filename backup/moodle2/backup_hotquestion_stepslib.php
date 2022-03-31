@@ -30,7 +30,7 @@
  * Define the complete hotquestion structure for backup, with file and id annotations
  */
 
-defined('MOODLE_INTERNAL') || die();
+defined('MOODLE_INTERNAL') || die(); // @codingStandardsIgnoreLine
 
 /**
  * Define the complete choice structure for backup, with file and id annotations
