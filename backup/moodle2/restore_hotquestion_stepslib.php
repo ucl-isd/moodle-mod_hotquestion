@@ -26,7 +26,7 @@
  * Structure step to restore one hotquestion activity.
  */
 
-defined('MOODLE_INTERNAL') || die();
+defined('MOODLE_INTERNAL') || die(); // @codingStandardsIgnoreLine
 
 /**
  * Define the complete hotquestion structure for restore, with file and id annotations
