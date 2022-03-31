@@ -24,19 +24,15 @@
  */
 
 namespace mod_hotquestion\privacy;
-defined('MOODLE_INTERNAL') || die();
 
 use context;
 use context_helper;
 use context_user;
 use context_module;
 use core_privacy\local\metadata\collection;
-use core_privacy\local\request\approved_contextlist;
-use core_privacy\local\request\contextlist;
-use core_privacy\local\request\transform;
-use core_privacy\local\request\deletion_criteria;
-use core_privacy\local\request\helper;
-use core_privacy\local\request\writer;
+use core_privacy\local\request\{writer, transform, helper, contextlist, approved_contextlist, approved_userlist, userlist};
+
+defined('MOODLE_INTERNAL') || die(); // @codingStandardsIgnoreLine
 
 /**
  * Data provider class for the Hot Question activity module.
@@ -46,39 +42,56 @@ use core_privacy\local\request\writer;
  * @author     AL Rachels <drachels@drachels.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class provider implements
-    \core_privacy\local\metadata\provider,
-    \core_privacy\local\request\plugin\provider {
-
-    // This trait must be included.
-    use \core_privacy\local\legacy_polyfill;
-
+class provider implements \core_privacy\local\metadata\provider,
+                          \core_privacy\local\request\plugin\provider,
+                          \core_privacy\local\request\core_userlist_provider {
     /**
-     * Return metadata.
+     * Get a description of the data stored by this plugin.
      *
      * @param collection $collection The initialised collection to add items to.
      * @return collection The updated collection of metadata items.
      */
-    public static function get_metadata(collection $collection) {
-
-        $collection->add_database_table('hotquestion_questions', [
-            'id' => 'privacy:metadata:hotquestion_questions:id',
-            'hotquestion' => 'privacy:metadata:hotquestion_questions:hotquestion',
-            'content' => 'privacy:metadata:hotquestion_questions:content',
-            'userid' => 'privacy:metadata:hotquestion_questions:userid',
-            'time' => 'privacy:metadata:hotquestion_questions:time',
-            'anonymous' => 'privacy:metadata:hotquestion_questions:anonymous',
-            'approved' => 'privacy:metadata:hotquestion_questions:approved',
-            'tpriority' => 'privacy:metadata:hotquestion_questions:tpriority',
-        ], 'privacy:metadata:hotquestion_questions');
-
-        $collection->add_database_table('hotquestion_votes', [
-            'id' => 'privacy:metadata:hotquestion_votes:id',
-            'question' => 'privacy:metadata:hotquestion_votes:question',
-            'voter' => 'privacy:metadata:hotquestion_votes:voter',
-        ], 'privacy:metadata:hotquestion_votes');
-
+    public static function get_metadata(collection $collection) : collection {
+        $collection->add_database_table(
+            'hotquestion_questions',
+            [
+                'id' => 'privacy:metadata:hotquestion_questions:id',
+                'hotquestion' => 'privacy:metadata:hotquestion_questions:hotquestion',
+                'content' => 'privacy:metadata:hotquestion_questions:content',
+                'userid' => 'privacy:metadata:hotquestion_questions:userid',
+                'time' => 'privacy:metadata:hotquestion_questions:time',
+                'anonymous' => 'privacy:metadata:hotquestion_questions:anonymous',
+                'approved' => 'privacy:metadata:hotquestion_questions:approved',
+                'tpriority' => 'privacy:metadata:hotquestion_questions:tpriority',
+            ],
+            'privacy:metadata:hotquestion_questions'
+        );
+        $collection->add_database_table(
+            'hotquestion_votes',
+            [
+                'id' => 'privacy:metadata:hotquestion_votes:id',
+                'question' => 'privacy:metadata:hotquestion_votes:question',
+                'voter' => 'privacy:metadata:hotquestion_votes:voter',
+            ],
+            'privacy:metadata:hotquestion_votes'
+        );
         return $collection;
+    }
+
+    /** @var int */
+    private static $modid;
+
+    /**
+     * Get the module id for the 'hotquestion' module.
+     * @return false|mixed
+     * @throws \dml_exception
+     */
+    private static function get_modid() {
+        global $DB;
+        if (self::$modid === null) {
+            self::$modid = $DB->get_field('modules', 'id', ['name' => 'hotquestion']);
+        }
+        return self::$modid;
     }
 
     /**
@@ -87,24 +100,28 @@ class provider implements
      * @param int $userid the userid.
      * @return contextlist the list of contexts containing user info for the user.
      */
-    public static function get_contexts_for_userid($userid) {
-        $contextlist = new \core_privacy\local\request\contextlist();
-
-        $sql = "SELECT c.id
-                  FROM {context} c
-                  JOIN {course_modules} cm ON cm.id = c.instanceid AND c.contextlevel = :contextlevel
-                  JOIN {modules} m ON m.id = cm.module and m.name = :modulename
-                  JOIN {hotquestion} h ON h.id = cm.instance
-                  JOIN {hotquestion_questions} hq ON hq.hotquestion = h.id
-             LEFT JOIN {hotquestion_votes} hv ON hv.question = hq.id
-                 WHERE (hq.userid = :userid1) OR (hv.voter = :userid2)";
+    public static function get_contexts_for_userid(int $userid) : contextlist {
+        $contextlist = new contextlist();
+        $modid = self::get_modid();
+        if (!$modid) {
+            return $contextlist; // Hot Question module not installed.
+        }
 
         $params = [
-            'modulename' => 'hotquestion',
+            'modid' => $modid,
             'contextlevel' => CONTEXT_MODULE,
             'userid1' => $userid,
             'userid2' => $userid
         ];
+        $sql = "
+            SELECT c.id
+              FROM {context} c
+              JOIN {course_modules} cm ON cm.id = c.instanceid AND c.contextlevel = :contextlevel
+              JOIN {modules} m ON m.id = cm.module and m.name = :modid
+              JOIN {hotquestion} h ON h.id = cm.instance
+              JOIN {hotquestion_questions} hq ON hq.hotquestion = h.id
+         LEFT JOIN {hotquestion_votes} hv ON hv.question = hq.id
+             WHERE (hq.userid = :userid1) OR (hv.voter = :userid2)";
 
         $contextlist->add_from_sql($sql, $params);
 
@@ -112,35 +129,51 @@ class provider implements
     }
 
     /**
+     * Get the list of users who have data within a context.
+     *
+     * @param   userlist    $userlist   The userlist containing the list of users who have data in this context/plugin combination.
+     */
+    public static function get_users_in_context(userlist $userlist) {
+        $context = $userlist->get_context();
+        if (!is_a($context, \context_module::class)) {
+            return;
+        }
+        $modid = self::get_modid();
+        if (!$modid) {
+            return; // HotQuestion module not installed.
+        }
+        $params = [
+            'modid' => $modid,
+            'contextlevel' => CONTEXT_MODULE,
+            'contextid'    => $context->id,
+        ];
+
+        // User-created entry in hotquestion_question.
+        $sql = "
+            SELECT hqq.userid
+              FROM {hotquestion_questions} hqq
+              JOIN {hotquestion} hq ON hq.id = hqq.hotquestion
+              JOIN {course_modules} cm ON cm.instance = hq.id AND cm.module = :modid
+              JOIN {context} ctx ON ctx.instanceid = cm.id AND ctx.contextlevel = :contextlevel
+             WHERE ctx.id = :contextid
+        ";
+        $userlist->add_from_sql('userid', $sql, $params);
+    }
+    /**
      * Export personal data for the given approved_contextlist. User and context information is contained within the contextlist.
      *
      * @param approved_contextlist $contextlist a list of contexts approved for export.
+     * @throws \coding_exception
+     * @throws \dml_exception
      */
     public static function export_user_data(approved_contextlist $contextlist) {
         global $DB;
 
-        $user = $contextlist->get_user();
-        $userid = $user->id;
-        $cmids = array_reduce($contextlist->get_contexts(), function($carry, $context) {
-            if ($context->contextlevel == CONTEXT_MODULE) {
-                $carry[] = $context->instanceid;
-            }
-            return $carry;
-        }, []);
-        if (empty($cmids)) {
+        if (!$contextlist->count()) {
             return;
         }
 
-        // If the context export was requested, then let's at least describe the hotquestion.
-        foreach ($cmids as $cmid) {
-            $context = context_module::instance($cmid);
-            $contextdata = helper::get_context_data($context, $user);
-            helper::export_context_files($context, $user);
-            writer::with_context($context)->export_data([], $contextdata);
-        }
-        // Find the hotquestion IDs.
-        $hotquestionidstocmids = static::_get_hotquestion_ids_to_cmids_from_cmids($cmids);
-
+        $user = $contextlist->get_user();
         list($contextsql, $contextparams) = $DB->get_in_or_equal($contextlist->get_contextids(), SQL_PARAMS_NAMED);
 
         // Export the votes.
@@ -236,12 +269,17 @@ class provider implements
      */
     public static function delete_data_for_all_users_in_context(\context $context) {
         global $DB;
-
-        if (!$context instanceof \context_module) {
+        if (!$context) {
             return;
         }
-
-        if ($cm = get_coursemodule_from_id('hotquestion', $context->instanceid)) {
+        if ($context->contextlevel != CONTEXT_MODULE) {
+            return;
+        }
+        if (!$cm = get_coursemodule_from_id('hotquestion', $context->instanceid)) {
+            return;
+        }
+        $itemids = $DB->get_fieldset_select('hotquestion_questions', 'id', 'hotquestion = ?', [$cm->instance]);
+        if ($itemids) {
             $DB->delete_records('hotquestion_questions', ['hotquestionid' => $cm->instance]);
             $DB->delete_records('hotquestion_votes', ['hotquestionid' => $cm->instance]);
         }
@@ -254,67 +292,72 @@ class provider implements
      */
     public static function delete_data_for_user(approved_contextlist $contextlist) {
         global $DB;
-        if (empty($contextlist->count())) {
+        if (!$contextlist->count()) {
             return;
         }
 
         $userid = $contextlist->get_user()->id;
         foreach ($contextlist->get_contexts() as $context) {
-            $instanceid = $DB->get_field('course_modules', 'instance', ['id' => $context->instanceid], MUST_EXIST);
-            $DB->delete_records('hotquestion_questions', ['hotquestion' => $instanceid, 'userid' => $userid]);
-            $DB->delete_records('hotquestion_votes', ['voter' => $userid]);
-        }
-    }
-
-    /**
-     * Return a dict of hotquestion IDs mapped to their course module ID.
-     *
-     * @param array $cmids The course module IDs.
-     * @return array In the form of [$hotquestionid => $cmid].
-     */
-    protected static function get_hotquestion_ids_to_cmids_from_cmids(array $cmids) {
-        global $DB;
-        list($insql, $inparams) = $DB->get_in_or_equal($cmids, SQL_PARAMS_NAMED);
-        $sql = "
-            SELECT h.id, cm.id AS cmid
-              FROM {hotquestion} h
-              JOIN {modules} m
-                ON m.name = :hotquestion
-              JOIN {course_modules} cm
-                ON cm.instance = h.id
-               AND cm.module = m.id
-             WHERE cm.id $insql";
-        $params = array_merge($inparams, ['hotquestion' => 'hotquestion']);
-        return $DB->get_records_sql_menu($sql, $params);
-    }
-    /**
-     * Loop and export from a recordset.
-     *
-     * @param moodle_recordset $recordset The recordset.
-     * @param string $splitkey The record key to determine when to export.
-     * @param mixed $initial The initial data to reduce from.
-     * @param callable $reducer The function to return the dataset, receives current dataset, and the current record.
-     * @param callable $export The function to export the dataset, receives the last value from $splitkey and the dataset.
-     * @return void
-     */
-    protected static function recordset_loop_and_export(\moodle_recordset $recordset, $splitkey, $initial,
-            callable $reducer, callable $export) {
-
-        $data = $initial;
-        $lastid = null;
-
-        foreach ($recordset as $record) {
-            if ($lastid && $record->{$splitkey} != $lastid) {
-                $export($lastid, $data);
-                $data = $initial;
+            if ($context->contextlevel != CONTEXT_MODULE) {
+                continue;
             }
-            $data = $reducer($data, $record);
-            $lastid = $record->{$splitkey};
-        }
-        $recordset->close();
+            if (!$cm = get_coursemodule_from_id('hotquestion', $context->instanceid)) {
+                continue;
+            }
+            $itemids = $DB->get_fieldset_select('hotquestion_questions', 'id', 'hotquestion = ?', [$cm->instance]);
+            if ($itemids) {
+                list($isql, $params) = $DB->get_in_or_equal($itemids, SQL_PARAMS_NAMED);
+                $params['userid'] = $userid;
+                $DB->delete_records_select('hotquestion_votes', "id $isql AND userid = :userid", $params);
+                $params = ['instanceid' => $cm->instance, 'userid' => $userid];
+                $DB->delete_records_select('hotquestion_questions', 'hotquestion = :instanceid AND userid = :userid', $params);
 
-        if (!empty($lastid)) {
-            $export($lastid, $data);
+
+
+                //$DB->delete_records('hotquestion_questions', ['hotquestion' => $instanceid, 'userid' => $userid]);
+                //$DB->delete_records('hotquestion_votes', ['voter' => $userid]);
+            }
         }
     }
+
+    /**
+     * Delete multiple users within a single context.
+     *
+     * @param   approved_userlist       $userlist The approved context and user information to delete information for.
+     */
+    public static function delete_data_for_users(approved_userlist $userlist) {
+        global $DB;
+        $context = $userlist->get_context();
+        if (!is_a($context, \context_module::class)) {
+            return;
+        }
+        $modid = self::get_modid();
+        if (!$modid) {
+            return; // HotQuestion module not installed.
+        }
+        if (!$cm = get_coursemodule_from_id('hotquestion', $context->instanceid)) {
+            return;
+        }
+
+        // Prepare SQL to gather all completed IDs.
+        $itemids = $DB->get_fieldset_select('hotquestion_questions', 'id', 'hotquestion = ?', [$cm->instance]);
+        list($itsql, $itparams) = $DB->get_in_or_equal($itemids, SQL_PARAMS_NAMED);
+        $userids = $userlist->get_userids();
+        list($insql, $inparams) = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED);
+
+        // Delete user-created personal hotquestion items.
+        $DB->delete_records_select(
+            'hotquestion_questions',
+            "userid $insql AND hotquestion = :hotquestionid",
+            array_merge($inparams, ['hotquestionid' => $cm->instance])
+        );
+
+        // Delete comments made by a teacher about a particular item for a student.
+        $DB->delete_records_select(
+            'hotquestion_votes',
+            "userid $insql AND itemid $itsql",
+            array_merge($inparams, $itparams)
+        );
+    }
+
 }
