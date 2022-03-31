@@ -113,4 +113,9 @@ if ($ADMIN->fulltree) {
         new lang_string('approvallabel', 'hotquestion'),
         new lang_string('approvallabel_descr', 'hotquestion'),
         'Approved', PARAM_TEXT, 20));
+
+    // Default allow comments setting.
+    $settings->add(new admin_setting_configcheckbox('mod_hotquestion/allowcomments'
+                                                    , get_string('allowcomments', 'hotquestion')
+                                                    , get_string('cnfallowcomments', 'hotquestion'), 0));
 }
