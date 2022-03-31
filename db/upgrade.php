@@ -23,7 +23,7 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
+defined('MOODLE_INTERNAL') || die(); // @codingStandardsIgnoreLine
 
 /**
  * Upgrade this hotquestion instance - this function could be skipped but it will be needed later.
@@ -275,7 +275,7 @@ function xmldb_hotquestion_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2020121700, 'hotquestion');
     }
 
-    if ($oldversion < 2021022400) {
+    if ($oldversion < 2022021500) {
 
         // Define field scale to be added to hotquestion.
         $table = new xmldb_table('hotquestion');
@@ -306,7 +306,14 @@ function xmldb_hotquestion_upgrade($oldversion=0) {
 
         // Define field assessedtimefinish to be added to hotquestion.
         $table = new xmldb_table('hotquestion');
-        $field = new xmldb_field('assessedtimefinish', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'assessedtimestart');
+        $field = new xmldb_field('assessedtimefinish'
+                                 , XMLDB_TYPE_INTEGER
+                                 , '10'
+                                 , null
+                                 , XMLDB_NOTNULL
+                                 , null
+                                 , '0'
+                                 , 'assessedtimestart');
 
         // Conditionally launch add field assessedtimefinish.
         if (!$dbman->field_exists($table, $field)) {
@@ -315,7 +322,7 @@ function xmldb_hotquestion_upgrade($oldversion=0) {
 
         // Define field comments to be added to hotquestion.
         $table = new xmldb_table('hotquestion');
-        $field = new xmldb_field('comments', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, '0', 'assesstimefinish');
+        $field = new xmldb_field('comments', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, '0', 'assessedtimefinish');
 
         // Conditionally launch add field comments.
         if (!$dbman->field_exists($table, $field)) {
@@ -332,7 +339,7 @@ function xmldb_hotquestion_upgrade($oldversion=0) {
         }
 
         // Hotquestion savepoint reached.
-        upgrade_mod_savepoint(true, 2021022400, 'hotquestion');
+        upgrade_mod_savepoint(true, 2022021500, 'hotquestion');
     }
     return $result;
 }
