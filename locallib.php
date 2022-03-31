@@ -35,7 +35,7 @@ use \mod_hotquestion\event\remove_question;
 use \mod_hotquestion\event\remove_round;
 use \mod_hotquestion\event\download_questions;
 
-defined('MOODLE_INTERNAL') || die();
+defined('MOODLE_INTERNAL') || die(); // @codingStandardsIgnoreLine
 define('HOTQUESTION_EVENT_TYPE_OPEN', 'open');
 define('HOTQUESTION_EVENT_TYPE_CLOSE', 'close');
 /**
@@ -109,8 +109,8 @@ class mod_hotquestion {
         $data = new StdClass();
         $data->hotquestion = $this->instance->id;
 
-        // $data->content = trim($fromform->question);
-        // print_object($fromform->question2);
+        // ...$data->content = trim($fromform->question);...
+        // ...print_object($fromform->question2);...
         // 20210218 Switched code to use text editor instead of text area.
         $data->content = ($fromform->text_editor['text']);
         $data->format = ($fromform->text_editor['format']);
