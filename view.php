@@ -32,6 +32,8 @@ require_once("../../config.php");
 require_once("lib.php");
 require_once("locallib.php");
 require_once("mod_form.php");
+require_once($CFG->dirroot . '/comment/lib.php');
+comment::init();
 
 $id = required_param('id', PARAM_INT);                  // Course_module ID.
 $ajax = optional_param('ajax', 0, PARAM_BOOL);          // Asychronous form request.
@@ -50,12 +52,17 @@ $hq = new mod_hotquestion($id, $roundid);
 
 // Confirm login.
 require_login($hq->course, true, $hq->cm);
-    require_once($CFG->dirroot . '/comment/lib.php');
-    comment::init();
+
+//require_once($CFG->dirroot . '/comment/lib.php');
+//comment::init();
+
 $context = context_module::instance($hq->cm->id);
 
 $entriesmanager = has_capability('mod/hotquestion:manageentries', $context);
 $canask = has_capability('mod/hotquestion:ask', $context);
+
+//require_once($CFG->dirroot . '/comment/lib.php');
+//comment::init();
 
 if (!$entriesmanager && !$canask) {
     throw new moodle_exception(get_string('accessdenied', 'hotquestion'));
@@ -189,8 +196,8 @@ if (has_capability('mod/hotquestion:ask', $context)) {
         if (!$ajax) {
             redirect('view.php?id='.$hq->cm->id, get_string('questionsubmitted', 'hotquestion'));
         }
-        print_object('Printing $fromform');
-        print_object($fromform);
+        //print_object('Printing $fromform');
+        //print_object($fromform);
         die;
     }
 }
@@ -284,12 +291,23 @@ if (!$ajax) {
             // Password code can go here. e.g. // } else if {.
         }
     }
-    // Print hotquestion description.
-    echo $output->introduction();
+    // 20220301 Added activity completion to the hotquestion description.
+    $cminfo = cm_info::create($cm);
+    $completiondetails = \core_completion\cm_completion_details::get_instance($cminfo, $USER->id);
+    $activitydates = \core\activity_dates::get_dates_for_module($cminfo, $USER->id);
+    echo $output->introduction($cminfo, $completiondetails, $activitydates);
+
+    // 20211219 Added link to all HotQuestion activities.
+    echo '<span style="float:right"><a href="index.php?id='
+         .$course->id
+         .'">'
+         .get_string('viewallhotquestions', 'hotquestion')
+         .'</a></span><br>';
+    echo
 
     // Print group information (A drop down box will be displayed if the user
     // is a member of more than one group, or has access to all groups).
-    groups_print_activity_menu($cm, $CFG->wwwroot . '/mod/hotquestion/view.php?id=' . $cm->id);
+    groups_print_activity_menu($cm, $CFG->wwwroot.'/mod/hotquestion/view.php?id='.$cm->id);
 
     // Print the text box for typing submissions in.
     if (has_capability('mod/hotquestion:ask', $context)) {
