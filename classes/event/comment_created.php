@@ -33,7 +33,7 @@ defined('MOODLE_INTERNAL') || die(); // @codingStandardsIgnoreLine
  * @copyright  2013 Rajesh Taneja <rajesh@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class comment_deleted extends \core\event\comment_deleted {
+class comment_created extends \core\event\comment_created {
     /**
      * Get URL related to the action.
      *
@@ -49,7 +49,7 @@ class comment_deleted extends \core\event\comment_deleted {
      * @return string
      */
     public function get_description() {
-        return "The user with id '$this->userid' created the comment with id '$this->objectid' from the hotquestion activity with " .
-            "course module id '$this->contextinstanceid'.";
+        return "The user with id '$this->userid' created the comment with id '$this->objectid' from the hotquestion " .
+            "activity with course module id '$this->contextinstanceid'.";
     }
 }

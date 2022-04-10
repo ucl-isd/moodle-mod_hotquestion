@@ -311,11 +311,6 @@ class provider implements \core_privacy\local\metadata\provider,
                 $DB->delete_records_select('hotquestion_votes', "id $isql AND userid = :userid", $params);
                 $params = ['instanceid' => $cm->instance, 'userid' => $userid];
                 $DB->delete_records_select('hotquestion_questions', 'hotquestion = :instanceid AND userid = :userid', $params);
-
-
-
-                //$DB->delete_records('hotquestion_questions', ['hotquestion' => $instanceid, 'userid' => $userid]);
-                //$DB->delete_records('hotquestion_votes', ['voter' => $userid]);
             }
         }
     }

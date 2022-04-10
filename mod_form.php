@@ -186,22 +186,13 @@ class mod_hotquestion_mod_form extends moodleform_mod {
         $mform->addHelpButton('removelabel', 'inputapprovallabel', 'hotquestion');
         $mform->addRule('removelabel', null, 'required', null, 'client');
         $mform->addRule('removelabel', get_string('maximumchars', '', 20), 'maxlength', 20, 'client');
-/*
-        $mform->addElement('selectyesno', 'allowcomments', get_string('allowcomments', 'hotquestion'));
-        $mform->setDefault('allowcomments', $hotquestionconfig->allowcomments);
-        $mform->addHelpButton('allowcomments', 'allowcomments', 'hotquestion');
-        if (empty($CFG->usecomments)) {
-            $mform->hardFreeze('comments');
-            $mform->setConstant('comments', 0);
-        }
-*/
-        // Allow comments.
+
+        // 20220410 Allow comments.
         if ($hotquestionconfig->allowcomments) {
             $mform->addElement('selectyesno', 'comments', get_string('allowcomments', 'hotquestion'));
             $mform->addHelpButton('comments', 'allowcomments', 'hotquestion');
             $mform->setDefault('comments', 0);
         }
-
 
         // Availability.
         $mform->addElement('header', 'availabilityhdr', get_string('availability'));

@@ -53,16 +53,10 @@ $hq = new mod_hotquestion($id, $roundid);
 // Confirm login.
 require_login($hq->course, true, $hq->cm);
 
-//require_once($CFG->dirroot . '/comment/lib.php');
-//comment::init();
-
 $context = context_module::instance($hq->cm->id);
 
 $entriesmanager = has_capability('mod/hotquestion:manageentries', $context);
 $canask = has_capability('mod/hotquestion:ask', $context);
-
-//require_once($CFG->dirroot . '/comment/lib.php');
-//comment::init();
 
 if (!$entriesmanager && !$canask) {
     throw new moodle_exception(get_string('accessdenied', 'hotquestion'));
@@ -96,17 +90,6 @@ if (!$ajax) {
     $PAGE->set_context($context);
     $PAGE->set_cm($hq->cm);
     $PAGE->add_body_class('hotquestion');
-    $jsmodule = array(
-        'name'     => 'mod_hotquestion',
-        'fullpath' => '/mod/hotquestion/module.js',
-        'requires' => array('base', 'io', 'node', 'event-valuechange'),
-        'strings'  => array(
-            array('invalidquestion', 'hotquestion'),
-            array('connectionerror', 'hotquestion')
-        )
-    );
-
-    $PAGE->requires->js_init_call('M.mod_hotquestion.init', null, true, $jsmodule);
 }
 
 require_capability('mod/hotquestion:view', $context);
@@ -114,50 +97,6 @@ require_capability('mod/hotquestion:view', $context);
 // Get local renderer.
 $output = $PAGE->get_renderer('mod_hotquestion');
 $output->init($hq);
-
-// print_object('spacer 1');
-// print_object('spacer 2');
-// print_object('spacer 3');
-// print_object('spacer 4x');
-// print_object('Printing $hq');
-// print_object($hq);
-// die;
-
-///////////////////////////////////
-// put data processing here????
-// $data->id = $cm->id;
-/*
-list ($editoroptions, $attachmentoptions) = results::hotquestion_get_editor_and_attachment_options($course,
-                                                                                             $context,
-                                                                                             $entry);
-
-$data = file_prepare_standard_editor($data,
-                                     'text',
-                                     $editoroptions,
-                                     $context,
-                                     'mod_hotquestion',
-                                     'entry',
-                                     $data->entryid);
-$data = file_prepare_standard_filemanager($data,
-                                          'attachment',
-                                          $attachmentoptions,
-                                          $context,
-                                          'mod_hotquestion',
-                                          'attachment',
-                                          $data->entryid);
-
-// 20201119 Added $hotquestion->editdates setting.
-$form = new hotquestion_form(null, array(
-    'current' => $data,
-    'cm' => $cm,
-    'hotquestion' => $hotquestion->editdates,
-    'editoroptions' => $editoroptions,
-    'attachmentoptions' => $attachmentoptions
-));
-*/
-
-
-///////////////////////////////////
 
 // Process submitted question.
 if (has_capability('mod/hotquestion:ask', $context)) {
@@ -184,20 +123,12 @@ if (has_capability('mod/hotquestion:ask', $context)) {
         $newentry->tpriority = 0;
         $newentry->submitbutton = $fromform->submitbutton;
 
-        // print_object('Printing $newentry');
-        // print_object($newentry);
-        // print_object('Printing $fromform');
-        // print_object($fromform);
-        // die;
-
         if (!$hq->add_new_question($fromform)) { // Returns 1 if valid question submitted.
             redirect('view.php?id='.$hq->cm->id, get_string('invalidquestion', 'hotquestion'));
         }
         if (!$ajax) {
             redirect('view.php?id='.$hq->cm->id, get_string('questionsubmitted', 'hotquestion'));
         }
-        //print_object('Printing $fromform');
-        //print_object($fromform);
         die;
     }
 }
@@ -309,7 +240,7 @@ if (!$ajax) {
     // is a member of more than one group, or has access to all groups).
     groups_print_activity_menu($cm, $CFG->wwwroot.'/mod/hotquestion/view.php?id='.$cm->id);
 
-    // Print the text box for typing submissions in.
+    // Print the textarea box for typing submissions in.
     if (has_capability('mod/hotquestion:ask', $context)) {
         $mform->display();
     }

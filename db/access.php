@@ -51,7 +51,6 @@ defined('MOODLE_INTERNAL') || die();
 $capabilities = array(
 
     'mod/hotquestion:manageentries' => array(
-
         'captype' => 'write',
         'contextlevel' => CONTEXT_MODULE,
         'archetypes' => array(
@@ -115,7 +114,6 @@ $capabilities = array(
         )
     ),
     'mod/hotquestion:rate' => array(
-
         'captype' => 'write',
         'contextlevel' => CONTEXT_MODULE,
         'archetypes' => array(
@@ -127,7 +125,6 @@ $capabilities = array(
     'mod/hotquestion:comment' => array(
 
         'riskbitmask' => RISK_SPAM,
-
         'captype' => 'write',
         'contextlevel' => CONTEXT_MODULE,
         'archetypes' => array(

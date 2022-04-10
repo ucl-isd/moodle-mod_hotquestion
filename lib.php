@@ -491,7 +491,7 @@ function hotquestion_comment_validate($commentparam) {
     }
     $context = context_module::instance($cm->id);
 
-    if ($hotquestion->approval and !$record->approved and !has_capability('mod/hotquestion:approve', $context)) {
+    if ($hotquestion->approval and !$record->approved and !has_capability('mod/hotquestion:manageentries', $context)) {
         throw new comment_exception('notapproved', 'hotquestion');
     }
     // Validate context id.
@@ -501,7 +501,7 @@ function hotquestion_comment_validate($commentparam) {
     // Validation for comment deletion.
     if (!empty($commentparam->commentid)) {
         if ($comment = $DB->get_record('comments', array('id' => $commentparam->commentid))) {
-            if ($comment->commentarea != 'hotquestion_episode') {
+            if ($comment->commentarea != 'hotquestion_questions') {
                 throw new comment_exception('invalidcommentarea');
             }
             if ($comment->contextid != $commentparam->context->id) {
@@ -514,10 +514,6 @@ function hotquestion_comment_validate($commentparam) {
             throw new comment_exception('invalidcommentid');
         }
     }
-    $debug['lib.php Tracking hotquestion_comment_validate exit: '] = 'Returning true validation in function in HQ lib.php file!';
-
-    //print_object($debug);
-
     return true;
 }
 
@@ -539,10 +535,6 @@ function hotquestion_comment_validate($commentparam) {
  * @return array
  */
 function hotquestion_comment_permissions($commentparam) {
-//print_object('///////////////////////////////////////////////////////////////////////');
-//print_object('In Hot Question lib.php file at line 504 checking comment permissions.');
-//print_object(array('post' => true, 'view' => true));
-//print_object('///////////////////////////////////////////////////////////////////////');
     return array('post' => true, 'view' => true);
 }
 

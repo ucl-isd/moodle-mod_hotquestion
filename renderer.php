@@ -351,36 +351,23 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
                             $authorinfo = '<div class="author">'.get_string('authorinfohide', 'hotquestion', $a).'</div>';
                         }
 
-                        // Add rating and comments here.
-                        // print_object('Printing the $question.');
-                        // print_object($question);
-                        $debug = array();
-
-                        //if (!$question->approved) {
-                            $comment = '';
-                            $debug['In renderer.php tracking comments dev cp 5a showing $comment is blank: '] = $comment;
-
-                        //} else {
-
-                            // 20210306 Generate comment box using API.
-                            if (($this->hotquestion->instance->comments) && ($question->approved)) {
-                                list($context, $course, $cm) = get_context_info_array($context->id);
-                                // Initialize and then check to see how many comments for this question.
-                                require_once($CFG->dirroot  . '/comment/lib.php');
-                                comment::init();
-
-                                $comment = results::hotquestion_display_question_comments($question, $cm, $context, $course);
-
-                                $debug['In renderer.php tracking comments dev cp 5b showing $comment: '] = $comment;
-                            }
-                        //}
-
-                        //print_object($debug);
-
+                        // 20220410 Add rating and comments here.
+                        $comment = '';
+                        // 20210306 Generate comment box using API.
+                        // 20220410 Got it working.
+                        if ((($this->hotquestion->instance->comments)
+                              && ($question->approved))
+                              || (($this->hotquestion->instance->comments)
+                              && (has_capability('mod/hotquestion:manageentries', $context)))) {
+                            list($context, $course, $cm) = get_context_info_array($context->id);
+                            // Initialize and then check to see how many comments for this question.
+                            require_once($CFG->dirroot  . '/comment/lib.php');
+                            comment::init();
+                            $comment = results::hotquestion_display_question_comments($question, $cm, $context, $course);
+                        }
 
                         // Rating and comments should go in next line after authorinfo.
                         $line[] = $content.$authorinfo.$comment;
-
 
                         // Get current priority value to show.
                         $tpriority = $question->tpriority;

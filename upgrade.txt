@@ -1,6 +1,12 @@
 This files describes changes in the Hot Question code.
 
-=== 4.0.2 ===
+=== 4.0.3 === released - pending
+20220220 HotQuestion_484 - Need to update GDPR Code. Made changes as needed until
+    the code ran without errors when I ran: php adhoc_task.php --execute. As of
+    20220410 I have added comments so they need to be included in the GDPR Code.
+
+
+=== 4.0.2 === released 20220410
 20211029 Merged pull request #51 made by Vidalia.
 20211029 Ran codechecker.php.
 20211029 HotQuestion_758 - According to codechececker.php underscores in functions need
@@ -27,14 +33,11 @@ This files describes changes in the Hot Question code.
 20211103 HotQuestion_766 - Line 69: Function print_error() has been deprecated;
     in view.php. Switched to using the throw new moodle_exception(). Already
     have the needed language string.
-20211104 HotQuestion_487 - Need to implement Comments. Restarted dev work on this.
-    There is a proposal to greatly change comments at:
-    https://docs.moodle.org/dev/Rewrite_Comment_API. This will need to be watched!
+20211104 HotQuestion_487 - Need to implement Comments. Finally got this working
+    by deleting module.js and all references to it in view.php.
 20211219 HotQuestion_790 - Would be nice to have, View all Hot Questions link on
     view.php page. Added code for an href link to view.php file about line 290.
     Also had to add one new string, viewallhotquestions. 
-20220220 HotQuestion_484 - Need to update GDPR Code. Made changes as needed until
-    the code ran without errors when I ran: php adhoc_task.php --execute.
 20220225 Merged pull request #52 made by ehsan42. Entered info into another
     behat ticket,  HotQuestion_486 - Need to update Behat tests for new remove
     confirmation.
@@ -44,7 +47,11 @@ This files describes changes in the Hot Question code.
 20220321 Hot Question_834 - Need new hotquestion_supports($feature) for Moodle 4.0.
     Created two versions of the switch ($feature), and added a branch check to
     control which is used. The first switch includes the needed new feature,
-    while the second, does not. 
+    while the second, does not.
+20220410 Hot Question_841 - The file module.js is no longer needed so it and
+    all references to it need removal. Removed the file and all references to it.
+20220410 Ran codechecker.php. 
+
 
 === 4.0.1 ===
 20210516 Hot Question_695 - Invalid get_string() identifier: 'hotquestion:rate'.

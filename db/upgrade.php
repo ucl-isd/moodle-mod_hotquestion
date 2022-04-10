@@ -275,7 +275,7 @@ function xmldb_hotquestion_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2020121700, 'hotquestion');
     }
 
-    if ($oldversion < 2022021500) {
+    if ($oldversion < 2022041000) {
 
         // Define field scale to be added to hotquestion.
         $table = new xmldb_table('hotquestion');
@@ -339,7 +339,7 @@ function xmldb_hotquestion_upgrade($oldversion=0) {
         }
 
         // Hotquestion savepoint reached.
-        upgrade_mod_savepoint(true, 2022021500, 'hotquestion');
+        upgrade_mod_savepoint(true, 2022041000, 'hotquestion');
     }
     return $result;
 }
