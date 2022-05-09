@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="mod/hotquestion/db" VERSION="20210224" COMMENT="XMLDB file for Moodle mod/hotquestion"
+<XMLDB PATH="mod/hotquestion/db" VERSION="20220508" COMMENT="XMLDB file for Moodle mod/hotquestion"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -17,14 +17,14 @@
         <FIELD NAME="timeopen" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Date HQ opens."/>
         <FIELD NAME="timeclose" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Date HQ closes."/>
         <FIELD NAME="questionlabel" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="Questions" SEQUENCE="false" COMMENT="Change default heading label as desired."/>
-        <FIELD NAME="teacherpriorityvisibility" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Teacher priority column visibility."/>
+        <FIELD NAME="teacherpriorityvisibility" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Teacher priority column visibility."/>
         <FIELD NAME="teacherprioritylabel" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="Priority" SEQUENCE="false" COMMENT="Change the default heading label as desired."/>
-        <FIELD NAME="heatvisibility" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Heat column visibility."/>
+        <FIELD NAME="heatvisibility" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Heat column visibility."/>
         <FIELD NAME="heatlabel" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="Heat" SEQUENCE="false" COMMENT="Change default heat heading label as desired."/>
-        <FIELD NAME="heatlimit" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Vote limit."/>
-        <FIELD NAME="anonymouspost" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
-        <FIELD NAME="authorhide" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="approval" TYPE="int" LENGTH="4" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="heatlimit" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Vote limit."/>
+        <FIELD NAME="anonymouspost" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="1" SEQUENCE="false"/>
+        <FIELD NAME="authorhide" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="approval" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="approvallabel" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="Approved" SEQUENCE="false" COMMENT="Change default heading approvallabel as desired."/>
         <FIELD NAME="removelabel" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="Remove" SEQUENCE="false" COMMENT="Change the default remove heading label as desired."/>
         <FIELD NAME="scale" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
@@ -32,6 +32,14 @@
         <FIELD NAME="assesstimestart" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="assesstimefinish" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="comments" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="grade" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The maximum grade for this activity. Can be negative to indicate the use of a scale."/>
+        <FIELD NAME="postmaxgrade" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Participation required to get maximum grade"/>
+        <FIELD NAME="factorheat" TYPE="int" LENGTH="2" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="Factor in % to weight heat received by posts, for grading."/>
+        <FIELD NAME="factorpriority" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Factor in % to weight priority received by posts, for grading."/>
+        <FIELD NAME="factorvote" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Factor in % to weight votes emitted, for grading"/>
+        <FIELD NAME="completionpost" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Nonzero if a certain number of questions are required to mark this activity complete for a user."/>
+        <FIELD NAME="completionvote" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Nonzero if a certain number of votes are required to mark this activity complete for a user."/>
+        <FIELD NAME="completionpass" TYPE="int" LENGTH="2" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
@@ -48,9 +56,9 @@
         <FIELD NAME="format" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="time" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="anonymous" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="approved" TYPE="int" LENGTH="4" NOTNULL="false" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="tpriority" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="teacher priority"/>
+        <FIELD NAME="anonymous" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="approved" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+        <FIELD NAME="tpriority" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="teacher priority"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
@@ -87,6 +95,23 @@
       </KEYS>
       <INDEXES>
         <INDEX NAME="starttime" UNIQUE="false" FIELDS="starttime"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="hotquestion_grades" COMMENT="Grading data for hotquestion instances">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="hotquestion" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
+        <FIELD NAME="rawrating" TYPE="number" LENGTH="10" NOTNULL="false" SEQUENCE="false" DECIMALS="5" COMMENT="The numerical value for this user's hotquestion rating."/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="hotquestion" TYPE="foreign" FIELDS="hotquestion" REFTABLE="hotquestion" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="userid" UNIQUE="false" FIELDS="userid"/>
+        <INDEX NAME="usergrade" UNIQUE="true" FIELDS="hotquestion, userid"/>
       </INDEXES>
     </TABLE>
   </TABLES>

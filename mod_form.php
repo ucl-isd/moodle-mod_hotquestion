@@ -204,6 +204,34 @@ class mod_hotquestion_mod_form extends moodleform_mod {
                            get_string('hotquestionclosetime', 'hotquestion'),
                            array('optional' => true, 'step' => 1));
 
+        // Contrib by ecastro ULPGC.
+        // Add standard grading elements, common to all modules.
+        $this->standard_grading_coursemodule_elements();
+
+        $mform->addElement('text', 'postmaxgrade', get_string('postmaxgrade', 'hotquestion'), ['size' => 3]);
+        $mform->addHelpButton('postmaxgrade', 'postmaxgrade', 'hotquestion');
+        $mform->setType('postmaxgrade', PARAM_INT);
+        $mform->setDefault('postmaxgrade', $hotquestionconfig->heatlimit);
+        $mform->addRule('postmaxgrade', get_string('valueinterror', 'hotquestion'), 'regex', '/^[0-9]+$/', 'client');
+
+        $mform->addElement('text', 'factorpriority', get_string('factorpriority', 'hotquestion'), ['size' => 3]);
+        $mform->addHelpButton('factorpriority', 'factorpriority', 'hotquestion');
+        $mform->setType('factorpriority', PARAM_INT);
+        $mform->setDefault('factorpriority', floor(100 / $hotquestionconfig->heatlimit));
+        $mform->addRule('factorpriority', get_string('valueinterror', 'hotquestion'), 'regex', '/^[0-9]+$/', 'client');
+
+        $mform->addElement('text', 'factorheat', get_string('factorheat', 'hotquestion'), ['size' => 3]);
+        $mform->addHelpButton('factorheat', 'factorheat', 'hotquestion');
+        $mform->setType('factorheat', PARAM_INT);
+        $mform->setDefault('factorheat', floor(100 / $hotquestionconfig->heatlimit));
+        $mform->addRule('factorheat', get_string('valueinterror', 'hotquestion'), 'regex', '/^[0-9]+$/', 'client');
+
+        $mform->addElement('text', 'factorvote', get_string('factorvote', 'hotquestion'), ['size' => 3]);
+        $mform->addHelpButton('factorvote', 'factorvote', 'hotquestion');
+        $mform->setType('factorvote', PARAM_INT);
+        $mform->setDefault('factorvote', floor(100 / $hotquestionconfig->heatlimit));
+        $mform->addRule('factorvote', get_string('valueinterror', 'hotquestion'), 'regex', '/^[0-9]+$/', 'client');
+        // Contrib by ecastro ULPGC.
         // Add standard elements, common to all modules.
         $this->standard_coursemodule_elements();
         // Next line was missing. Added Sep 30, 2016.
@@ -211,7 +239,6 @@ class mod_hotquestion_mod_form extends moodleform_mod {
 
         // Add standard buttons, common to all modules.
         $this->add_action_buttons();
-
     }
 }
 

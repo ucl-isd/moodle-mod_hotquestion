@@ -234,11 +234,10 @@ if (!$ajax) {
          .'">'
          .get_string('viewallhotquestions', 'hotquestion')
          .'</a></span><br>';
-    echo
 
     // Print group information (A drop down box will be displayed if the user
     // is a member of more than one group, or has access to all groups).
-    groups_print_activity_menu($cm, $CFG->wwwroot.'/mod/hotquestion/view.php?id='.$cm->id);
+    echo groups_print_activity_menu($cm, $CFG->wwwroot.'/mod/hotquestion/view.php?id='.$cm->id);
 
     // Print the textarea box for typing submissions in.
     if (has_capability('mod/hotquestion:ask', $context)) {
@@ -249,6 +248,15 @@ if (!$ajax) {
 echo $output->container_start(null, 'questions_list');
 // Print toolbar.
 echo $output->container_start("toolbar");
+// Start contrib by ecastro ULPGC.
+echo $output->current_user_rating(has_capability('mod/hotquestion:ask', $context));
+
+if ($entriesmanager) {
+    echo ' ';
+    $url = new moodle_url('grades.php', ['id' => $cm->id]);
+    echo $output->single_button($url, get_string('viewgrades', 'hotquestion'));
+}
+// End contrib by ecastro ULPGC.
 echo $output->toolbar(has_capability('mod/hotquestion:manageentries', $context));
 echo $output->container_end();
 

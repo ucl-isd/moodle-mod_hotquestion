@@ -49,9 +49,11 @@ class restore_hotquestion_activity_structure_step extends restore_activity_struc
 
         $paths[] = new restore_path_element('hotquestion', '/activity/hotquestion');
         if ($userinfo) {
+            $paths[] = new restore_path_element('hotquestion_grade', '/activity/hotquestion/grades/grade');
             $paths[] = new restore_path_element('hotquestion_question', '/activity/hotquestion/questions/question');
+            $paths[] = new restore_path_element('hotquestion_vote', '/activity/hotquestion/votes/vote');
             $paths[] = new restore_path_element('hotquestion_round', '/activity/hotquestion/rounds/round');
-            $paths[] = new restore_path_element('hotquestion_vote', '/activity/hotquestion/questions/question/votes/vote');
+            //$paths[] = new restore_path_element('hotquestion_vote', '/activity/hotquestion/questions/question/votes/vote');
         }
 
         // Return the paths wrapped into standard activity structure.
@@ -81,6 +83,28 @@ class restore_hotquestion_activity_structure_step extends restore_activity_struc
     }
 
     /**
+     * Process a grade restore.
+     * @param object $data The data in object form.
+     * @return void
+     */
+    protected function process_hotquestion_grade($data) {
+        global $DB;
+
+        $data = (object)$data;
+        $oldid = $data->id;
+
+        $data->hotquestion = $this->get_new_parentid('hotquestion');
+        $data->userid = $this->get_mappingid('user', $data->userid);
+        //$data->rawrating = $this->get_mappingid('rawrating', $data->rawrating);
+        //$data->timemodified = $this->get_mappingid('timemodified', $data->timemodified);
+
+        //$data->time = $this->apply_date_offset($data->time);
+
+        $newitemid = $DB->insert_record('hotquestion_grades', $data);
+        //$this->set_mapping('hotquestion_grade', $oldid, $newitemid);
+    }
+
+    /**
      * Process a question restore.
      * @param object $data The data in object form.
      * @return void
@@ -93,7 +117,7 @@ class restore_hotquestion_activity_structure_step extends restore_activity_struc
 
         $data->hotquestion = $this->get_new_parentid('hotquestion');
         $data->userid = $this->get_mappingid('user', $data->userid);
-        $data->time = $this->apply_date_offset($data->time);
+        //$data->time = $this->apply_date_offset($data->time);
 
         $newitemid = $DB->insert_record('hotquestion_questions', $data);
         $this->set_mapping('hotquestion_question', $oldid, $newitemid);
@@ -111,8 +135,8 @@ class restore_hotquestion_activity_structure_step extends restore_activity_struc
         $oldid = $data->id;
 
         $data->hotquestion = $this->get_new_parentid('hotquestion');
-        $data->starttime = $this->apply_date_offset($data->starttime);
-        $data->endtime = $this->apply_date_offset($data->endtime);
+        //$data->starttime = $this->apply_date_offset($data->starttime);
+        //$data->endtime = $this->apply_date_offset($data->endtime);
 
         $newitemid = $DB->insert_record('hotquestion_rounds', $data);
         // No need to save this mapping as far as nothing depend on it

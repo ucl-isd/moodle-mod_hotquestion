@@ -81,6 +81,10 @@ class mod_hotquestion {
         $this->course    = $DB->get_record('course', array('id' => $this->cm->course), '*', MUST_EXIST);
         $this->instance  = $DB->get_record('hotquestion', array('id' => $this->cm->instance), '*', MUST_EXIST);
         $this->set_currentround($roundid);
+
+        // Contrib by ecastro ULPGC, for grades callbacks.
+        $this->instance->cmid = $cmid;
+        $this->instance->cmidumber = $this->cm->idnumber;
     }
 
     /**
@@ -147,6 +151,8 @@ class mod_hotquestion {
                 add_to_log($this->course->id, "hotquestion", "add question"
                     , "view.php?id={$this->cm->id}", $data->content, $this->cm->id);
             }
+            // Contrib by ecastro ULPGC update grades for question author.
+            $this->update_users_grades([$USER->id]);
             return true;
         } else {
             return false;
@@ -186,6 +192,8 @@ class mod_hotquestion {
             } else {
                 $DB->delete_records('hotquestion_votes', array('question' => $question->id, 'voter' => $USER->id));
             }
+            // Contrib by ecastro ULPGC, update grades for questions author and voters.
+            $this->update_users_grades([$question->userid, $USER->id]);
         }
     }
 
@@ -222,6 +230,8 @@ class mod_hotquestion {
             } else {
                 $DB->delete_records('hotquestion_votes', array('question' => $question->id, 'voter' => $USER->id));
             }
+            // Contrib by ecastro ULPGC, update grades for question author and voters.
+            $this->update_users_grades([$question->userid, $USER->id]);
         }
     }
 
@@ -479,10 +489,17 @@ class mod_hotquestion {
         if (null !== (required_param('q', PARAM_INT))) {
             $questionid = required_param('q', PARAM_INT);
             $dbquestion = $DB->get_record('hotquestion_questions', array('id' => $questionid));
+            // Contrib by ecastro ULPGC.
+            $users = $this->get_question_voters($questionid);
+            $users[] = $dbquestion->userid;
+            // Contrib by ecastro ULPGC.
             $DB->delete_records('hotquestion_questions', array('id' => $dbquestion->id));
             // Get an array of all votes on the question that was just deleted, then delete them.
             $dbvote = $DB->get_records('hotquestion_votes', array('question' => $questionid));
             $DB->delete_records('hotquestion_votes', array('question' => $dbquestion->id));
+
+            // Contrib by ecastro ULPGC, update grades for question author and voters.
+            $this->update_users_grades($users);
         }
         return $this->currentround;
     }
@@ -534,10 +551,17 @@ class mod_hotquestion {
             foreach ($questions as $q) {
                 $questionid = $q->id; // Get id of first question on the page to delete.
                 $dbquestion = $DB->get_record('hotquestion_questions', array('id' => $questionid));
+                // Contrib by ecastro ULPGC.
+                $users = $this->get_question_voters($questionid);
+                $users[] = $dbquestion->userid;
+                // Contrib by ecastro ULPGC.
                 $DB->delete_records('hotquestion_questions', array('id' => $dbquestion->id));
                 // Get an array of all votes on the question that was just deleted, then delete them.
                 $dbvote = $DB->get_records('hotquestion_votes', array('question' => $questionid));
                 $DB->delete_records('hotquestion_votes', array('question' => $dbquestion->id));
+
+                // Contrib by ecastro ULPGC, update grades for question author and voters.
+                $this->update_users_grades($users);
             }
             // Now that all questions and votes are gone, remove the round.
             $dbround = $DB->get_record('hotquestion_rounds', array('id' => $roundid));
@@ -580,6 +604,7 @@ class mod_hotquestion {
         require_once($CFG->libdir.'/csvlib.class.php');
 
         $context = context_module::instance($this->cm->id);
+
         // Trigger download_questions event.
         if ($CFG->version > 2014051200) { // If newer than Moodle 2.7+ use new event logging.
             $params = array(
@@ -698,7 +723,7 @@ class mod_hotquestion {
                            COUNT(hv.voter) AS heat,
                            hq.approved AS approved
                      FROM {hotquestion_questions} hq
-                LEFT JOIN {hotquestion_votes} hv ON hv.question=hq.id
+                LEFT JOIN {hotquestion_votes} hv ON hv.question = hq.id
                      JOIN {user} u ON u.id = hq.userid
                     WHERE hq.userid > 0 ";
         }
@@ -767,10 +792,108 @@ class mod_hotquestion {
         }
     }
 
+    // Contrib by ecastro ULPGC.
 
+    /**
+     * Get the user rating in this activity, by posts and votes.
+     *
+     * @param int $userid the user to calculate ratings.
+     * @return float $rating number
+     */
+    public function calculate_user_ratings($userid = null) : float {
+        global $DB, $USER;
+
+        if (!$userid) {
+            $userid = $USER->id;
+        }
+        // Get any questions by this user and any votes if they have some.
+        $sql = "SELECT q.id, q.approved, q.tpriority, count(v.voter) as votes
+                  FROM {hotquestion_questions} q
+             LEFT JOIN {hotquestion_votes} v ON v.question = q.id
+                 WHERE q.hotquestion = ? AND q.userid = ?
+              GROUP BY q.id ";
+        $params = [$this->instance->id, $userid];
+        $questions = $DB->get_records_sql($sql, $params);
+        $grade = 0;
+        // If the user added any questions, add to the current user rating.
+        foreach ($questions as $question) {
+            $qrate = ($question->tpriority) ? $question->tpriority : $this->instance->factorpriority / 100;
+            $grade += $qrate + $question->votes * $this->instance->factorheat / 100;
+        }
+        // Get any votes made by this user.
+        $sql = "SELECT COUNT(v.id)
+                  FROM {hotquestion_votes} v
+                  JOIN {hotquestion_questions} q ON v.question = q.id
+                 WHERE q.hotquestion = ? AND v.voter = ? ";
+        $params = [$this->instance->id, $userid];
+        $votes = $DB->count_records_sql($sql, $params);
+        // If the user voted, add to the current user rating.
+        if ($votes > 0) {
+            $grade += $votes * $this->instance->factorvote / 100;
+        }
+
+        return $grade;
+    }
+
+    /**
+     * Gets the users that had voted a given question.
+     *
+     * @param int $questionid The question id.
+     * @return array Array of int userids or empty if none.
+     */
+    public function get_question_voters(int $questionid) : array {
+        global $DB;
+
+        $voters = $DB->get_records_menu('hotquestion_votes', ['question' => $questionid], 'id, voter');
+
+        if ($voters) {
+            return array_values($voters);
+        }
+        return [];
+    }
+
+    /**
+     * Recalculates ratings and grades for users related to question
+     * The author of the question and the voters.
+     *
+     * @param array $users The userids of users to update.
+     */
+    public function update_users_grades(array $users) {
+        global $DB;
+
+        if (empty($users)) {
+            return false;
+        }
+
+        list($insql, $params) = $DB->get_in_or_equal($users);
+        $select = "userid $insql AND hotquestion = ? ";
+        $params[] = $this->instance->id;
+        $grades = $DB->get_records_select('hotquestion_grades',
+                                          $select, $params, '',
+                                          'userid, id, hotquestion, rawrating, timemodified');
+
+        $now = time();
+        $newgrade = new stdClass();
+        $newgrade->hotquestion = $this->instance->id;
+        $newgrade->timemodified = $now;
+        foreach ($users as $userid) {
+            $rating = $this->calculate_user_ratings($userid);
+            if (isset($grades[$userid])) {
+                // Existing user grade, update if changed.
+                $grade = $grades[$userid];
+                if ($rating != $grade->rawrating) {
+                    $grade->rawrating = $rating;
+                    $grade->timemodified = $now;
+                    $DB->update_record('hotquestion_grades', $grade);
+                }
+            } else {
+                // New user grade, create.
+                $newgrade->rawrating = $rating;
+                $newgrade->userid = $userid;
+                $DB->insert_record('hotquestion_grades', $newgrade);
+            }
+
+            hotquestion_update_grades($this->instance, $userid);
+        }
+    }
 }
-
-
-
-
-

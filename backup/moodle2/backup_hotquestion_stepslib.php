@@ -51,27 +51,72 @@ class backup_hotquestion_activity_structure_step extends backup_activity_structu
         $userinfo = $this->get_setting_value('userinfo');
 
         // Define each element separated.
-        $hotquestion = new backup_nested_element('hotquestion', array('id'), array(
-            'name', 'intro', 'introformat', 'submitdirections', 'timecreated',
-            'timemodified', 'timeopen', 'timeclose', 'questionlabel', 'teacherpriorityvisibility',
-            'teacherprioritylabel', 'heatvisibility', 'heatlabel', 'heatlimit', 'anonymouspost',
-            'authorhide', 'approval', 'approvallabel', 'removelabel'));
+        $hotquestion = new backup_nested_element('hotquestion', array('id'),
+                                                 array('name',
+                                                       'intro',
+                                                       'introformat',
+                                                       'submitdirections',
+                                                       'timecreated',
+                                                       'timemodified',
+                                                       'timeopen',
+                                                       'timeclose',
+                                                       'questionlabel',
+                                                       'teacherpriorityvisibility',
+                                                       'teacherprioritylabel',
+                                                       'heatvisibility',
+                                                       'heatlabel',
+                                                       'heatlimit',
+                                                       'anonymouspost',
+                                                       'authorhide',
+                                                       'approval',
+                                                       'approvallabel',
+                                                       'removelabel',
+                                                       'scale',
+                                                       'assessed',
+                                                       'assessedtimestart',
+                                                       'assessedtimefinish',
+                                                       'assesstimestart',
+                                                       'assesstimefinish',
+                                                       'comments',
+                                                       'grade',
+                                                       'postmaxgrade',
+                                                       'factorheat',
+                                                       'factorpriority',
+                                                       'factorvote',
+                                                       'completionpost',
+                                                       'completionvote',
+                                                       'completionpass'));
+
+        $grades = new backup_nested_element('grades');
+        $grade = new backup_nested_element('grade', array('id'),
+                                           array('userid',
+                                                 'rawrating',
+                                                 'timemodified'));
 
         $questions = new backup_nested_element('questions');
-
-        $question = new backup_nested_element('question', array('id'), array(
-            'content', 'format', 'userid', 'time', 'anonymous', 'approved', 'tpriority'));
+        $question = new backup_nested_element('question', array('id'),
+                                              array('content',
+                                                    'format',
+                                                    'userid',
+                                                    'time',
+                                                    'anonymous',
+                                                    'approved',
+                                                    'tpriority'));
 
         $rounds = new backup_nested_element('rounds');
-
-        $round = new backup_nested_element('round', array('id'), array(
-            'starttime', 'endtime'));
+        $round = new backup_nested_element('round', array('id'),
+                                           array('starttime',
+                                                 'endtime'));
 
         $votes = new backup_nested_element('votes');
-
-        $vote = new backup_nested_element('vote', array('id'), array('voter'));
+        $vote = new backup_nested_element('vote', array('id'),
+                                          array('question',
+                                                'voter'));
 
         // Build the tree.
+        $hotquestion->add_child($grades);
+        $grades->add_child($grade);
+
         $hotquestion->add_child($questions);
         $questions->add_child($question);
 
@@ -86,12 +131,14 @@ class backup_hotquestion_activity_structure_step extends backup_activity_structu
 
         // All the rest of elements only happen if we are including user info.
         if ($userinfo) {
+            $grade->set_source_table('hotquestion_grades', array('hotquestion' => backup::VAR_PARENTID));
             $question->set_source_table('hotquestion_questions', array('hotquestion' => backup::VAR_PARENTID));
             $round->set_source_table('hotquestion_rounds', array('hotquestion' => backup::VAR_PARENTID));
             $vote->set_source_table('hotquestion_votes', array('question' => backup::VAR_PARENTID));
         }
 
         // Define id annotations.
+        $grade->annotate_ids('user', 'userid');
         $question->annotate_ids('user', 'userid');
         $vote->annotate_ids('user', 'voter');
 

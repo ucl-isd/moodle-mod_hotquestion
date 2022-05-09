@@ -341,5 +341,198 @@ function xmldb_hotquestion_upgrade($oldversion=0) {
         // Hotquestion savepoint reached.
         upgrade_mod_savepoint(true, 2022041000, 'hotquestion');
     }
+    if ($oldversion < 2022042708) {
+
+        // Define field grade to be added to hotquestion.
+        $table = new xmldb_table('hotquestion');
+        $field = new xmldb_field('grade', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'comments');
+
+        // Conditionally launch add field grade.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define field postmaxgrade to be added to hotquestion.
+        $table = new xmldb_table('hotquestion');
+        $field = new xmldb_field('postmaxgrade', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '0', 'grade');
+
+        // Conditionally launch add field postmaxgrade.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define field factorheat to be added to hotquestion.
+        $table = new xmldb_table('hotquestion');
+        $field = new xmldb_field('factorheat', XMLDB_TYPE_INTEGER, '2', null, null, null, '0', 'postmaxgrade');
+
+        // Conditionally launch add field factorheat.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define field factorpriority to be added to hotquestion.
+        $table = new xmldb_table('hotquestion');
+        $field = new xmldb_field('factorpriority', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '0', 'factorheat');
+
+        // Conditionally launch add field factorpriority.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define field factorvote to be added to hotquestion.
+        $table = new xmldb_table('hotquestion');
+        $field = new xmldb_field('factorvote', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '0', 'factorpriority');
+
+        // Conditionally launch add field factorvote.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define field completionpost to be added to hotquestion.
+        $table = new xmldb_table('hotquestion');
+        $field = new xmldb_field('completionpost', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '0', 'factorvote');
+
+        // Conditionally launch add field completionpost.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define field completionvote to be added to hotquestion.
+        $table = new xmldb_table('hotquestion');
+        $field = new xmldb_field('completionvote', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '0', 'completionpost');
+
+        // Conditionally launch add field completionvote.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define field completionpass to be added to hotquestion.
+        $table = new xmldb_table('hotquestion');
+        $field = new xmldb_field('completionpass', XMLDB_TYPE_INTEGER, '2', null, null, null, '0', 'completionvote');
+
+        // Conditionally launch add field completionpass.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define table hotquestion_grades to be created.
+        $table = new xmldb_table('hotquestion_grades');
+
+        // Adding fields to table hotquestion_grades.
+        $table->add_field('id', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, XMLDB_SEQUENCE, null);
+        $table->add_field('hotquestion', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('userid', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, null);
+        $table->add_field('rawrating', XMLDB_TYPE_NUMBER, '10, 5', null, null, null, null);
+        $table->add_field('timemodified', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0');
+
+        // Adding keys to table hotquestion_grades.
+        $table->add_key('primary', XMLDB_KEY_PRIMARY, ['id']);
+        $table->add_key('hotquestion', XMLDB_KEY_FOREIGN, ['hotquestion'], 'hotquestion', ['id']);
+
+        // Adding indexes to table hotquestion_grades.
+        $table->add_index('userid', XMLDB_INDEX_NOTUNIQUE, ['userid']);
+        $table->add_index('usergrade', XMLDB_INDEX_UNIQUE, ['hotquestion', 'userid']);
+
+        // Conditionally launch create table for hotquestion_grades.
+        if (!$dbman->table_exists($table)) {
+            $dbman->create_table($table);
+        }
+
+        // Redefine field teacherpriorityvisibility to be added to hotquestion.
+        $table = new xmldb_table('hotquestion');
+        $field = new xmldb_field('teacherpriorityvisibility',
+                                 XMLDB_TYPE_INTEGER, '2', null,
+                                 XMLDB_NOTNULL, null, '1',
+                                 'questionlabel');
+
+        // Launch change of defaults for field teacherpriorityvisibility.
+        $dbman->change_field_precision($table, $field);
+        $dbman->change_field_notnull($table, $field);
+        $dbman->change_field_default($table, $field);
+
+        // Redefine field heatvisibility to be added to hotquestion.
+        $table = new xmldb_table('hotquestion');
+        $field = new xmldb_field('heatvisibility', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '1', 'teacherprioritylabel');
+
+        // Launch change of defaults for field heatvisibility.
+        $dbman->change_field_precision($table, $field);
+        $dbman->change_field_notnull($table, $field);
+        $dbman->change_field_default($table, $field);
+
+        // Redefine field heatlimit to be added to hotquestion.
+        $table = new xmldb_table('hotquestion');
+        $field = new xmldb_field('heatlimit', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '0', 'heatlabel');
+
+        // Launch change of defaults for field heatlimit.
+        $dbman->change_field_precision($table, $field);
+        $dbman->change_field_notnull($table, $field);
+        $dbman->change_field_default($table, $field);
+
+        // Redefine field anonymouspost to be added to hotquestion.
+        $table = new xmldb_table('hotquestion');
+        $field = new xmldb_field('anonymouspost', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '1', 'heatlimit');
+
+        // Launch change of defaults for field anonymouspost.
+        $dbman->change_field_precision($table, $field);
+        $dbman->change_field_notnull($table, $field);
+        $dbman->change_field_default($table, $field);
+
+        // Redefine field authorhide to be added to hotquestion.
+        $table = new xmldb_table('hotquestion');
+        $field = new xmldb_field('authorhide', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '0', 'anonymouspost');
+
+        // Launch change of defaults for field authorhide.
+        $dbman->change_field_precision($table, $field);
+        $dbman->change_field_notnull($table, $field);
+        $dbman->change_field_default($table, $field);
+
+        // Redefine field approval to be added to hotquestion.
+        $table = new xmldb_table('hotquestion');
+        $field = new xmldb_field('approval', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '0', 'authorhide');
+
+        // Launch change of defaults for field approval.
+        $dbman->change_field_precision($table, $field);
+        $dbman->change_field_notnull($table, $field);
+        $dbman->change_field_default($table, $field);
+
+        // Redefine field comments to be added to hotquestion.
+        $table = new xmldb_table('hotquestion');
+        $field = new xmldb_field('comments', XMLDB_TYPE_INTEGER, '4', null, XMLDB_NOTNULL, null, '0', 'assesstimefinish');
+
+        // Launch change of defaults for field comments.
+        $dbman->change_field_precision($table, $field);
+        $dbman->change_field_notnull($table, $field);
+        $dbman->change_field_default($table, $field);
+
+        // Redefine field anonymous to be added to hotquestion_questions.
+        $table = new xmldb_table('hotquestion_questions');
+        $field = new xmldb_field('anonymous', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '0', 'time');
+
+        // Launch change of defaults for field anonymous.
+        $dbman->change_field_precision($table, $field);
+        $dbman->change_field_notnull($table, $field);
+        $dbman->change_field_default($table, $field);
+
+        // Redefine field approved to be added to hotquestion_questions.
+        $table = new xmldb_table('hotquestion_questions');
+        $field = new xmldb_field('approved', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '0', 'anonymous');
+
+        // Launch change of defaults for field approved.
+        $dbman->change_field_precision($table, $field);
+        $dbman->change_field_notnull($table, $field);
+        $dbman->change_field_default($table, $field);
+
+        // Redefine field tpriority to be added to hotquestion_questions.
+        $table = new xmldb_table('hotquestion_questions');
+        $field = new xmldb_field('tpriority', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '0', 'approved');
+
+        // Launch change of defaults for field tpriority.
+        $dbman->change_field_precision($table, $field);
+        $dbman->change_field_notnull($table, $field);
+        $dbman->change_field_default($table, $field);
+
+        // Hotquestion savepoint reached.
+        upgrade_mod_savepoint(true, 2022042708, 'hotquestion');
+    }
     return $result;
 }

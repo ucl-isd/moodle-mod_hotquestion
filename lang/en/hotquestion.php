@@ -65,14 +65,42 @@ $string['eventupdatevote'] = 'Updated vote';
 $string['exportfilename'] = 'questions.csv';
 $string['exportfilenamep1'] = 'All_Site';
 $string['exportfilenamep2'] = '_HQ_Questions_Exported_On_';
+$string['factorheat'] = 'Heat factor';
+$string['factorheat_help'] = 'A factor to apply to questions count for grading based on question heat.
+The hotter the question, the greater weight towards grading.
+A question by a student counts as 1 plus addition credit
+
+    credit = (votes) · factor/100.
+
+Normally a heat factor of 5% is adequate, meaning if 20 people votes a question, it\'s value is doubled.
+You may need to adjust depending on number of participants and their engagement. ';
+$string['factorpriority'] = 'Priority factor';
+$string['factorpriority_help'] = 'A factor to count questions without teacher priority set.
+Each question counts in the sum of questiosn asked by a student as their priority value (1, 2 ...).
+For those questions without priority (0) the specified value (as a %) is counted. <br />
+A 100% factor means that a non-priority question counts just as a question with priority 1. ';
+$string['factorvote'] = 'Voting factor';
+$string['factorvote_help'] = 'A factor to apply to the voting count of the students when calculating grades.
+In addition to writing new questions, an student can receive participation credit by voting questions by other students.
+This credit is the number of emitted votes times this factor/100.
+
+    credit = votes · factor/100
+
+The factor need to be adjusted depending on the total votes an student could emit
+and the weight desired for this type of participation.
+For instance, in an student can emit 5 heat votes, a factor on 20% means voting for other 5 questions counts as
+one question written by this student. A factor of 100% means voting for other questions counts the same as writing a new question. ';
 $string['for'] = ' for site: ';
+$string['grading'] = 'Raw grade';
 $string['heat'] = 'Heat';
 $string['heaterror'] = 'Too many votes';
+$string['heatgiven'] = 'Heat given';
 $string['heatlabel'] = 'Heat column label';
 $string['heatlabel_descr'] = 'Enter a default label for the Heat column.';
 $string['heatlimit'] = 'Heat default limit';
 $string['heatlimit_descr'] = 'Enter a default for the number of times users can apply heat/vote, per round. Zero hides the heat column.';
 $string['heatlimit_help'] = 'Enter a default for the number of times you can apply heat/vote, per round. Zero hides the heat column.';
+$string['heatreceived'] = 'Heat received';
 $string['heatvisibility'] = 'Heat column visibility';
 $string['heatvisibility_help'] = 'If enabled, the Heat column is visible.';
 $string['heatvisibility_descr'] = 'If enabled, the Heat column is visible, otherwise it is hidden.';
@@ -91,6 +119,7 @@ $string['hotquestion:manageentries'] = 'View list of activities';
 $string['hotquestion:rate'] = 'Rate questions';
 $string['hotquestion:view'] = 'View questions';
 $string['hotquestion:vote'] = 'Vote on questions';
+$string['improperuseviewgradesclass'] = 'Improper use of the viewgrades class. Cannot load the grade item.';
 $string['incorrectmodule'] = 'Course Module ID was incorrect';
 $string['id'] = 'ID';
 $string['inputquestion'] = 'Submit your question here:';
@@ -127,6 +156,11 @@ $string['pluginadministration'] = 'Hot question administration';
 $string['pluginname'] = 'Hot Question';
 $string['previousround'] = 'Previous round';
 $string['postbutton'] = 'Click to post';
+$string['postmaxgrade'] = 'Questions for max grading';
+$string['postmaxgrade_help'] = 'The number of questions required to obtain the maximum calification.
+
+This is nominally a count of questions, but the value attained by a users may be improved by heat factor (questions with greater heat count more)
+and by voting to other questions (a user may improve the grade by participating voting for questions by other students).';
 $string['privacy:metadata:hotquestion_questions'] = "Information about the user's entries for a given Hot Question activity. ";
 $string['privacy:metadata:hotquestion_questions:userid'] = 'The ID of the user that posted this entry.';
 $string['privacy:metadata:hotquestion_questions:hotquestion'] = 'The ID of the Hot Question activity in which the content was posted.';
@@ -149,6 +183,7 @@ $string['questionlabel_descr'] = 'Enter a default label for the Questions column
 $string['questionsubmitted'] = 'Your post has been submitted successfully.';
 $string['questionremove'] = 'Remove';
 $string['questionremovesuccess'] = 'You have successfully removed that question.';
+$string['rawgrade'] = 'Raw grade {$a->rawgrade} / {$a->max}';
 $string['removelabel'] = 'Remove column label';
 $string['removelabel_descr'] = 'Enter a default label for the Remove column.';
 $string['removeround'] = 'Remove this round';
@@ -169,8 +204,10 @@ $string['teacherpriorityvisibility_descr'] = 'If enabled, the Teacher priority c
 $string['time'] = 'Time';
 $string['totalcomments'] = 'Total comments';
 $string['userid'] = 'Userid';
-$string['vote'] = 'Vote';
+$string['valueinterror'] = 'The factor must be a positive integer number';
 $string['viewallentries'] = '{$a->ucount} user(s) posted {$a->qcount} question(s).';
 $string['viewallhotquestions'] = 'View all Hot Questions';
 $string['viewentries'] = 'Participation in current round';
+$string['viewgrades'] = 'View grades';
+$string['vote'] = 'Vote';
 $string['xofn'] = ' of ';

@@ -271,6 +271,7 @@ class results {
      * Added 20210307.
      * @param object $question
      * @param object $cm
+     * @param object $course
      * @return string
      */
     public static function hotquestion_get_question_comment_count($question, $cm, $course) {
@@ -292,6 +293,7 @@ class results {
      * Added 20210313.
      * @param object $question
      * @param object $cm
+     * @param object $context
      * @param object $course
      */
     public static function hotquestion_display_question_comments($question, $cm, $context, $course) {
@@ -344,10 +346,6 @@ class results {
      * @param stdClass $course Course object.
      * @param stdClass $context Context object.
      * @param stdClass $entry Entry object.
-     * @param stdClass $action Action object.
-     * @param stdClass $firstkey Firstkey object.
-     * @return array $editoroptions Array containing the editor and attachment options.
-     * @return array $attachmentoptions Array containing the editor and attachment options.
      */
     public static function hotquestion_get_editor_and_attachment_options($course, $context, $entry) {
         $maxfiles = 99; // TODO: add some setting.

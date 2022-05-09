@@ -30,7 +30,14 @@ use context_helper;
 use context_user;
 use context_module;
 use core_privacy\local\metadata\collection;
-use core_privacy\local\request\{writer, transform, helper, contextlist, approved_contextlist, approved_userlist, userlist};
+use core_privacy\local\request\{writer,
+                                transform,
+                                helper,
+                                contextlist,
+                                approved_contextlist,
+                                approved_userlist,
+                                userlist,
+                                deletion_criteria};
 
 defined('MOODLE_INTERNAL') || die(); // @codingStandardsIgnoreLine
 

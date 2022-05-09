@@ -527,7 +527,6 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
         return $output;
     }
 
-
     /**
      * Get the total number of comments for a specific question.
      *
@@ -545,5 +544,30 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
         } else {
             return 0;
         }
+    }
+
+    // Contrib by ecastro ULPGC .
+
+    /**
+     * Returns formatted user rating grades.
+     *
+     * @param bool $showrating
+     * @return string
+     */
+    public function current_user_rating(bool $showrating) : string {
+        global $USER;
+
+        $output = '';
+
+        if (!$this->hotquestion->instance->grade || !$showrating) {
+            return '';
+        }
+
+        $count = new stdClass();
+        $count->rawgrade = $this->hotquestion->calculate_user_ratings($USER->id);
+        $count->max = $this->hotquestion->instance->postmaxgrade;
+        $output = html_writer::span(get_string('rawgrade', 'hotquestion', $count), ' rawusergrade ');
+
+        return $output;
     }
 }
