@@ -342,7 +342,30 @@ function xmldb_hotquestion_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2022041000, 'hotquestion');
     }
     if ($oldversion < 2022050900) {
+        // Define field assesstimestart to be added to hotquestion.
+        $table = new xmldb_table('hotquestion');
+        $field = new xmldb_field('assesstimestart', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'assessedtimefinish');
 
+        // Conditionally launch add field assessedtimestart.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Define field assesstimefinish to be added to hotquestion.
+        $table = new xmldb_table('hotquestion');
+        $field = new xmldb_field('assesstimefinish'
+                                 , XMLDB_TYPE_INTEGER
+                                 , '10'
+                                 , null
+                                 , XMLDB_NOTNULL
+                                 , null
+                                 , '0'
+                                 , 'assessedtimestart');
+
+        // Conditionally launch add field assessedtimefinish.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
         // Define field grade to be added to hotquestion.
         $table = new xmldb_table('hotquestion');
         $field = new xmldb_field('grade', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'comments');
