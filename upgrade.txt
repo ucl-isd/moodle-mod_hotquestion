@@ -69,9 +69,11 @@ This files describes changes in the Hot Question code.
 20220508 Hot Question_857 - Need to redefine Hot Question DB fields size and defaults.
     Made changes as needed. See ticket for more details. 
 20220508 Hot Question_864 - Need to sort language file on string names. Completed
-    manual sort using compy and paste.
+    manual sort using copy and paste.
 20220508 Hot Question_865 - Need to verify backup files are correct for all the new
-    changes.
+    changes. Still needs further testing but backup and restore is working.
+
+
 
 
 

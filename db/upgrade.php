@@ -341,7 +341,7 @@ function xmldb_hotquestion_upgrade($oldversion=0) {
         // Hotquestion savepoint reached.
         upgrade_mod_savepoint(true, 2022041000, 'hotquestion');
     }
-    if ($oldversion < 2022042708) {
+    if ($oldversion < 2022050900) {
 
         // Define field grade to be added to hotquestion.
         $table = new xmldb_table('hotquestion');
@@ -532,7 +532,7 @@ function xmldb_hotquestion_upgrade($oldversion=0) {
         $dbman->change_field_default($table, $field);
 
         // Hotquestion savepoint reached.
-        upgrade_mod_savepoint(true, 2022042708, 'hotquestion');
+        upgrade_mod_savepoint(true, 2022050900, 'hotquestion');
     }
     return $result;
 }
