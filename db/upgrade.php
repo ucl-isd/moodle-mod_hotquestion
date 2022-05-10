@@ -360,7 +360,7 @@ function xmldb_hotquestion_upgrade($oldversion=0) {
                                  , XMLDB_NOTNULL
                                  , null
                                  , '0'
-                                 , 'assesstimestart');
+                                 , 'assessedtimestart');
 
         // Conditionally launch add field assessedtimefinish.
         if (!$dbman->field_exists($table, $field)) {
