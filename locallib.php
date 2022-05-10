@@ -488,15 +488,19 @@ class mod_hotquestion {
 
         if (null !== (required_param('q', PARAM_INT))) {
             $questionid = required_param('q', PARAM_INT);
+            $itemid = required_param('q', PARAM_INT);
             $dbquestion = $DB->get_record('hotquestion_questions', array('id' => $questionid));
+
             // Contrib by ecastro ULPGC.
             $users = $this->get_question_voters($questionid);
             $users[] = $dbquestion->userid;
             // Contrib by ecastro ULPGC.
             $DB->delete_records('hotquestion_questions', array('id' => $dbquestion->id));
-            // Get an array of all votes on the question that was just deleted, then delete them.
-            $dbvote = $DB->get_records('hotquestion_votes', array('question' => $questionid));
+            // 20220510 Deleted $dbvote line of code.
+            // Delete all votes on the question that was just deleted.
             $DB->delete_records('hotquestion_votes', array('question' => $dbquestion->id));
+            // 20220510 Delete all comments on the question that was just deleted.
+            $DB->delete_records('comments', array('itemid' => $itemid, 'component' => 'mod_hotquestion'));
 
             // Contrib by ecastro ULPGC, update grades for question author and voters.
             $this->update_users_grades($users);
