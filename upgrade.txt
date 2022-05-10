@@ -3,8 +3,7 @@ This files describes changes in the Hot Question code.
 === 4.?.? === Items that hopefully will be in a future release.
 20220410 Hot Question_840 - Need to add comments to question downloads. 
 20220421 Hot Question_844 - The Moodle Mobile app is not supported.
-20220502 Hot Question_839 - Need to make sure associated comments are deleted
-    whenever a question is deleted.
+
 20220430 Hot Question_853 - Sometimes when a user has no question submitted, they
     are getting a grade anyway. 
 
@@ -72,8 +71,11 @@ This files describes changes in the Hot Question code.
     manual sort using copy and paste.
 20220508 Hot Question_865 - Need to verify backup files are correct for all the new
     changes. Still needs further testing but backup and restore is working.
-
-
+20220502 Hot Question_839 - Need to make sure associated comments are deleted
+    whenever a question is deleted. 20220510 1115 Added two lines of code and a comment
+    to locallib.php.When a question is deleted, it, any comments on it, and any votes
+    on it, are also deleted.
+20220510 1130 Ran codechecker and made changes as needed.
 
 
 
