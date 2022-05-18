@@ -108,13 +108,14 @@ if (has_capability('mod/hotquestion:ask', $context)) {
         $timenow = time();
 
         // This will be overwritten after we have the entryid.
+        // Data for all the fields for a question, plus the submit button status.
         $newentry = new stdClass();
         $newentry->hotquestion = $hq->instance->id;
         $newentry->content = $fromform->text_editor['text'];
         $newentry->format = $fromform->text_editor['format'];
         $newentry->userid = $USER->id;
         $newentry->time = $timenow;
-        if ($fromform->anonymous = null) {
+        if (isset($fromform->anonymous)) {
             $newentry->anonymous = $fromform->anonymous;
         } else {
             $newentry->anonymous = 0;
@@ -123,7 +124,9 @@ if (has_capability('mod/hotquestion:ask', $context)) {
         $newentry->tpriority = 0;
         $newentry->submitbutton = $fromform->submitbutton;
 
-        if (!$hq->add_new_question($fromform)) { // Returns 1 if valid question submitted.
+        // From this point, need to process the question and save it.
+        //if (!$hq->add_new_question($fromform)) { // Returns 1 if valid question submitted.
+        if (!results::add_new_question($newentry, $hq)) { // Returns 1 if valid question submitted.
             redirect('view.php?id='.$hq->cm->id, get_string('invalidquestion', 'hotquestion'));
         }
         if (!$ajax) {
@@ -251,7 +254,9 @@ echo $output->container_start("toolbar");
 // Start contrib by ecastro ULPGC.
 echo $output->current_user_rating(has_capability('mod/hotquestion:ask', $context));
 
-if ($entriesmanager) {
+// 20220515 Endabled the view grade button for both managers and students. Student ONLY see their grade.
+//if ($entriesmanager) {
+if ($entriesmanager || $canask) {
     echo ' ';
     $url = new moodle_url('grades.php', ['id' => $cm->id]);
     echo $output->single_button($url, get_string('viewgrades', 'hotquestion'));

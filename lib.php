@@ -378,7 +378,7 @@ function hotquestion_get_participants($hotquestionid) {
 
 /**
  * This function is used by the reset_course_userdata function in moodlelib.
- * This function will remove all posts from the specified forum
+ * This function will remove all posts from the specified hotquestion
  * and clean up any related data.
  *
  * @param stdClass $data
@@ -624,7 +624,7 @@ function hotquestion_get_completion_state($course, $cm, $userid, $type) {
         }
     }
 
-    // Check if the user has used up all attempts.
+    // Check if the user has used up all heat.
     if ($hotquestion->completionvote) {
         $sql = "SELECT COUNT(v.id)
                   FROM {hotquestion_votes} v
@@ -669,7 +669,7 @@ function hotquestion_get_coursemodule_info($coursemodule) {
     global $DB;
 
     $dbparams = ['id' => $coursemodule->instance];
-    $fields = 'id, name, intro, introformat, completionpost, completionvote, completionpass';
+    $fields = 'id, name, intro, introformat, completionpost, completionvote, completionpass, timeopen, timeclose';
     if (!$hotquestion = $DB->get_record('hotquestion', $dbparams, $fields)) {
         return false;
     }
@@ -687,6 +687,14 @@ function hotquestion_get_coursemodule_info($coursemodule) {
         $result->customdata['customcompletionrules']['completionpost'] = $hotquestion->completionpost;
         $result->customdata['customcompletionrules']['completionvote'] = $hotquestion->completionvote;
         $result->customdata['customcompletionrules']['completionpass'] = $hotquestion->completionpass;
+    }
+
+    // Populate some other values that can be used in calendar or on dashboard.
+    if ($hotquestion->timeopen) {
+        $result->customdata['timeopen'] = $hotquestion->timeopen;
+    }
+    if ($hotquestion->timeclose) {
+        $result->customdata['timeclose'] = $hotquestion->timeclose;
     }
     return $result;
 }
@@ -905,17 +913,14 @@ function hotquestion_check_ratings_recalculation(stdClass $hotquestion) : bool {
     require_once($CFG->dirroot.'/mod/hotquestion/locallib.php');
 
     $oldrecord = $DB->get_record('hotquestion', ['id' => $hotquestion->id]);
-
     $fields = ['factorheat', 'factorpriority', 'factorvote'];
 
     foreach ($fields as $field) {
-
         if (!isset($oldrecord->$field) || !isset($hotquestion->$field) ||
             $oldrecord->$field != $hotquestion->$field) {
             return true;
         }
     }
-
     return false;
 }
 
@@ -939,6 +944,16 @@ function hotquestion_recalculate_rating_grades(int $cmid) {
     $users = $DB->get_records_menu('hotquestion_questions', $params, 'userid', 'id, userid');
     $graded = $DB->get_records_menu('hotquestion_grades', $params, 'userid', 'id, userid');
     $users = array_unique($users + $graded);
+
+    $debug['libCP1 checking $hq: '] = $hq;
+    $debug['libCP2 checking $params: '] = $params;
+    $debug['libCP3 checking $graded: '] = $graded;
+    $debug['libCP4 checking $users: '] = $users;
+
+
+
+
+
     unset($graded);
     $sql = "SELECT v.id, v.voter
               FROM {hotquestion_votes} v
@@ -951,4 +966,6 @@ function hotquestion_recalculate_rating_grades(int $cmid) {
     unset($voters);
 
     $hq->update_users_grades($users);
+print_object($debug);
+//die;
 }

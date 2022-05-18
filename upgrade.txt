@@ -7,7 +7,7 @@ This files describes changes in the Hot Question code.
 20220430 Hot Question_853 - Sometimes when a user has no question submitted, they
     are getting a grade anyway. 
 
-=== 4.1.0 === release is pending
+=== 4.1.0 === 2022051800 release is pending
 20220220 HotQuestion_484 - Need to update GDPR Code. Made changes as needed until
     the code ran without errors when I ran: php adhoc_task.php --execute. As of
     20220410 I have added comments so they need to be included in the GDPR Code.

@@ -65,8 +65,8 @@ if ($entriesmanager = has_capability('mod/hotquestion:manageentries', $context))
 } else {
     $userid = $USER->id;
 }
-
-$userid = 0;
+// 20220515 Commented out next line so that an individual can see only their grade.
+//$userid = 0;
 
 // Process submited actions.
 

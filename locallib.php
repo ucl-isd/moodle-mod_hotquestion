@@ -108,10 +108,16 @@ class mod_hotquestion {
      *
      * @param object $fromform From ask form.
      */
+/*
     public function add_new_question($fromform) {
         global $USER, $CFG, $DB;
         $data = new StdClass();
         $data->hotquestion = $this->instance->id;
+
+        $debug = array();
+        $debug['locallib CP0 entered public function add_new_question($fromform) and checking item $this->instance->id: '] = $this->instance->id;
+        $debug['locallib CP $this and checking item $this: '] = $this;
+        $debug['locallib CP $fromform and checking item $fromform: '] = $fromform;
 
         // ...$data->content = trim($fromform->question);...
         // ...print_object($fromform->question2);...
@@ -122,20 +128,39 @@ class mod_hotquestion {
         $data->userid = $USER->id;
         $data->time = time();
         $data->tpriority = 0;
+
+$debug['locallib CP data1 and checking item $data: '] = $data;
+
+
         // Check if approval is required for this HotQuestion activity.
         if (!($this->instance->approval)) {
             // If approval is NOT required, then auto approve the question so everyone can see it.
             $data->approved = 1;
+
+$debug['locallib CP data2 and checking item $data: '] = $data;
+
         } else {
             // If approval is required, then mark as not approved so only teachers can see it.
             $data->approved = 0;
+
+$debug['locallib CP data3 and checking item $data: '] = $data;
+
         }
         $context = context_module::instance($this->cm->id);
+
+$debug['locallib CP anonymous 0 and checking item $fromform: '] = $fromform;
+$debug['locallib CP anonymous 1 and checking item isset($fromform->anonymous): '] = isset($fromform->anonymous);
+//$debug['locallib CP anonymous 2 and checking item $fromform->anonymous: '] = $fromform->anonymous;
+$debug['locallib CP anonymous 3 and checking item $this->instance->anonymouspost: '] = $this->instance->anonymouspost;
+
         // If marked anonymous and anonymous is allowed then change from actual userid to guest.
         if (isset($fromform->anonymous) && $fromform->anonymous && $this->instance->anonymouspost) {
             $data->anonymous = $fromform->anonymous;
             // Assume this user is guest.
             $data->userid = $CFG->siteguest;
+
+$debug['locallib CP data4 and checking item $data: '] = $data;
+
         }
         if (!empty($data->content)) {
             // If there is some actual content, then create a new record.
@@ -153,12 +178,17 @@ class mod_hotquestion {
             }
             // Contrib by ecastro ULPGC update grades for question author.
             $this->update_users_grades([$USER->id]);
+
+$debug['locallib CP exit true1 and checking item $this: '] = $this;
+$debug['locallib CP exit true2 and checking item $this->update_users_grades([$USER->id]): '] = $this->update_users_grades([$USER->id]);
+print_object($debug);
+die;
             return true;
         } else {
             return false;
         }
     }
-
+*/
     /**
      * Vote on question.
      *

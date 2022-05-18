@@ -47,6 +47,22 @@ $string['authorinfohide'] = 'Posted {$a->time}';
 $string['calendarend'] = '{$a} closes';
 $string['calendarstart'] = '{$a} opens';
 $string['cnfallowcomments'] = 'Define if a hot question will accept comments on entries by default';
+
+$string['completiondetail:post'] = 'Post questions: {$a}';
+$string['completiondetail:vote'] = 'Heat given: {$a}';
+$string['completiondetail:pass'] = 'Passing grade: {$a}';
+
+$string['completionpostdesc'] = 'Student must create at least {$a} questions(s)';
+$string['completionvotedesc'] = 'Student must vote/give heat to {$a} question(s) or post(s)';
+$string['completionpassdesc'] = 'Student must receive passing grade of {$a}';
+
+$string['completionpostgroup'] = 'Require questions';
+$string['completionvotegroup'] = 'Require heat:';
+$string['completionpassgroup'] = 'Require pass:';
+
+$string['completionpost'] = 'Student must add questions:';
+$string['completionvote'] = 'Student must add heat:';
+$string['completionpass'] = 'Student must pass:';
 $string['connectionerror'] = 'Connection error';
 $string['content'] = 'Content';
 $string['csvexport'] = 'Export to .csv';
@@ -65,7 +81,7 @@ $string['eventupdatevote'] = 'Updated vote';
 $string['exportfilename'] = 'questions.csv';
 $string['exportfilenamep1'] = 'All_Site';
 $string['exportfilenamep2'] = '_HQ_Questions_Exported_On_';
-$string['factorheat'] = 'Heat factor';
+$string['factorheat'] = 'Heat received factor';
 $string['factorheat_help'] = 'A factor to apply to questions count for grading based on question heat.
 The hotter the question, the greater weight towards grading.
 A question by a student counts as 1 plus addition credit
@@ -74,14 +90,14 @@ A question by a student counts as 1 plus addition credit
 
 Normally a heat factor of 5% is adequate, meaning if 20 people votes a question, it\'s value is doubled.
 You may need to adjust depending on number of participants and their engagement. ';
-$string['factorpriority'] = 'Priority factor';
+$string['factorpriority'] = 'Teacher priority factor';
 $string['factorpriority_help'] = 'A factor to count questions without teacher priority set.
-Each question counts in the sum of questiosn asked by a student as their priority value (1, 2 ...).
+Each question counts in the sum of questions asked by a student as their priority value (1, 2 ...).
 For those questions without priority (0) the specified value (as a %) is counted. <br />
 A 100% factor means that a non-priority question counts just as a question with priority 1. ';
-$string['factorvote'] = 'Voting factor';
+$string['factorvote'] = 'Heat given factor';
 $string['factorvote_help'] = 'A factor to apply to the voting count of the students when calculating grades.
-In addition to writing new questions, an student can receive participation credit by voting questions by other students.
+In addition to writing new questions, a student can receive participation credit by voting on questions by other students.
 This credit is the number of emitted votes times this factor/100.
 
     credit = votes · factor/100

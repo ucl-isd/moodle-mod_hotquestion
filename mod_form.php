@@ -31,6 +31,7 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/course/moodleform_mod.php');
 
+use core_grades\component_gradeitems;
 /**
  * Standard base class for mod_hotquestion configuration form.
  *
