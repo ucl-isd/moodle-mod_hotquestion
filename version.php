@@ -33,5 +33,5 @@ $plugin->version   = 2022051800;      // The current module version (Date: YYYYM
 $plugin->requires  = 2014111000;      // Requires Moodle 2.8 version.
 $plugin->cron      = 0;               // Period for cron to check this module (secs).
 $plugin->component = 'mod_hotquestion';
-$plugin->maturity  = MATURITY_BETA_RC1;
-$plugin->release   = "4.1.0 (Build: 2022051800)"; // User-friendly version number.
+$plugin->maturity  = MATURITY_RC;
+$plugin->release   = "4.1.0 (Build: 2022051800) RC1"; // User-friendly version number.
