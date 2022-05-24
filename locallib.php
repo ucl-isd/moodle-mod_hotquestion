@@ -831,7 +831,9 @@ die;
     /**
      * Get the user rating in this activity, by posts and votes.
      *
-     * @param int $userid the user to calculate ratings.
+     * Function is called when a user is on view.php page.
+     *
+     * @param int $userid The single user to calculate the rating for.
      * @return float $rating number
      */
     public function calculate_user_ratings($userid = null) : float {

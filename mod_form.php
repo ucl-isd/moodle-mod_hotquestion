@@ -32,6 +32,7 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot.'/course/moodleform_mod.php');
 
 use core_grades\component_gradeitems;
+
 /**
  * Standard base class for mod_hotquestion configuration form.
  *
@@ -241,6 +242,122 @@ class mod_hotquestion_mod_form extends moodleform_mod {
         // Add standard buttons, common to all modules.
         $this->add_action_buttons();
     }
+
+    /**
+     * Add custom completion rules.
+     *
+     * @return array Array of string IDs of added items, empty array if none.
+     */
+    public function add_completion_rules() {
+        $mform =& $this->_form;
+
+        $group=array();
+        $group[] =& $mform->createElement('checkbox', 'completionpostenabled', '', get_string('completionpost','hotquestion'));
+        $group[] =& $mform->createElement('text', 'completionpost', '', array('size'=>3));
+        $mform->setType('completionpost',PARAM_INT);
+        $mform->addGroup($group, 'completionpostgroup', get_string('completionpostgroup','hotquestion'), array(' '), false);
+        $mform->disabledIf('completionpost','completionpostenabled','notchecked');
+
+        $group=array();
+        $group[] =& $mform->createElement('checkbox', 'completionvoteenabled', '', get_string('completionvote','hotquestion'));
+        $group[] =& $mform->createElement('text', 'completionvote', '', array('size'=>3));
+        $mform->setType('completionvote',PARAM_INT);
+        $mform->addGroup($group, 'completionvotegroup', get_string('completionvotegroup','hotquestion'), array(' '), false);
+        $mform->disabledIf('completionvote','completionvoteenabled','notchecked');
+
+        //$group=array();
+        //$group[] =& $mform->createElement('checkbox', 'completionpassenabled', '', get_string('completionpass','hotquestion'));
+        //$group[] =& $mform->createElement('text', 'completionpass', '', array('size'=>3));
+        //$mform->setType('completionpass',PARAM_INT);
+        //$mform->addGroup($group, 'completionpassgroup', get_string('completionpassgroup','hotquestion'), array(' '), false);
+        //$mform->disabledIf('completionpass','completionpassenabled','notchecked');
+
+        //return array('completionpostgroup','completionvotegroup','completionpassgroup');
+        return array('completionpostgroup','completionvotegroup');
+    }
+
+    /**
+     * Called during validation to see whether some module-specific completion rules are selected.
+     *
+     * @param array $data Input data not yet validated.
+     * @return bool True if one or more rules is enabled, false if none are.
+     */
+    function completion_rule_enabled($data) {
+
+        //return (!empty($data['completionpostenabled']) && $data['completionpost']!=0) ||
+        //    (!empty($data['completionvoteenabled']) && $data['completionvote']!=0) ||
+        //    (!empty($data['completionpassenabled']) && $data['completionpass']!=0);
+
+        return (!empty($data['completionpostenabled']) && $data['completionpost']!=0) ||
+            (!empty($data['completionvoteenabled']) && $data['completionvote']!=0);
+    }
+
+    /**
+     * Return submitted data if properly submitted or returns NULL if validation fails or
+     * if there is no submitted data.
+     *
+     * Do not override this method, override data_postprocessing() instead.
+     *
+     * @return object submitted data; NULL if not valid or not submitted or cancelled
+     */
+    public function get_data() {
+        $data = parent::get_data();
+        if ($data) {
+            $itemname = 'hotquestion';
+            $component = 'mod_hotquestion';
+            //$gradepassfieldname = component_gradeitems::get_field_name_for_itemname($component, $itemname, 'gradepass');
+
+            // Convert the grade pass value - we may be using a language which uses commas,
+            // rather than decimal points, in numbers. These need to be converted so that
+            // they can be added to the DB.
+            //if (isset($data->{$gradepassfieldname})) {
+            //    $data->{$gradepassfieldname} = unformat_float($data->{$gradepassfieldname});
+            //}
+        }
+
+        return $data;
+    }
+
+    /**
+     * 
+     * 
+     *
+     * 
+     *
+     * 
+     */
+    function data_preprocessing(&$default_values) {
+        parent::data_preprocessing($default_values);
+
+        // Set up the completion checkboxes which aren't part of standard data.
+        // We also make the default value (if you turn on the checkbox) for those
+        // numbers to be 1, this will not apply unless checkbox is ticked.
+        $default_values['completionpostenabled']=
+            !empty($default_values['completionpost']) ? 1 : 0;
+        if (empty($default_values['completionpost'])) {
+            $default_values['completionpost']=1;
+        }
+        $default_values['completionvoteenabled']=
+            !empty($default_values['completionvote']) ? 1 : 0;
+        if (empty($default_values['completionvote'])) {
+            $default_values['completionvote']=1;
+        }
+        //$default_values['completionpassenabled']=
+        //    !empty($default_values['completionpass']) ? 1 : 0;
+        //if (empty($default_values['completionpass'])) {
+        //    $default_values['completionpass']=1;
+        //}
+        // Tick by default if Add mode or if completion post settings is set to 1 or more.
+        if (empty($this->_instance) || !empty($default_values['completionposts'])) {
+            $default_values['completionpostenabled'] = 1;
+        } else {
+            $default_values['completionpostenabled'] = 0;
+        }
+        if (empty($default_values['completionpost'])) {
+            $default_values['completionpost']=1;
+        }
+    }
+
 }
 
 /**

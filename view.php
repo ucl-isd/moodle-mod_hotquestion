@@ -39,7 +39,8 @@ $id = required_param('id', PARAM_INT);                  // Course_module ID.
 $ajax = optional_param('ajax', 0, PARAM_BOOL);          // Asychronous form request.
 $action  = optional_param('action', '', PARAM_ACTION);  // Action(vote, newround).
 $roundid = optional_param('round', -1, PARAM_INT);      // Round id.
-$changegroup = optional_param('group', -1, PARAM_INT);  // Choose the current group.
+//$changegroup = optional_param('group', -1, PARAM_INT);  // Choose the current group.
+$group = optional_param('group', -1, PARAM_INT);  // Choose the current group.
 
 if (! $cm = get_coursemodule_from_id('hotquestion', $id)) {
     throw new moodle_exception(get_string('incorrectmodule', 'hotquestion'));
@@ -259,7 +260,9 @@ echo $output->current_user_rating(has_capability('mod/hotquestion:ask', $context
 if ($entriesmanager || $canask) {
     echo ' ';
     $url = new moodle_url('grades.php', ['id' => $cm->id]);
+    //$url = new moodle_url('grades.php', array('id' => $cm->id, 'group' => $group));
     echo $output->single_button($url, get_string('viewgrades', 'hotquestion'));
+echo 'testxx';
 }
 // End contrib by ecastro ULPGC.
 echo $output->toolbar(has_capability('mod/hotquestion:manageentries', $context));

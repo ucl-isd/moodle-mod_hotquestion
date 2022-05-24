@@ -213,10 +213,10 @@ class results {
                           JOIN {user} u ON u.id = g.userid
                      LEFT JOIN {hotquestion_rounds} hr ON hr.hotquestion=hq.hotquestion
                          WHERE hq.hotquestion = :hqid
-                               AND g.groupid = :gidid
-                               AND hr.endtime=0
-                               AND hq.time>=hr.starttime
-                               AND hq.userid>0";
+                           AND g.groupid = :gidid
+                           AND hr.endtime=0
+                           AND hq.time>=hr.starttime
+                           AND hq.userid>0";
                 $params = array();
                 $params = ['hqid' => $hotquestion->id] + ['gidid' => $gid->id];
                 $hotquestions = $DB->get_records_sql($sql, $params);
@@ -231,9 +231,9 @@ class results {
                       JOIN {user} u ON u.id = hq.userid
                  LEFT JOIN {hotquestion_rounds} hr ON hr.hotquestion=hq.hotquestion
                      WHERE hq.hotquestion = :hqid
-                           AND hr.endtime = 0
-                           AND hq.time >= hr.starttime
-                           AND hq.userid = :userid";
+                       AND hr.endtime = 0
+                       AND hq.time >= hr.starttime
+                       AND hq.userid = :userid";
 
             $params = array();
             $params = ['hqid' => $hotquestion->id] + ['userid' => $USER->id];
@@ -246,9 +246,9 @@ class results {
                       JOIN {user} u ON u.id = hq.userid
                  LEFT JOIN {hotquestion_rounds} hr ON hr.hotquestion=hq.hotquestion
                      WHERE hq.hotquestion = :hqid
-                           AND hr.endtime = 0
-                           AND hq.time >= hr.starttime
-                           AND hq.userid > 0";
+                       AND hr.endtime = 0
+                       AND hq.time >= hr.starttime
+                       AND hq.userid > 0";
             $params = array();
             $params = ['hqid' => $hotquestion->id];
             $hotquestions = $DB->get_records_sql($sql, $params);
@@ -383,8 +383,8 @@ class results {
         //$data->hotquestion = $this->instance->id;
 
         $debug = array();
-        $debug['results CP0 entered public static function add_new_question($newentry, $hq) and checking item $hq: '] = $hq;
-        $debug['results CP1 $newentry and checking item $newentry: '] = $newentry;
+        $debug['results 380 CP0 entered public static function add_new_question($newentry, $hq) and checking item $hq: '] = $hq;
+        $debug['results 380 CP1 $newentry and checking item $newentry: '] = $newentry;
 
         // 20210218 Switched code to use text editor instead of text area.
         //$data->content = ($fromform->text_editor['text']);
@@ -430,9 +430,9 @@ class results {
             //$newentry->update_users_grades([$USER->id]);
             $hq->update_users_grades([$USER->id]);
 
-$debug['results CP exit true1 and checking item $hq: '] = $hq;
-$debug['results CP exit true2 and checking item $hq->update_users_grades([$USER->id]): '] = $hq->update_users_grades([$USER->id]);
-//$debug['results CP exit true3 and checking item $newentry->update_users_grades([$USER->id]): '] = $newentry->update_users_grades([$USER->id]);
+$debug['results 380 CP exit true1 and checking item $hq: '] = $hq;
+$debug['results 380 CP exit true2 and checking item $hq->update_users_grades([$USER->id]): '] = $hq->update_users_grades([$USER->id]);
+//$debug['results 380 CP exit true3 and checking item $newentry->update_users_grades([$USER->id]): '] = $newentry->update_users_grades([$USER->id]);
 //print_object($debug);
 //die;
             return true;

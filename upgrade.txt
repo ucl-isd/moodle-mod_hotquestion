@@ -7,7 +7,7 @@ This files describes changes in the Hot Question code.
 20220430 Hot Question_853 - Sometimes when a user has no question submitted, they
     are getting a grade anyway. 
 
-=== 4.1.0 === 2022051800 release is pending
+=== 4.1.0 === 2022052100 release is pending
 20220220 HotQuestion_484 - Need to update GDPR Code. Made changes as needed until
     the code ran without errors when I ran: php adhoc_task.php --execute. As of
     20220410 I have added comments so they need to be included in the GDPR Code.
@@ -76,7 +76,11 @@ This files describes changes in the Hot Question code.
     to locallib.php.When a question is deleted, it, any comments on it, and any votes
     on it, are also deleted.
 20220510 1130 Ran codechecker and made changes as needed.
-
+20220519 1030 Hot Questions_868 - Group is not working correctly when going from view to
+    grades. Noticed this problem back when I first integrated the contributed code. Just
+    now spent a few minutes to actually add the $group information to the $url in
+    view.php. Got a weird result (managers only) the very first time I went to grades.php
+    page, but after that it seems to be working correctly. 
 
 
 === 4.0.2 === released 20220410 for Moodle 3.1 and higher
