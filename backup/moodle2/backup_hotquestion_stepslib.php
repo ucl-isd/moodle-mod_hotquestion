@@ -73,8 +73,6 @@ class backup_hotquestion_activity_structure_step extends backup_activity_structu
                                                        'removelabel',
                                                        'scale',
                                                        'assessed',
-                                                       'assessedtimestart',
-                                                       'assessedtimefinish',
                                                        'assesstimestart',
                                                        'assesstimefinish',
                                                        'comments',

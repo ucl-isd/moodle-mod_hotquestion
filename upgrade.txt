@@ -1,86 +1,121 @@
 This files describes changes in the Hot Question code.
 
 === 4.?.? === Items that hopefully will be in a future release.
-20220410 Hot Question_840 - Need to add comments to question downloads. 
-20220421 Hot Question_844 - The Moodle Mobile app is not supported.
-
-20220430 Hot Question_853 - Sometimes when a user has no question submitted, they
+20220410 HotQuestion_840 - Need to add comments to question downloads. 
+20220421 HotQuestion_844 - The Moodle Mobile app is not supported.
+20220430 HotQuestion_853 - Sometimes when a user has no question submitted, they
     are getting a grade anyway. 
+20220706 HotQuestion_881 - When Whole Hot Question grading is NOT enabled, the
+    Activity completion should reflect that. No changes needed as the desired
+    outcome is automatic when the Grade selection is None. What DOES need to be
+    fixed is, if the teacher elects to require a number of Questions and
+    Heat/votes. Currently they do not auto update and do not turn green unless
+    I edit the activity.
+
 
 === 4.1.0 === 2022052100 release is pending
-20220220 HotQuestion_484 - Need to update GDPR Code. Made changes as needed until
+20220220 HotQuestion_484v - Need to update GDPR Code. Made changes as needed until
     the code ran without errors when I ran: php adhoc_task.php --execute. As of
     20220410 I have added comments so they need to be included in the GDPR Code.
-20220410 Hot Question_838 - Need setting to limit new comments to the current round.
-    Made changes to an if in results.php about line 328. Also had to change some
-    code in lib.php at about line 494. See ticket for more details.
-20220426 Hot Question_846 - Are Completion & grades considered of interest? #53.
-    Added modified code from contributed work into current Hot Question code.
-20220427 Hot Question_848 - String [grade,core] is deprecated. 20220427 Changed
-    the language string reference in hotquestion/classes/output/rankingtable.php
-    down around line 144 from, get_string('grade'), over to, get_string('gradenoun'),
+20220410 HotQuestion_838v - Need setting to limit new comments to the current round.
+    Made changes to an if in renderer.php about line 356. See ticket for more details.
+20220426 HotQuestion_846v - Are Completion & grades considered of interest? #53.
+    Added modified code from contributed work into current Hot Question code. Then
+    made a tone of updates and changes to get it working reliably.
+20220427 HotQuestion_848v - String [grade,core] is deprecated. 20220427 Changed
+    the language string reference in hotquestion/classes/output/viewgrades.php
+    down around line 166 from, get_string('grade'), over to, get_string('gradenoun'),
     and the debug error went away.
-20220427 Hot Question_849 - get_extra_user_fields() is deprecated. Changed the code
+20220427 HotQuestion_849v - get_extra_user_fields() is deprecated. Changed the code
     as needed to fix the problem. See the ticket for details.
-20220427 Hot Question_850 - user_picture::fields() is deprecated. Changed the code
+20220427 HotQuestion_850v - user_picture::fields() is deprecated. Changed the code
     as needed to fix the problem. See the ticket for details.
-20220428 Hot Question_851 - *_get_completion_state() callback functions such as
+20220428 HotQuestion_851v - *_get_completion_state() callback functions such as
     hotquestion_get_completion_state have been deprecated. 20220428 1025 Created
     the needed folder and file. Not getting the debug message anymore.
-20220429 Hot Question_852 - Invalid course module ID when making grade setup change.
+20220429 HotQuestion_852v - Invalid course module ID when making grade setup change.
     Added code to check for missing cmid and get it, if needed. The change is in
     lib.php down around line 809.
 20220427 Ran codechecker and fixed hundreds of warnings and errors, as needed.
-20220502 Hot Question_854 - Need a space between new Rating score and Rating ranking
+20220502 HotQuestion_854v - Need a space between new Rating score and Rating ranking
     button. In view.php down around line 255, I added an echo space that only gets
     added if the user can see the button. For a normal student user, the extra space
     is not needed as spacing is handled by the toolbar.
-20220503 Hot Question_855 - Need heatgiven and heatreceived in place of Votes in
+20220503 HotQuestion_855v - Need heatgiven and heatreceived in place of Votes in
     Rating ranking. Added new $fields to the sql in ranking_tables.php file down
     around line 185 that counts the number of heat/votes that a user has received.
     Also added needed language string for heatreceived. Also changed the votes
     string to heatgiven.
-20220504 Hot Question_856 - Need teacherpriority column on Rating ranking page. Added
+20220504 HotQuestion_856v - Need teacherpriority column on Rating ranking page. Added
     the needed code to the ranking_table.php file like I did yesterday for heatreceived.
     Today, 20220507, I had to modify the sql to get it to show zero, positive, or
     negative teacher priority count.
-20220505 Hot Question_858 - Need to add percentage factors to column labels. Added
+20220505 HotQuestion_858v - Need to add percentage factors to column labels. Added
     needed info to the string for each column label. The way the ranking _table.php
     does this, it automatically gets added for downloads.
-20220506 Hot Question_859 - Need to change all references to rating over to grade. 
-    Made code and language string changes as needed int eh language file and other
+20220506 HotQuestion_859v - Need to change all references to rating over to grade. 
+    Made code and language string changes as needed in the language file and other
     locations.
-20220507 Hot Question_860 - Need to change hard coded text to a language string in
+20220507 HotQuestion_860v - Need to change hard coded text to a language string in
     the /mod/hotquestion/classes/output/viewgrades.php file. Commented out the original
     line of code and changed to new version using a string. Have a second commented
     out version available, if needed.
-20220507 Hot Question_861 - The ranking_table.php file name needs to be changed to
+20220507 HotQuestion_861v - The ranking_table.php file name needs to be changed to
     viewgrades.php. Changed the filename and, hopefully, all references to it in
     all the Hot Question files.
-20220507 Hot Question_862 - Need to change $rankingtable variable to $gradestable
+20220507 HotQuestion_862v - Need to change $rankingtable variable to $gradestable
     in grades.php file. Changed the $rankingtable variable to $gradestable. Hopefully,
     I have changed all references to it, also.
-20220507 Hot Question_863 - Need to fix viewgrades.php functions that print out the
+20220507 HotQuestion_863v - Need to fix viewgrades.php functions that print out the
     column data. Tested each of the column functions and fixed code and reference name
     errors, as needed. Ensured the teacher priority prints '-' in the teacher priority
     column for students that have NOT posted a question, yet. Prints a 0 if they posted
     a question, but the teacher has NOT changed the priority.
-20220508 Hot Question_857 - Need to redefine Hot Question DB fields size and defaults.
+20220508 HotQuestion_857v - Need to redefine Hot Question DB fields size and defaults.
     Made changes as needed. See ticket for more details. 
-20220508 Hot Question_864 - Need to sort language file on string names. Completed
+20220508 HotQuestion_864v - Need to sort language file on string names. Completed
     manual sort using copy and paste.
-20220508 Hot Question_865 - Need to verify backup files are correct for all the new
+20220508 HotQuestion_865v - Need to verify backup files are correct for all the new
     changes. Still needs further testing but backup and restore is working.
-20220502 Hot Question_839 - Need to make sure associated comments are deleted
+20220502 HotQuestion_839v - Need to make sure associated comments are deleted
     whenever a question is deleted. 20220510 1115 Added two lines of code and a comment
-    to locallib.php.When a question is deleted, it, any comments on it, and any votes
+    to locallib.php. When a question is deleted, it, any comments on it, and any votes
     on it, are also deleted.
 20220510 1130 Ran codechecker and made changes as needed.
-20220519 1030 Hot Questions_868 - Group is not working correctly when going from view to
+20220515 HotQuestion_866v - Anonymous posts do not work. Fixed the anonymous problem by
+    changing code in results.php down around line 408 by using isset check. 
+20220519 1030 Hot Questions_868v - Group is not working correctly when going from view to
     grades. Noticed this problem back when I first integrated the contributed code. Just
     now spent a few minutes to actually add the $group information to the $url in
     view.php. Got a weird result (managers only) the very first time I went to grades.php
-    page, but after that it seems to be working correctly. 
+    page, but after that it seems to be working correctly.
+20220608 HotQuestion_871v - Deleting a Hot Question activity does NOT delete associated
+    grades. See ticket for details. Changed line 896 in lib.php and delete started working.
+20220622 HotQuestion_873v - Default setting for Comments is not working on mod_form.php.
+    Modified the 'default' on the mod_form.php page to use the current Hot Question
+    configuration setting, that was missing and using a default of 0, which means, No. It
+    is now giving expected results.
+20220623 HotQuestion_874v - A question should not add to the grade if it is NOT approved.
+     Added an if check in locallib.php function calculate_user_ratings that checks to see
+     if the question is approved. Skips adding to the grade if not approved.
+20220629 HotQuestion_875v - Changing the tpriority for a student does not update their grade.
+    In the locallib.php file, I added a call to,
+    $this->update_users_grades([$question->userid, $USER->id]); in the, public function
+    tpriority_change($u, $question) {, which seems to fix the problem.
+20220629 HotQuestion_876v - Changing the approval status for a sudent question does not
+    update their grade. In the locallib.php file, I added a call to,
+    $this->update_users_grades([$question->userid, $USER->id]); in the, public function
+    approve_question($question) {, which seems to fix the problem.
+20220630 HotQuestion_877v - When Whole Hot Question grading is NOT enabled, the View
+    grades button should be hidden. Modified the if check in view.php, at about line
+    264 so that the raw rating and view grades button are visible only if gading is setup.
+20220706 HotQuestion_882v - In Moodle 4.0.x the activity name, description, and completion
+    labels get duplicated. Added a branch check in view.php about line 233, that skips
+    adding the intro for Moodle 4.0 and higher.
+20220707 HotQuestion_887v - Anonymous post should NOT count towards a users grade. In file
+    locallib.php at about line 855, I added, AND q.anonymous = 0. This is in the
+    calculate_user_ratings function and makes it so that only entries that are NOT
+    anonymous get counted towards a users grade.
 
 
 === 4.0.2 === released 20220410 for Moodle 3.1 and higher
@@ -121,28 +156,28 @@ This files describes changes in the Hot Question code.
 20220301 HotQuestion_827 - Need to implement Activity Completion for View. Made
     changes and code addition as needed to lib.php, view.php, and renderer.php.
     See the ticket for details.
-20220321 Hot Question_834 - Need new hotquestion_supports($feature) for Moodle 4.0.
+20220321 HotQuestion_834 - Need new hotquestion_supports($feature) for Moodle 4.0.
     Created two versions of the switch ($feature), and added a branch check to
     control which is used. The first switch includes the needed new feature,
     while the second, does not.
-20220410 Hot Question_841 - The file module.js is no longer needed so it and
+20220410 HotQuestion_841 - The file module.js is no longer needed so it and
     all references to it need removal. Removed the file and all references to it.
 20220410 Ran codechecker.php. 
 
 
 === 4.0.1 ===
-20210516 Hot Question_695 - Invalid get_string() identifier: 'hotquestion:rate'.
+20210516 HotQuestion_695v - Invalid get_string() identifier: 'hotquestion:rate'.
     Added the missing string.
-20210516 Hot Question_723 - Invalid get_string() identifier: 'hotquestion:comment'.
+20210516 HotQuestion_723v - Invalid get_string() identifier: 'hotquestion:comment'.
     Added the missing string.
-20210823 Hot Question_751 - user_picture::fields() is deprecated. Please use the
+20210823 HotQuestion_751v - user_picture::fields() is deprecated. Please use the
     \core_user\fields API instead. For compatibility, added an if check to use the new
     code for Moodle > 3.0 the old code for 3.0 and below.
-20211001 Hot Question_752 - need to format_text of the submit directions. Changed the
+20211001 HotQuestion_752v - need to format_text of the submit directions. Changed the
     code to include format_text, in mod_form.php down around line 236.
 
 === 4.0.0 ===
-20210321 Hot Question_561 See about using editor text area to allow for formatting
+20210321 HotQuestion_561 See about using editor text area to allow for formatting
     and emoji's. Got it working in just a couple of hours, mostly looking for the
     best place to add the code. Does not support audio and video recording. Will do
     that, hopefully, in a later release.

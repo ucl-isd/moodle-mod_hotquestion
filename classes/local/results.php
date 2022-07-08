@@ -298,7 +298,6 @@ class results {
      * @param object $course
      */
     public static function hotquestion_display_question_comments($question, $cm, $context, $course) {
-        // 20210313 Not in use yet. Part of future development.
         global $CFG, $USER, $OUTPUT, $DB;
         $html = '';
         if (($question->approved) || (has_capability('mod/hotquestion:manageentries', $context))) {
@@ -374,28 +373,13 @@ class results {
     /**
      * Add a new question to current round.
      *
-     * @param object $fromform From ask form.
+     * @param object $newentry
+     * @param object $hq
      */
-    //public static function add_new_question($fromform) {
     public static function add_new_question($newentry, $hq) {
         global $USER, $CFG, $DB;
-        //$data = new StdClass();
-        //$data->hotquestion = $this->instance->id;
 
-        $debug = array();
-        $debug['results 380 CP0 entered public static function add_new_question($newentry, $hq) and checking item $hq: '] = $hq;
-        $debug['results 380 CP1 $newentry and checking item $newentry: '] = $newentry;
-
-        // 20210218 Switched code to use text editor instead of text area.
-        //$data->content = ($fromform->text_editor['text']);
-        //$data->format = ($fromform->text_editor['format']);
-
-        //$data->userid = $USER->id;
-        //$data->time = time();
-        //$data->tpriority = 0;
         // Check if approval is required for this HotQuestion activity.
-        //if (!($newentry->instance->approval)) {
-        //if (!($newentry->approval)) {
         if (!($newentry->approved)) {
             // If approval is NOT required, then auto approve the question so everyone can see it.
             $newentry->approved = 1;
@@ -413,7 +397,6 @@ class results {
         if (!empty($newentry->content)) {
             // If there is some actual content, then create a new record.
             $DB->insert_record('hotquestion_questions', $newentry);
-
             if ($CFG->version > 2014051200) { // If newer than Moodle 2.7+ use new event logging.
                 $params = array(
                     'objectid' => $hq->cm->id,
@@ -427,14 +410,8 @@ class results {
             }
 
             // Contrib by ecastro ULPGC update grades for question author.
-            //$newentry->update_users_grades([$USER->id]);
+            // ...$newentry->update_users_grades([$USER->id]);...
             $hq->update_users_grades([$USER->id]);
-
-$debug['results 380 CP exit true1 and checking item $hq: '] = $hq;
-$debug['results 380 CP exit true2 and checking item $hq->update_users_grades([$USER->id]): '] = $hq->update_users_grades([$USER->id]);
-//$debug['results 380 CP exit true3 and checking item $newentry->update_users_grades([$USER->id]): '] = $newentry->update_users_grades([$USER->id]);
-//print_object($debug);
-//die;
             return true;
         } else {
             return false;

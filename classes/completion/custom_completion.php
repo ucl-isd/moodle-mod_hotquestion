@@ -46,41 +46,13 @@ class custom_completion extends activity_custom_completion {
         $userid = $this->userid;
         $hotquestionid = $this->cm->instance;
 
-
         if (!$hotquestion = $DB->get_record('hotquestion', ['id' => $hotquestionid])) {
-            //throw new \moodle_exception('Unable to find hotquestion with id ' . $hotquestionid);
             throw new moodle_exception(get_string('incorrectmodule', 'hotquestion'));
 
         }
 
         $questioncountparams = ['userid' => $userid, 'hotquestionid' => $hotquestionid];
         $questionvoteparams = ['userid' => $userid, 'hotquestionid' => $hotquestionid];
-/*
-        $questioncountsql = "SELECT COUNT(*)
-                           FROM {hotquestion_questions} hqq
-                           LEFT JOIN {hotquestion_votes} hqv ON hqq.id = hqv.question
-                           LEFT JOIN {hotquestion_grades} hqg ON hqq.id = hqg.hotquestion
-                          WHERE hqq.userid = :userid
-                            AND hqv.question = :hotquestionid";
-
-
-
-
-    // Check if the user has used up all heat.
-    if ($hotquestion->completionvote) {
-        $sql = "SELECT COUNT(v.id)
-                  FROM {hotquestion_votes} v
-                  JOIN {hotquestion_questions} q ON q.id = v.question
-                 WHERE q.hotquestion = :hotquestion AND v.voter = :userid ";
-        $params = array('hotquestion' => $hotquestion->id, 'userid' => $userid);
-        $value = $hotquestion->completionvote <= $DB->count_records_sql($sql, $params);
-        if ($type == COMPLETION_AND) {
-            $result = $result && $value;
-        } else {
-            $result = $result || $value;
-        }
-    }
-*/
 
         $questionvotesql = "SELECT COUNT(hv.id)
                            FROM {hotquestion_votes} hv
@@ -90,7 +62,7 @@ class custom_completion extends activity_custom_completion {
 
         $questiongradesql = "SELECT *
                            FROM {hotquestion_grades} hqg
-                           JOIN {hotquestion_questions} hqq ON hqg.hotquestion = hqq.id 
+                           JOIN {hotquestion_questions} hqq ON hqg.hotquestion = hqq.id
                           WHERE hqg.userid = :userid
                             AND hqq.id = :hotquestionid";
 
@@ -100,20 +72,13 @@ class custom_completion extends activity_custom_completion {
 
         } else if ($rule == 'completionvote') {
             $status = $hotquestion->completionvote <=
-                //$DB->count_records('hotquestion_votes', ['question' => $hotquestionid, 'voter' => $userid]);
-
-
-                //$DB->get_field_sql($questioncountsql . ' AND hqv.voter <> $userid', $questioncountparams);
                 $DB->get_field_sql($questionvotesql , $questionvoteparams);
-
-
-        //} else if ($rule == 'completionpass') {
-        //    $status = $hotquestion->completionpass <= 
-        //        $DB->get_record('hotquestion_grades', ['hotquestion' => $hotquestionid, 'userid' => !$userid]);
-
-                //$DB->get_field_sql($questioncountsql . ' AND hqg.userid = $userid AND hqg.rawrating >= hqqcompletionpass', $questioncountparams);
+        } else if ($rule == 'completionpass') {
+            $status = $hotquestion->completionpass <=
+                $DB->get_field_sql($questioncountsql.
+                    ' AND hqg.userid = $userid AND hqg.rawrating >= hqqcompletionpass',
+                    $questioncountparams);
         }
-
         return $status ? COMPLETION_COMPLETE : COMPLETION_INCOMPLETE;
     }
 
@@ -126,7 +91,6 @@ class custom_completion extends activity_custom_completion {
         return [
             'completionpost',
             'completionvote',
-            //'completionpass',
         ];
     }
 
@@ -138,11 +102,9 @@ class custom_completion extends activity_custom_completion {
     public function get_custom_rule_descriptions(): array {
         $completionpost = $this->cm->customdata['customcompletionrules']['completionpost'] ?? 0;
         $completionvote = $this->cm->customdata['customcompletionrules']['completionvote'] ?? 0;
-        //$completionpass = $this->cm->customdata['customcompletionrules']['completionpass'] ?? 0;
         return [
             'completionpost' => get_string('completiondetail:post', 'hotquestion', $completionpost),
             'completionvote' => get_string('completiondetail:vote', 'hotquestion', $completionvote),
-            //'completionpass' => get_string('completiondetail:pass', 'hotquestion', $completionpass),
         ];
     }
 
@@ -157,7 +119,7 @@ class custom_completion extends activity_custom_completion {
             'completionpost',
             'completionvote',
             'completionusegrade',
-            //'completionpass',
+            'completionpassgrade',
         ];
     }
 }

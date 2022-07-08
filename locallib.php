@@ -104,92 +104,6 @@ class mod_hotquestion {
     }
 
     /**
-     * Add a new question to current round.
-     *
-     * @param object $fromform From ask form.
-     */
-/*
-    public function add_new_question($fromform) {
-        global $USER, $CFG, $DB;
-        $data = new StdClass();
-        $data->hotquestion = $this->instance->id;
-
-        $debug = array();
-        $debug['locallib CP0 entered public function add_new_question($fromform) and checking item $this->instance->id: '] = $this->instance->id;
-        $debug['locallib CP $this and checking item $this: '] = $this;
-        $debug['locallib CP $fromform and checking item $fromform: '] = $fromform;
-
-        // ...$data->content = trim($fromform->question);...
-        // ...print_object($fromform->question2);...
-        // 20210218 Switched code to use text editor instead of text area.
-        $data->content = ($fromform->text_editor['text']);
-        $data->format = ($fromform->text_editor['format']);
-
-        $data->userid = $USER->id;
-        $data->time = time();
-        $data->tpriority = 0;
-
-$debug['locallib CP data1 and checking item $data: '] = $data;
-
-
-        // Check if approval is required for this HotQuestion activity.
-        if (!($this->instance->approval)) {
-            // If approval is NOT required, then auto approve the question so everyone can see it.
-            $data->approved = 1;
-
-$debug['locallib CP data2 and checking item $data: '] = $data;
-
-        } else {
-            // If approval is required, then mark as not approved so only teachers can see it.
-            $data->approved = 0;
-
-$debug['locallib CP data3 and checking item $data: '] = $data;
-
-        }
-        $context = context_module::instance($this->cm->id);
-
-$debug['locallib CP anonymous 0 and checking item $fromform: '] = $fromform;
-$debug['locallib CP anonymous 1 and checking item isset($fromform->anonymous): '] = isset($fromform->anonymous);
-//$debug['locallib CP anonymous 2 and checking item $fromform->anonymous: '] = $fromform->anonymous;
-$debug['locallib CP anonymous 3 and checking item $this->instance->anonymouspost: '] = $this->instance->anonymouspost;
-
-        // If marked anonymous and anonymous is allowed then change from actual userid to guest.
-        if (isset($fromform->anonymous) && $fromform->anonymous && $this->instance->anonymouspost) {
-            $data->anonymous = $fromform->anonymous;
-            // Assume this user is guest.
-            $data->userid = $CFG->siteguest;
-
-$debug['locallib CP data4 and checking item $data: '] = $data;
-
-        }
-        if (!empty($data->content)) {
-            // If there is some actual content, then create a new record.
-            $DB->insert_record('hotquestion_questions', $data);
-            if ($CFG->version > 2014051200) { // If newer than Moodle 2.7+ use new event logging.
-                $params = array(
-                    'objectid' => $this->cm->id,
-                    'context' => $context,
-                );
-                $event = add_question::create($params);
-                $event->trigger();
-            } else {
-                add_to_log($this->course->id, "hotquestion", "add question"
-                    , "view.php?id={$this->cm->id}", $data->content, $this->cm->id);
-            }
-            // Contrib by ecastro ULPGC update grades for question author.
-            $this->update_users_grades([$USER->id]);
-
-$debug['locallib CP exit true1 and checking item $this: '] = $this;
-$debug['locallib CP exit true2 and checking item $this->update_users_grades([$USER->id]): '] = $this->update_users_grades([$USER->id]);
-print_object($debug);
-die;
-            return true;
-        } else {
-            return false;
-        }
-    }
-*/
-    /**
      * Vote on question.
      *
      * Called from view.php.
@@ -222,9 +136,10 @@ die;
             } else {
                 $DB->delete_records('hotquestion_votes', array('question' => $question->id, 'voter' => $USER->id));
             }
-            // Contrib by ecastro ULPGC, update grades for questions author and voters.
-            $this->update_users_grades([$question->userid, $USER->id]);
         }
+        // Contrib by ecastro ULPGC, update grades for questions author and voters.
+        // 20220623 Moved so entering viewgrades.php page always updates to the latest grade.
+        $this->update_users_grades([$question->userid, $USER->id]);
     }
 
     /**
@@ -322,7 +237,7 @@ die;
                    AND hqq.time > hqr.starttime
                    AND hqr.endtime = 0
                    AND hqv.voter = ?
-               GROUP BY hqq.id, hqr.id, hqv.voter, hqq.hotquestion, hqq.content,
+              GROUP BY hqq.id, hqr.id, hqv.voter, hqq.hotquestion, hqq.content,
                         hqq.userid, hqv.voter, hqq.time, hqq.anonymous, hqq.tpriority,
                         hqq.approved
               ORDER BY hqq.hotquestion ASC, tpriority DESC, heat DESC";
@@ -800,14 +715,15 @@ die;
             $question->approved = '1';
             $DB->update_record('hotquestion_questions', $question);
         }
+        $this->update_users_grades([$question->userid, $USER->id]);
         return;
     }
 
     /**
      * Set teacher priority of current question in current round.
      *
-     * @param int $u the priority up or down flag.
-     * @param int $question the question id
+     * @param int $u The priority up(1) or down(0) flag.
+     * @param int $question The question id to change the teacher priority for.
      */
     public function tpriority_change($u, $question) {
         global $CFG, $DB, $USER;
@@ -824,14 +740,15 @@ die;
             $question->tpriority = --$question->tpriority;
             $DB->update_record('hotquestion_questions', $question);
         }
+        $this->update_users_grades([$question->userid, $USER->id]);
     }
 
     // Contrib by ecastro ULPGC.
 
     /**
-     * Get the user rating in this activity, by posts and votes.
+     * Get the user rating in this activity, by posts and heat/votes.
      *
-     * Function is called when a user is on view.php page.
+     * Function is called ONLY when a user is on view.php but via renderer.php page.
      *
      * @param int $userid The single user to calculate the rating for.
      * @return float $rating number
@@ -846,15 +763,21 @@ die;
         $sql = "SELECT q.id, q.approved, q.tpriority, count(v.voter) as votes
                   FROM {hotquestion_questions} q
              LEFT JOIN {hotquestion_votes} v ON v.question = q.id
-                 WHERE q.hotquestion = ? AND q.userid = ?
+                 WHERE q.hotquestion = ? AND q.userid = ? AND q.anonymous = 0
               GROUP BY q.id ";
         $params = [$this->instance->id, $userid];
         $questions = $DB->get_records_sql($sql, $params);
         $grade = 0;
         // If the user added any questions, add to the current user rating.
         foreach ($questions as $question) {
-            $qrate = ($question->tpriority) ? $question->tpriority : $this->instance->factorpriority / 100;
-            $grade += $qrate + $question->votes * $this->instance->factorheat / 100;
+            // 20220623 Add to the current user rating only if the question is approved.
+            if ($question->approved) {
+                // Add/subtract to the current user rating based on teacher priority.
+                $qrate = ($question->tpriority) ? $question->tpriority : $this->instance->factorpriority / 100;
+
+                // Add/subtract to the current user rating based on teacher priority and heat given.
+                $grade += $qrate + $question->votes * $this->instance->factorheat / 100;
+            }
         }
         // Get any votes made by this user.
         $sql = "SELECT COUNT(v.id)
@@ -865,6 +788,7 @@ die;
         $votes = $DB->count_records_sql($sql, $params);
         // If the user voted, add to the current user rating.
         if ($votes > 0) {
+            // Add/subtract to the current user rating based on heat received.
             $grade += $votes * $this->instance->factorvote / 100;
         }
 
@@ -889,7 +813,7 @@ die;
     }
 
     /**
-     * Recalculates ratings and grades for users related to question
+     * Recalculates ratings and grades for users related to a question.
      * The author of the question and the voters.
      *
      * @param array $users The userids of users to update.
@@ -905,8 +829,14 @@ die;
         $select = "userid $insql AND hotquestion = ? ";
         $params[] = $this->instance->id;
         $grades = $DB->get_records_select('hotquestion_grades',
-                                          $select, $params, '',
-                                          'userid, id, hotquestion, rawrating, timemodified');
+                                          $select,
+                                          $params,
+                                          '',
+                                          'userid,
+                                          id,
+                                          hotquestion,
+                                          rawrating,
+                                          timemodified');
 
         $now = time();
         $newgrade = new stdClass();
@@ -928,7 +858,7 @@ die;
                 $newgrade->userid = $userid;
                 $DB->insert_record('hotquestion_grades', $newgrade);
             }
-
+            // Calling the function in lib.php at about line 807.
             hotquestion_update_grades($this->instance, $userid);
         }
     }

@@ -349,21 +349,9 @@ class viewgrades extends table_sql {
      */
     public function col_finalgrade($row) {
         $item = $this->get_grade_item();
-//print_object('next few items are all from about line 350, function col_finalgrade of the viewgrades.php file');
-//print_object('printing $item that was just retrieved: ');
-//print_object($item);
-//print_object('printing $row that was passed into the function: ');
-//print_object($row);
+
         if ($this->is_downloading()) {
             return format_float($row->finalgrade, $item->get_decimals());
-        }
-        //if (($row->finalgrade) && ($row->rawrating = '-')) {
-        if (($row->finalgrade) && (!$row->rawrating)) {
-            //print_object($row);
-
-            print_object('There is a possible grade error for user '.$row->firstname.' '.$row->lastname.', userid = '.$row->userid.'. There is a rawrating of, '.$row->rawrating.', with a final grade of '.$row->finalgrade);
-
-            //die;
         }
         return $this->display_grade($row->finalgrade);
     }
@@ -612,9 +600,7 @@ class viewgrades extends table_sql {
         static $scalegrades = array();
 
         $o = '';
-//print_object('next few items are all from about line 605, function display_grade of the viewgrades.php file');
 
-//print_object('printing $grade that was passed into the function: '.$grade);
         // If using points then we go here.
         if ($this->hotquestion->instance->grade >= 0) {
             // Normal number.
@@ -632,10 +618,7 @@ class viewgrades extends table_sql {
         } else {
             // If using scale and the Scale is missing go here.
             if (empty($this->cache['scale'])) {
-//print_object('the scale is empty, so get it for use');
                 if ($scale = $DB->get_record('scale', array('id' => -($this->hotquestion->instance->grade)))) {
-//print_object($scale);
-
                     $this->cache['scale'] = make_menu_from_list($scale->scale);
                 } else {
                     $o .= '-';
@@ -644,11 +627,6 @@ class viewgrades extends table_sql {
             }
             // Create a scaleid based on users current grade.
             $scaleid = (int)$grade;
-//print_object($scale);
-//print_object($this->cache['scale'] = make_menu_from_list($scale->scale));
-//print_object('printing $this->hotquestion->instance->grade '.$this->hotquestion->instance->grade);
-//print_object('printing $grade '.$grade);
-//print_object('printing $scaleid '.$scaleid);
             // If it is there, pick the users grade from the scale using the scaleid.
             // Currently, we have a problem as everyones grade is set to 1 which gives everyone, Missing.
             if (isset($this->cache['scale'][$scaleid])) {
