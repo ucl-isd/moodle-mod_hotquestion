@@ -12,8 +12,11 @@ This files describes changes in the Hot Question code.
     Heat/votes. Currently they do not auto update and do not turn green unless
     I edit the activity.
 
+=== 4.1.1 ===
+20220709 HotQuestion_888 - upgrade.php, line 348 needs assesstimefinish changed to
+    assessed. Made needed change to upgrade.php, version.php and upgrade.txt.
 
-=== 4.1.0 === 2022052100 release is pending
+=== 4.1.0 === 2022070700
 20220220 HotQuestion_484v - Need to update GDPR Code. Made changes as needed until
     the code ran without errors when I ran: php adhoc_task.php --execute. As of
     20220410 I have added comments so they need to be included in the GDPR Code.

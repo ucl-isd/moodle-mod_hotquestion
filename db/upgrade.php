@@ -342,10 +342,10 @@ function xmldb_hotquestion_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2022041000, 'hotquestion');
     }
     // 4.1.0  Upgrade starts here.
-    if ($oldversion < 2022070700) {
+    if ($oldversion < 2022070701) {
         // Define field assesstimestart to be added to hotquestion.
         $table = new xmldb_table('hotquestion');
-        $field = new xmldb_field('assesstimestart', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'assesstimefinish');
+        $field = new xmldb_field('assesstimestart', XMLDB_TYPE_INTEGER, '10', null, XMLDB_NOTNULL, null, '0', 'assessed');
 
         // Conditionally launch add field assesstimestart.
         if (!$dbman->field_exists($table, $field)) {
@@ -552,7 +552,7 @@ function xmldb_hotquestion_upgrade($oldversion=0) {
         $dbman->change_field_default($table, $field);
 
         // Hotquestion savepoint reached.
-        upgrade_mod_savepoint(true, 2022070700, 'hotquestion');
+        upgrade_mod_savepoint(true, 2022070701, 'hotquestion');
     }
     return $result;
 }
