@@ -359,10 +359,16 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
                         $f1 = $this->hotquestion->get_currentroundx();
                         $f2 = $this->hotquestion->get_roundcount();
 
+                        if ((($this->hotquestion->instance->comments) && ($question->approved) && (($f1 == $f2) || (!$f1)) && (has_capability('mod/hotquestion:comment', $context)))
+                              || (($this->hotquestion->instance->comments) && (has_capability('mod/hotquestion:manageentries', $context)))) {
+/*
                         if ((($this->hotquestion->instance->comments)
                               && ($question->approved) && ($f1 == $f2))
                               || (($this->hotquestion->instance->comments)
-                              && (has_capability('mod/hotquestion:manageentries', $context)))) {
+                              //&& (has_capability('mod/hotquestion:manageentries', $context)))) {
+                              && (has_capability('mod/hotquestion:comment', $context) && ($f1 == $f2)))) {
+*/
+
                             list($context, $course, $cm) = get_context_info_array($context->id);
                             // Initialize and then check to see how many comments for this question.
                             require_once($CFG->dirroot  . '/comment/lib.php');
