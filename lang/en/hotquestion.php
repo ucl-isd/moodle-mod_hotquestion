@@ -107,6 +107,7 @@ The factor need to be adjusted depending on the total votes a student could emit
 and the weight desired for this type of participation.
 For instance, in a student can emit 5 heat votes, a factor on 20% means voting for other 5 questions counts as
 one question written by this student. A factor of 100% means voting for other questions counts the same as writing a new question. ';
+$string['finalgrade'] = 'Final grade ';
 $string['for'] = ' for site: ';
 $string['grading'] = 'Raw grade';
 $string['heat'] = 'Heat';
