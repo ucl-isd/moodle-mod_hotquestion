@@ -12,6 +12,18 @@ This files describes changes in the Hot Question code.
     Heat/votes. Currently they do not auto update and do not turn green unless
     I edit the activity.
 
+=== 4.1.1+ ===
+20220712 HotQuestion_890 - I think the Upgrade version check is incorrect.
+    Forgot to change if from checking for M2.8 to M3.11. 
+20220716 HotQuestion_891 - When using scales, the Grade column needs to show max
+    points, not the negative scale id. Added new string, Final grade. Added code
+    that gets the index of the highest item and entry, in the scale. Then adds
+    both to the, Final grade, column heading. e.g. Final grade (6=Mastery), if
+    using a scale of: No Credit, No Understanding, Beginning, Developing,
+    Accomplished, Mastery
+20220717 HotQuestion_893 - In v4.1.1 students cannot see or make comments. Modified
+    new check code to account for when the first flag is null.
+
 === 4.1.1 ===
 20220709 HotQuestion_888 - upgrade.php, line 348 needs assesstimefinish changed to
     assessed. Made needed change to upgrade.php, version.php and upgrade.txt.
