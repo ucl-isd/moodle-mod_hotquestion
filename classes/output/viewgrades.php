@@ -142,7 +142,7 @@ class viewgrades extends table_sql {
      * @param int $userid
      */
     protected function init($group = 0, $userid = 0) {
-        global $CFG;
+        global $CFG, $DB;
         // 20220503 Changed votes to heatgiven. Added teacher priority and heatreceived.
         // 20220504 Added teacherpriority.
         $tablecolumns = array('userpic',
@@ -155,6 +155,18 @@ class viewgrades extends table_sql {
                               'finalgrade'
                               );
 
+        // 20220716 Get the grade point setting for this Hot Question.
+        $finalgrade = $this->hotquestion->instance->grade;
+        // If HotQuestion is set for None or Points, then skip ahead.
+        // If set for Scale, then figure out the scale index and entry for the maximum score.
+        if ($finalgrade < 0) {
+            if ($scale = $DB->get_record('scale', array('id' => -($this->hotquestion->instance->grade)))) {
+                $this->cache['scale'] = make_menu_from_list($scale->scale);
+            }
+            $finalgrade = sizeof($this->cache['scale']);
+            $finalgrade .= '='.($this->cache['scale'][$finalgrade]);
+        }
+
         $tableheaders = array(
             get_string('userpic'),
             get_string('fullnameuser'),
@@ -163,7 +175,7 @@ class viewgrades extends table_sql {
             get_string('heatgiven', 'hotquestion').' ('.($this->hotquestion->instance->factorheat).'%)',
             get_string('heatreceived', 'hotquestion').' ('.($this->hotquestion->instance->factorvote).'%)',
             get_string('grading', 'hotquestion' ),
-            get_string('gradenoun').' ('.($this->hotquestion->instance->grade).')',
+            get_string('finalgrade', 'hotquestion').' ('.($finalgrade).')',
         );
 
         $context = $this->get_context();
@@ -628,7 +640,6 @@ class viewgrades extends table_sql {
             // Create a scaleid based on users current grade.
             $scaleid = (int)$grade;
             // If it is there, pick the users grade from the scale using the scaleid.
-            // Currently, we have a problem as everyones grade is set to 1 which gives everyone, Missing.
             if (isset($this->cache['scale'][$scaleid])) {
                 $o .= $this->cache['scale'][$scaleid];
                 return $o;
