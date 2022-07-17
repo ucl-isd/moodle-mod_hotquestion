@@ -207,7 +207,10 @@ if (!$ajax) {
     // Added code to include the activity name, 10/05/16.
     $hotquestionname = format_string($hotquestion->name, true, array('context' => $context));
     echo $output->header();
-    echo $OUTPUT->heading($hotquestionname);
+    // 20220716 HQ_882 Skip heading for Moodle 4.0 and higher as it seems to be automatic.
+    if ($CFG->branch < 400) {
+        echo $OUTPUT->heading($hotquestionname);
+    }
     // Allow access at any time to manager and editing teacher but prevent access to students.
     if (!(has_capability('mod/hotquestion:manage', $context))) {
         // Check availability timeopen and timeclose. Added 10/2/16.
