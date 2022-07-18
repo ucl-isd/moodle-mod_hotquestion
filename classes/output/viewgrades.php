@@ -163,7 +163,7 @@ class viewgrades extends table_sql {
             if ($scale = $DB->get_record('scale', array('id' => -($this->hotquestion->instance->grade)))) {
                 $this->cache['scale'] = make_menu_from_list($scale->scale);
             }
-            $finalgrade = sizeof($this->cache['scale']);
+            $finalgrade = count($this->cache['scale']);
             $finalgrade .= '='.($this->cache['scale'][$finalgrade]);
         }
 
