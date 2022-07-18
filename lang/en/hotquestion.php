@@ -47,23 +47,18 @@ $string['authorinfohide'] = 'Posted {$a->time}';
 $string['calendarend'] = '{$a} closes';
 $string['calendarstart'] = '{$a} opens';
 $string['cnfallowcomments'] = 'Define if a hot question will accept comments on entries by default';
-
 $string['completiondetail:post'] = 'Post questions: {$a}';
 $string['completiondetail:vote'] = 'Give heat: {$a}';
 $string['completiondetail:pass'] = 'Passing grade: {$a}';
-
 $string['completionpostdesc'] = 'Student must create at least {$a} questions(s)';
 $string['completionvotedesc'] = 'Student must vote/give heat to {$a} question(s) or post(s)';
 $string['completionpassdesc'] = 'Student must receive passing grade of {$a}';
-
 $string['completionpostgroup'] = 'Require questions';
 $string['completionvotegroup'] = 'Require heat:';
 $string['completionpassgroup'] = 'Require pass:';
-
 $string['completionpost'] = 'Student must add questions:';
 $string['completionvote'] = 'Student must add heat:';
 $string['completionpass'] = 'Student must pass:';
-
 $string['connectionerror'] = 'Connection error';
 $string['content'] = 'Content';
 $string['csvexport'] = 'Export to .csv';
