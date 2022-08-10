@@ -11,8 +11,17 @@ This files describes changes in the Hot Question code.
     fixed is, if the teacher elects to require a number of Questions and
     Heat/votes. Currently they do not auto update and do not turn green unless
     I edit the activity.
+20220718 HotQuestion_894 - Need to cleanup/change code in upgrade.php.
+20220810 Hot Question - Issue #65 at github regarding undefined variable. Added
+    a code snippet at line 166 and 167, in the, function reset_instance($hotquestionid),
+    in lib.php for Hot Question.
 
-=== 4.1.1+ ===
+=== 4.1.1.03+ ===
+20220718 HotQuestion_895 - Need to make some minor language string changes in
+    new grade strings. Made changes as needed.
+
+
+=== 4.1.1.02+ ===
 20220712 HotQuestion_890 - I think the Upgrade version check is incorrect.
     Forgot to change if from checking for M2.8 to M3.11. 
 20220716 HotQuestion_891 - When using scales, the Grade column needs to show max
