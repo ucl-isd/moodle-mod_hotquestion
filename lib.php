@@ -163,7 +163,8 @@ function hotquestion_delete_instance($id) {
  */
 function reset_instance($hotquestionid) {
     global $DB;
-
+    // 20220810 Added to fix git hub issue #65.
+    $hotquestion = $DB->get_record('hotquestion', array('id' => $hotquestionid));
     $questions = $DB->get_records('hotquestion_questions', array('hotquestion' => $hotquestionid));
     foreach ($questions as $question) {
         if (! $DB->delete_records('hotquestion_votes', array('question' => $question->id))) {
