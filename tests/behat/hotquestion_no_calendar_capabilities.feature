@@ -1,4 +1,4 @@
-@mod @mod_hotquestion @javascript 
+@mod @mod_hotquestion @javascript
 Feature: HotQuestion with no calendar capabilites
   In order to allow work effectively
   As a teacher
@@ -20,8 +20,8 @@ Feature: HotQuestion with no calendar capabilites
     And I override the system permissions of "Teacher" role with:
       | capability | permission |
       | moodle/calendar:manageentries | Prohibit |
-   And I am on "Course 1" course homepage
-   And I add a "Hot Question" to section "1" and I fill the form with:
+    And I am on "Course 1" course homepage
+    And I add a "Hot Question" to section "1" and I fill the form with:
       | Activity Name | Test hotquestion name |
       | Description | Test hotquestion description |
       | id_timeopen_enabled | 1 |
