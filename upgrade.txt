@@ -12,9 +12,12 @@ This files describes changes in the Hot Question code.
     Heat/votes. Currently they do not auto update and do not turn green unless
     I edit the activity.
 20220718 HotQuestion_894 - Need to cleanup/change code in upgrade.php.
-20220810 Hot Question - Issue #65 at github regarding undefined variable. Added
+
+====4.1.2.00 === 2022081700
+20220817 Ran Code checker and Moodle PHPdoc check. Fixed as needed.
+20220810 Hot Question_907 - Issue #65 at github regarding undefined variable. Added
     a code snippet at line 166 and 167, in the, function reset_instance($hotquestionid),
-    in lib.php for Hot Question.
+    in lib.php for Hot Question, that fixes the undefined variable.
 
 === 4.1.1.03+ ===
 20220718 HotQuestion_895 - Need to make some minor language string changes in
