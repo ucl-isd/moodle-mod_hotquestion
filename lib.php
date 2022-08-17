@@ -531,7 +531,7 @@ function hotquestion_comment_validate($commentparam) {
     }
     $context = context_module::instance($cm->id);
 
-    if ($hotquestion->approval and !$record->approved and !has_capability('mod/hotquestion:manageentries', $context)) {
+    if ($hotquestion->approval && !$record->approved && !has_capability('mod/hotquestion:manageentries', $context)) {
         throw new comment_exception('notapproved', 'hotquestion');
     }
     // Validate context id.
@@ -758,7 +758,7 @@ function hotquestion_update_grades($hotquestion, $userid=0, $nullifnone=true) {
     } else if ($grades = hotquestion_get_user_grades($hotquestion, $userid)) {
         hotquestion_grade_item_update($hotquestion, $grades);
 
-    } else if ($userid and $nullifnone) {
+    } else if ($userid && $nullifnone) {
         $grade = new stdClass();
         $grade->userid   = $userid;
         $grade->rawgrade = null;
