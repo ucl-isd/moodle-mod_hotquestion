@@ -100,7 +100,7 @@ This credit is the number of emitted votes times this factor/100.
 
 The factor need to be adjusted depending on the total votes a student could emit
 and the weight desired for this type of participation.
-For instance, in a student can emit 5 heat votes, a factor on 20% means voting for other 5 questions counts as
+For instance, if a student can emit 5 heat votes, a factor of 20% means voting for other 5 questions counts as
 one question written by this student. A factor of 100% means voting for other questions counts the same as writing a new question. ';
 $string['finalgrade'] = 'Final grade ';
 $string['for'] = ' for site: ';
@@ -170,10 +170,10 @@ $string['pluginname'] = 'Hot Question';
 $string['previousround'] = 'Previous round';
 $string['postbutton'] = 'Click to post';
 $string['postmaxgrade'] = 'Questions for max grading';
-$string['postmaxgrade_help'] = 'The number of questions required to obtain the maximum calification.
+$string['postmaxgrade_help'] = 'The number of questions required to obtain the maximum score.
 
 This is nominally a count of questions, but the value attained by a user may be improved by heat factor (questions with greater heat count more)
-and by voting to other questions (a user may improve the grade by participating voting for questions by other students).';
+and by voting on other questions (a user may improve the grade by participating in voting for questions by other students).';
 $string['privacy:metadata:hotquestion_questions'] = "Information about the user's entries for a given Hot Question activity. ";
 $string['privacy:metadata:hotquestion_questions:userid'] = 'The ID of the user that posted this entry.';
 $string['privacy:metadata:hotquestion_questions:hotquestion'] = 'The ID of the Hot Question activity in which the content was posted.';
