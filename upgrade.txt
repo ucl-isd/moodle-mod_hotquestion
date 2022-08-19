@@ -1,43 +1,47 @@
 This files describes changes in the Hot Question code.
 
 === 4.?.? === Items that hopefully will be in a future release.
-20220410 HotQuestion_840 - Need to add comments to question downloads. 
 20220421 HotQuestion_844 - The Moodle Mobile app is not supported.
 20220430 HotQuestion_853 - Sometimes when a user has no question submitted, they
     are getting a grade anyway. 
 20220706 HotQuestion_881 - When Whole Hot Question grading is NOT enabled, the
-    Activity completion should reflect that. No changes needed as the desired
-    outcome is automatic when the Grade selection is None. What DOES need to be
-    fixed is, if the teacher elects to require a number of Questions and
-    Heat/votes. Currently they do not auto update and do not turn green unless
-    I edit the activity.
-20220718 HotQuestion_894 - Need to cleanup/change code in upgrade.php.
+    Activity completion should reflect that. See the ticket for details.
 
-====4.1.2.00 === 2022081700
+
+=== 4.1.2.01 === pending
+20220410 HotQuestion_840 - Need to add comments to question downloads. Have gotten
+    this working for teachers, single HQ at a time. Admin has been further developed
+    to add course and Hot Question activity names.
+
+20220718 HotQuestion_894 - Need to cleanup/change code in upgrade.php. Made changes
+    as needed with the main one being next to last line of code being changed
+    to return true;, instead of, return $result;.
+20220819 Ran code checker and fixed two space errors.
+
+===4.1.2.00 === 2022081700
 20220817 Ran Code checker and Moodle PHPdoc check. Fixed as needed.
-20220810 Hot Question_907 - Issue #65 at github regarding undefined variable. Added
+20220810 Hot Question_907v - Issue #65 at github regarding undefined variable. Added
     a code snippet at line 166 and 167, in the, function reset_instance($hotquestionid),
     in lib.php for Hot Question, that fixes the undefined variable.
 
-=== 4.1.1.03+ ===
-20220718 HotQuestion_895 - Need to make some minor language string changes in
+=== 4.1.1.03+ === 2022071800
+20220718 HotQuestion_895v - Need to make some minor language string changes in
     new grade strings. Made changes as needed.
 
-
 === 4.1.1.02+ ===
-20220712 HotQuestion_890 - I think the Upgrade version check is incorrect.
+20220712 HotQuestion_890v - I think the Upgrade version check is incorrect.
     Forgot to change if from checking for M2.8 to M3.11. 
-20220716 HotQuestion_891 - When using scales, the Grade column needs to show max
+20220716 HotQuestion_891v - When using scales, the Grade column needs to show max
     points, not the negative scale id. Added new string, Final grade. Added code
     that gets the index of the highest item and entry, in the scale. Then adds
     both to the, Final grade, column heading. e.g. Final grade (6=Mastery), if
     using a scale of: No Credit, No Understanding, Beginning, Developing,
     Accomplished, Mastery
-20220717 HotQuestion_893 - In v4.1.1 students cannot see or make comments. Modified
+20220717 HotQuestion_893v - In v4.1.1 students cannot see or make comments. Modified
     new check code to account for when the first flag is null.
 
 === 4.1.1 ===
-20220709 HotQuestion_888 - upgrade.php, line 348 needs assesstimefinish changed to
+20220709 HotQuestion_888v - upgrade.php, line 348 needs assesstimefinish changed to
     assessed. Made needed change to upgrade.php, version.php and upgrade.txt.
 
 === 4.1.0 === 2022070700
@@ -144,7 +148,6 @@ This files describes changes in the Hot Question code.
     calculate_user_ratings function and makes it so that only entries that are NOT
     anonymous get counted towards a users grade.
 
-
 === 4.0.2 === released 20220410 for Moodle 3.1 and higher
 20211029 Merged pull request #51 made by Vidalia.
 20211029 Ran codechecker.php.
@@ -192,7 +195,7 @@ This files describes changes in the Hot Question code.
 20220410 Ran codechecker.php. 
 
 
-=== 4.0.1 ===
+=== 4.0.1 === 2021100100 For Moodle 2.8 thru Moodle 3.11
 20210516 HotQuestion_695v - Invalid get_string() identifier: 'hotquestion:rate'.
     Added the missing string.
 20210516 HotQuestion_723v - Invalid get_string() identifier: 'hotquestion:comment'.
@@ -203,7 +206,7 @@ This files describes changes in the Hot Question code.
 20211001 HotQuestion_752v - need to format_text of the submit directions. Changed the
     code to include format_text, in mod_form.php down around line 236.
 
-=== 4.0.0 ===
+=== 4.0.0 === 2021032300 For Moodle 2.8 thru Moodle 3.11
 20210321 HotQuestion_561 See about using editor text area to allow for formatting
     and emoji's. Got it working in just a couple of hours, mostly looking for the
     best place to add the code. Does not support audio and video recording. Will do
