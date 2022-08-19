@@ -34,6 +34,7 @@ use \mod_hotquestion\event\add_round;
 use \mod_hotquestion\event\remove_question;
 use \mod_hotquestion\event\remove_round;
 use \mod_hotquestion\event\download_questions;
+use \mod_hotquestion\local\results;
 
 defined('MOODLE_INTERNAL') || die(); // @codingStandardsIgnoreLine
 define('HOTQUESTION_EVENT_TYPE_OPEN', 'open');
@@ -586,20 +587,13 @@ class mod_hotquestion {
                             get_string('teacherpriority', 'hotquestion'),
                             get_string('heat', 'hotquestion'),
                             get_string('approvedyes', 'hotquestion'),
-                            get_string('content', 'hotquestion')
+                            get_string('content', 'hotquestion'),
+                            get_string('comments')
                             );
             // For admin we want every hotquestion activity.
             $whichhqs = ('AND hq.hotquestion > 0');
             $csv->filename = clean_filename(get_string('exportfilenamep1', 'hotquestion'));
 
-            // 20200524 Add info to our data array and denote this is ALL site questions.
-            $activityinfo = array(null, null, null, null, null,
-                                  null, null, null, null, null,
-                                  get_string('exportfilenamep1', 'hotquestion').
-                                  get_string('exportfilenamep2', 'hotquestion').
-                                  gmdate("Ymd_Hi").get_string('for', 'hotquestion').
-                                  $CFG->wwwroot);
-            $csv->add_data($activityinfo);
         } else {
             // Add fields with the column labels for ONLY the current HQ activity.
             $fields = array(get_string('firstname'),
@@ -613,6 +607,7 @@ class mod_hotquestion {
                             $this->instance->heatlabel,
                             $this->instance->approvallabel,
                             $this->instance->questionlabel,
+                            get_string('comments')
                             );
 
             $whichhqs = ('AND hq.hotquestion = ');
@@ -620,18 +615,12 @@ class mod_hotquestion {
 
             $csv->filename = clean_filename(($this->course->shortname).'_');
             $csv->filename .= clean_filename(($this->instance->name));
-            // 20200513 Add the course shortname and the HQ activity name to our data array.
-            $activityinfo = array(get_string('course').': '
-                                  .$this->course->shortname,
-                                  get_string('activity').': '
-                                  .$this->instance->name);
-            $csv->add_data($activityinfo);
         }
 
         $csv->filename .= clean_filename(get_string('exportfilenamep2', 'hotquestion').gmdate("Ymd_Hi").'GMT.csv');
 
-        // Add the column headings to our data array.
-        $csv->add_data($fields);
+        // 20220819 Save a copy of the fields list for later use.
+        $fields2 = $fields;
         // Now add this instance id that's needed in the sql for teachers and managers downloads.
         $fields = array($fields, 'thisinstid' => $this->instance->id);
 
@@ -670,9 +659,11 @@ class mod_hotquestion {
                            hq.anonymous AS anonymous,
                            hq.tpriority AS tpriority,
                            COUNT(hv.voter) AS heat,
-                           hq.approved AS approved
+                           hq.approved AS approved,
+                           h.course AS course
                      FROM {hotquestion_questions} hq
                 LEFT JOIN {hotquestion_votes} hv ON hv.question = hq.id
+                     JOIN {hotquestion} h ON h.id = hq.hotquestion
                      JOIN {user} u ON u.id = hq.userid
                     WHERE hq.userid > 0 ";
         }
@@ -680,17 +671,51 @@ class mod_hotquestion {
         $sql .= ($whichhqs);
         $sql .= " GROUP BY u.lastname, u.firstname, hq.hotquestion, hq.id, hq.content,
                             hq.userid, hq.time, hq.anonymous, hq.tpriority, hq.approved
-                  ORDER BY hq.hotquestion ASC, hq.id ASC, tpriority DESC, heat";
+                  ORDER BY hq.hotquestion ASC, u.lastname ASC, u.firstname ASC, hq.id ASC, tpriority DESC, heat";
 
         // Add the list of users and HotQuestions to our data array.
         if ($hqs = $DB->get_records_sql($sql, $fields)) {
+            $firstrunflag = 1;
+            if (is_siteadmin($USER->id)) {
+                $currenthqhotquestion = $hqs[1]->hotquestion;
+            } else {
+                $currenthqhotquestion = '';
+            }
             foreach ($hqs as $q) {
+                // 20220818 Initialize variable for any comments for the next question.
+                $comment = '';
+                // 20220818 Added comments for each question to the export file.
+                if ($cmts = $DB->get_records('comments', ['itemid' => $q->question], 'userid, content, timecreated')) {
+                    $temp = count($cmts);
+                    $comment .= '('.$temp.' '.get_string('comments').') ';
+                    foreach ($cmts as $cmt) {
+                        $comment .= get_string('user').' '.$cmt->userid.' commented: '.$cmt->content.' | ';
+                    }
+                }
+                // 20220819 Split admins output into sections by HotQuestions activities.
+                if ((($currenthqhotquestion <> $q->hotquestion) && (is_siteadmin($USER->id))) || ($firstrunflag)) {
+                    $currenthqhotquestion = $q->hotquestion;
+                    // 20220819 Add the course shortname and the HQ activity name to our data array.
+                    $currentcrsname = $DB->get_record('course', ['id' => $q->course], 'shortname');
+                    $currenthqname = $DB->get_record('hotquestion', ['id' => $q->hotquestion], 'name');
+
+                    $activityinfo = array(get_string('course').': '.$currentcrsname->shortname,
+                        get_string('activity').': '.$currenthqname->name,
+                        null, null, null, null, null, null, null, null,
+                        get_string('exportfilenamep2', 'hotquestion').
+                        gmdate("Ymd_Hi").get_string('for', 'hotquestion').
+                        $CFG->wwwroot);
+
+                    $csv->add_data($activityinfo);
+                    $csv->add_data($fields2);
+                    $firstrunflag = 0;
+                }
                 $output = array($q->firstname, $q->lastname, $q->userid, $q->hotquestion, $q->question,
-                    $q->time, $q->anonymous, $q->tpriority, $q->heat, $q->approved, $q->content);
+                    $q->time, $q->anonymous, $q->tpriority, $q->heat, $q->approved, $q->content, $comment);
                 $csv->add_data($output);
             }
         }
-        // Download the completed array.
+        // Download the completed array of questions and comments.
         $csv->download_file();
         exit;
     }
