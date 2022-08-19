@@ -75,8 +75,8 @@ $string['eventremoveround'] = 'Remove round';
 $string['eventremovevote'] = 'Removed vote';
 $string['eventupdatevote'] = 'Updated vote';
 $string['exportfilename'] = 'questions.csv';
-$string['exportfilenamep1'] = 'All_Site';
-$string['exportfilenamep2'] = '_HQ_Questions_Exported_On_';
+$string['exportfilenamep1'] = 'All_Site_';
+$string['exportfilenamep2'] = 'HQ_Questions_Exported_On_';
 $string['factorheat'] = 'Heat received factor';
 $string['factorheat_help'] = 'A factor to apply to questions count for grading based on question heat.
 The hotter the question, the greater weight towards grading.
