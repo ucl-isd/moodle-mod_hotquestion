@@ -9,14 +9,15 @@ This files describes changes in the Hot Question code.
 
 
 === 4.1.2.01 === pending
-20220410 HotQuestion_840 - Need to add comments to question downloads. Have gotten
-    this working for teachers, single HQ at a time. Admin has been further developed
-    to add course and Hot Question activity names.
-
+20220410 HotQuestion_840 - Need to add comments to question downloads. See ticket
+    for details. Have gotten working for teachers, managers and admins.
 20220718 HotQuestion_894 - Need to cleanup/change code in upgrade.php. Made changes
     as needed with the main one being next to last line of code being changed
     to return true;, instead of, return $result;.
-20220819 Ran code checker and fixed two space errors.
+20220821 Hot Question_910 - The public function get_description(), about line 61 in
+    download_questions. php needs updating. See ticket for details. Basically added
+    a check to see if it is an admin or a regular teacher/manager doing the download. 
+20220821 Ran code checker and fixed errors reported errors.
 
 ===4.1.2.00 === 2022081700
 20220817 Ran Code checker and Moodle PHPdoc check. Fixed as needed.
