@@ -8,7 +8,7 @@ This files describes changes in the Hot Question code.
     Activity completion should reflect that. See the ticket for details.
 
 
-=== 4.1.2.01 === pending
+=== 4.1.2.01 === 2022082100
 20220410 HotQuestion_840 - Need to add comments to question downloads. See ticket
     for details. Have gotten working for teachers, managers and admins.
 20220718 HotQuestion_894 - Need to cleanup/change code in upgrade.php. Made changes
