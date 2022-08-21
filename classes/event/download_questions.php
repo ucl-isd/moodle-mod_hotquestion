@@ -59,8 +59,14 @@ class download_questions extends \core\event\base {
      * @return string
      */
     public function get_description() {
-        return "The user with id '$this->userid' has downloaded questions for the hotquestion activity with the course module id
-            '$this->contextinstanceid'.";
+        if (is_siteadmin($this->userid)) {
+            $txtforlog = "The admin user with id '$this->userid' has downloaded questions for ALL hotquestion activities
+                         while in the hotquestion with the course module id '$this->contextinstanceid'.";
+        } else {
+            $txtforlog = "The teacher/manager with id '$this->userid' has downloaded the questions for the hotquestion
+                         activity with the course module id '$this->contextinstanceid'.";
+        }
+        return $txtforlog;
     }
 
     /**
