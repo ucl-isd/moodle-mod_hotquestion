@@ -6,15 +6,29 @@ This files describes changes in the Hot Question code.
     are getting a grade anyway. 
 20220706 HotQuestion_881 - When Whole Hot Question grading is NOT enabled, the
     Activity completion should reflect that. See the ticket for details.
+20220821 HotQuestion_911 - Need to see about including grades in the Export tool.
 
+
+
+
+=== 4.1.3 === pending
+20220601 Hot Question_870 - Default settings to allow comments, is not being picked
+    up when creating activity. Works now, but need to verify in a new install.
+20221023 HotQuestion_798 - Need to create new icons, monologo.svg and monologo.png
+    for Moodle 4.0. Decided it was better to actually have the correct files for
+    the icon. Changed the ticket title and created both icons and they are being
+    used in this Moodle 4.x.x site.
+20221029 Hot Question_945 - In locallib.php line 850 is returning the question ID
+    instead of the voter ID. Made the suggested change and verified the correct
+    deletions are being done.
 
 === 4.1.2.01 === 2022082100
-20220410 HotQuestion_840 - Need to add comments to question downloads. See ticket
+20220410 HotQuestion_840v - Need to add comments to question downloads. See ticket
     for details. Have gotten working for teachers, managers and admins.
-20220718 HotQuestion_894 - Need to cleanup/change code in upgrade.php. Made changes
+20220718 HotQuestion_894v - Need to cleanup/change code in upgrade.php. Made changes
     as needed with the main one being next to last line of code being changed
     to return true;, instead of, return $result;.
-20220821 Hot Question_910 - The public function get_description(), about line 61 in
+20220821 Hot Question_910v - The public function get_description(), about line 61 in
     download_questions. php needs updating. See ticket for details. Basically added
     a check to see if it is an admin or a regular teacher/manager doing the download. 
 20220821 Ran code checker and fixed errors reported errors.
