@@ -847,7 +847,7 @@ class mod_hotquestion {
     public function get_question_voters(int $questionid) : array {
         global $DB;
 
-        $voters = $DB->get_records_menu('hotquestion_votes', ['question' => $questionid], 'id, voter');
+        $voters = $DB->get_records_menu('hotquestion_votes', ['question' => $questionid], '', 'id, voter');
 
         if ($voters) {
             return array_values($voters);
