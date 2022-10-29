@@ -575,7 +575,7 @@ class viewgrades extends table_sql {
         if ($this->is_downloadable() && !$this->is_downloading()) {
             return $OUTPUT->download_dataformat_selector(get_string('downloadas', 'table'),
                     $this->baseurl->out_omit_querystring(), $this->downloadparamname, $this->baseurl->params());
-                    // Might see about adding a return button at the end of this return line of code.
+                    // Might see about adding a return button before or at the end of this return line of code.
         } else {
             return '';
         }
