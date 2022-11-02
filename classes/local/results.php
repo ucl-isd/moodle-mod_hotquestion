@@ -408,7 +408,8 @@ class results {
                 add_to_log($fromform->course->id, "hotquestion", "add question"
                     , "view.php?id={$fromform->cm->id}", $newentry->content, $fromform->cm->id);
             }
-
+            // Update completion state for current user.
+            $hq->update_completion_state();
             // Contrib by ecastro ULPGC update grades for question author.
             // ...$newentry->update_users_grades([$USER->id]);...
             $hq->update_users_grades([$USER->id]);

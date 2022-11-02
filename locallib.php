@@ -137,6 +137,8 @@ class mod_hotquestion {
             } else {
                 $DB->delete_records('hotquestion_votes', array('question' => $question->id, 'voter' => $USER->id));
             }
+            // Update completion state for current user.
+            $this->update_completion_state();
         }
         // Contrib by ecastro ULPGC, update grades for questions author and voters.
         // 20220623 Moved so entering viewgrades.php page always updates to the latest grade.
@@ -176,11 +178,12 @@ class mod_hotquestion {
             } else {
                 $DB->delete_records('hotquestion_votes', array('question' => $question->id, 'voter' => $USER->id));
             }
+            // Update completion state for current user.
+            $this->update_completion_state();
             // Contrib by ecastro ULPGC, update grades for question author and voters.
             $this->update_users_grades([$question->userid, $USER->id]);
         }
     }
-
 
     /**
      * Whether can vote on the question.
@@ -448,6 +451,12 @@ class mod_hotquestion {
             // 20220510 Delete all comments on the question that was just deleted.
             $DB->delete_records('comments', array('itemid' => $itemid, 'component' => 'mod_hotquestion'));
 
+            // Update completion state for question creator.
+            $this->update_completion_state($dbquestion->userid);
+            // Update completion state for voters.
+            foreach ($users as $user) {
+                $this->update_completion_state($user);
+            }
             // Contrib by ecastro ULPGC, update grades for question author and voters.
             $this->update_users_grades($users);
         }
@@ -510,6 +519,12 @@ class mod_hotquestion {
                 $dbvote = $DB->get_records('hotquestion_votes', array('question' => $questionid));
                 $DB->delete_records('hotquestion_votes', array('question' => $dbquestion->id));
 
+                // Update completion state for question creator.
+                $this->update_completion_state($dbquestion->userid);
+                // Update completion state for voters.
+                foreach ($users as $user) {
+                    $this->update_completion_state($user);
+                }
                 // Contrib by ecastro ULPGC, update grades for question author and voters.
                 $this->update_users_grades($users);
             }
@@ -904,5 +919,19 @@ class mod_hotquestion {
             // Calling the function in lib.php at about line 807.
             hotquestion_update_grades($this->instance, $userid);
         }
+    }
+
+    /**
+     * Update completion state.
+     *
+     * @param $user
+     * @return void
+     */
+    public function update_completion_state($user = null) {
+        $completion = new completion_info($this->course);
+        if (!$completion->is_enabled($this->cm)) {
+            return;
+        }
+        $completion->update_state($this->cm, COMPLETION_UNKNOWN, $user);
     }
 }
