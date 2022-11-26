@@ -25,7 +25,7 @@ Details: https://github.com/hit-moodle/moodle-mod_hotquestion/wiki
 - Navigate to Moodle root folder
 - **git clone git://github.com/drachels/moodle-mod_hotquestion.git mod/hotquestion**
 - **cd hotquestion**
-- **git checkout MOODLE_XY_STABLE** (where XY is the moodle version, e.g: MOODLE_30_STABLE, MOODLE_28_STABLE...)
+- **git checkout MOODLE_XY_STABLE** (where XY is the moodle version, e.g: MOODLE_311_STABLE, MOODLE_400_STABLE...)
 - Click the 'Notifications' link on the frontpage administration block or **php admin/cli/upgrade.php** if you have access to a command line interpreter.
 
 ## Install from a compressed file
