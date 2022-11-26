@@ -704,8 +704,9 @@ class mod_hotquestion {
                                 );
                 // 20220818 Initialize variable for any comments for the next question.
                 $comment = '';
-                // 20220818 If there are any, get the comments for each question to in the export file.
-                if ($cmts = $DB->get_records('comments', ['itemid' => $q->question], 'userid, content, timecreated')) {
+                // 20220818 If there are any, get the comments for each question to add in the export file.
+                // 20221124 Modified to include the component.
+                if ($cmts = $DB->get_records('comments', ['itemid' => $q->question, 'component' => 'mod_hotquestion'], 'userid, content, timecreated')) {
                     $temp = count($cmts);
                     $comment .= '('.$temp.' '.get_string('comments').') ';
                     foreach ($cmts as $cmt) {
