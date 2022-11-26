@@ -408,7 +408,7 @@ class mod_hotquestion {
             AND q.time <= ?
             GROUP BY q.id, q.hotquestion, q.content, q.userid, q.time,
                      q.anonymous, q.approved, q.tpriority
-            ORDER BY tpriority DESC, votecount DESC, q.time DESC', $params);
+            ORDER BY q.approved DESC, tpriority DESC, votecount DESC, q.time DESC', $params);
     }
 
     /**
