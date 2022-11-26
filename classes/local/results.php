@@ -227,9 +227,13 @@ class results {
             // Check all the entries from the whole course.
             // If not currently a group member, but group mode is set for separate groups or visible groups,
             // see if this user has posted anyway, posted before mode was changed or posted before removal from a group.
-            $sql = "SELECT COUNT(DISTINCT hq.userid) AS ucount, COUNT(DISTINCT hq.content) AS qcount FROM {hotquestion_questions} hq
-                      JOIN {user} u ON u.id = hq.userid
-                 LEFT JOIN {hotquestion_rounds} hr ON hr.hotquestion=hq.hotquestion
+            $sql = "SELECT COUNT(DISTINCT hq.userid) AS ucount,
+                           COUNT(DISTINCT hq.content) AS qcount
+                      FROM {hotquestion_questions} hq
+                      JOIN {user} u
+                        ON u.id = hq.userid
+                 LEFT JOIN {hotquestion_rounds} hr
+                        ON hr.hotquestion=hq.hotquestion
                      WHERE hq.hotquestion = :hqid
                        AND hr.endtime = 0
                        AND hq.time >= hr.starttime
@@ -244,7 +248,8 @@ class results {
             // Check all the users and entries from the whole course.
             $sql = "SELECT COUNT(DISTINCT hq.userid) AS ucount, COUNT(DISTINCT hq.content) AS qcount FROM {hotquestion_questions} hq
                       JOIN {user} u ON u.id = hq.userid
-                 LEFT JOIN {hotquestion_rounds} hr ON hr.hotquestion=hq.hotquestion
+                 LEFT JOIN {hotquestion_rounds} hr
+                        ON hr.hotquestion=hq.hotquestion
                      WHERE hq.hotquestion = :hqid
                        AND hr.endtime = 0
                        AND hq.time >= hr.starttime
