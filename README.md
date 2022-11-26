@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/drachels/moodle-mod_hotquestion.svg?branch=master)](https://travis-ci.org/drachels/moodle-mod_hotquestion)
+
 # Moodle Hot Question module
 The first moodle activity for physical classroom. The idea comes from
 Purdue University's hotseat.
