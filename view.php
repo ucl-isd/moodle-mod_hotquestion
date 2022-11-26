@@ -70,6 +70,16 @@ if (! $cw = $DB->get_record("course_sections", array("id" => $cm->section))) {
     throw new moodle_exception(get_string('incorrectmodule', 'hotquestion'));
 }
 
+                // Set a preference and then retrieve it.
+                $seeunapprovedpreference = optional_param('seeunapprovedpreference', get_user_preferences('hotquestion_seeunapproved', get_config('mod_hotquestion', 'approval')), PARAM_INT);
+
+                if ($seeunapprovedpreference == 1 || $seeunapprovedpreference == 'ON') {
+                    set_user_preference('hotquestion_seeunapproved', 'OFF');
+                } else {
+                    set_user_preference('hotquestion_seeunapproved', 'ON');
+                }
+
+
 // Trigger module viewed event.
 if ($CFG->version > 2014051200) { // Moodle 2.7+.
     $params = array('objectid' => $hq->cm->id, 'context' => $context);
@@ -193,6 +203,9 @@ if (!empty($action)) {
             break;
         case 'approve':
             if (has_capability('mod/hotquestion:manageentries', $context)) {
+
+
+
                 $q = required_param('q',  PARAM_INT);  // Question id to approve.
                 // Call approve question function in locallib.
                 $hq->approve_question($q);
@@ -237,12 +250,23 @@ if (!$ajax) {
         echo $output->introduction($cminfo, $completiondetails, $activitydates);
     }
 
-    // 20211219 Added link to all HotQuestion activities.
-    echo '<span style="float:right"><a href="index.php?id='
-         .$course->id
-         .'">'
-         .get_string('viewallhotquestions', 'hotquestion')
-         .'</a></span><br>';
+    // 20211219 Added link to all HotQuestion activities. 20221031 Added link to hide unapproved questions.
+    //if ($entriesmanager && $canask) {
+        echo '<span style="float:right"><a href="index.php?id='
+             .$course->id
+             .'">'
+             .get_string('viewallhotquestions', 'hotquestion')
+             .'</a> | <a href="view.php?id='.$cm->id
+             .'">'.get_string('seeunapproved', 'hotquestion', $seeunapprovedpreference)
+             .' Currently set to '.get_user_preferences('hotquestion_seeunapproved', get_config('mod_hotquestion', 'approval')).'.'
+             .'</a></span><br>';
+    //} else {
+    //    echo '<span style="float:right"><a href="index.php?id='
+    //         .$course->id
+    //         .'">'
+    //         .get_string('viewallhotquestions', 'hotquestion')
+    //         .'</a></span><br>';
+    //}
 
     // Print group information (A drop down box will be displayed if the user
     // is a member of more than one group, or has access to all groups).
