@@ -334,7 +334,16 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
                 if ((! $groups) || (groups_is_member($groups, $user->id))) {
                     // Process the question part of the row entry.
                     // If not a teacher and question is not approved, skip over it and do not show it.
-                    if ($question->approved || (has_capability('mod/hotquestion:manageentries', $context))) {
+                    //if ($question->approved || (has_capability('mod/hotquestion:manageentries', $context))) {
+
+                    if ((($question->approved)
+                            && (get_user_preferences('hotquestion_seeunapproved', null, $USER->id) == 'OFF'))
+                        || ((has_capability('mod/hotquestion:manageentries', $context))
+                            && (get_user_preferences('hotquestion_seeunapproved', null, $USER->id) == 'ON'))
+                        || (($question->approved)
+                            && (!has_capability('mod/hotquestion:manageentries', $context))
+                            && (get_user_preferences('hotquestion_seeunapproved', null, $USER->id) == 'ON'))) {
+
                         if ($question->anonymous) {
                             $a->user = get_string('anonymous', 'hotquestion');
                         } else {
@@ -500,7 +509,13 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
                             $line[] = $approve;
                         }
                         $table->data[] = $line;
-                    } else {
+                    //} else if ((!$question->approved) && (!get_user_preferences('hotquestion_seeunapproved', null, $USER->id) == 'ON') && (has_capability('mod/hotquestion:manageentries', $context))) {
+                    } else if (has_capability('mod/hotquestion:manageentries', $context)) {
+                        $line[] = 'In the first else if branch and can manage entries.';
+                        //$table->data[] = $line;
+                    } else if ((!$question->approved) && (get_user_preferences('hotquestion_seeunapproved', null, $USER->id) == 'ON')) {
+                        //$line[] = 'In the second else if branch and CANNOT manage entries.';
+
                         $line[] = get_string('notapproved', 'hotquestion');
                         $table->data[] = $line;
                     }
