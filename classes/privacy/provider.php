@@ -104,8 +104,8 @@ class provider implements \core_privacy\local\metadata\provider,
     /**
      * Get the list of contexts that contain user information for the specified user.
      *
-     * @param int $userid the userid.
-     * @return contextlist the list of contexts containing user info for the user.
+     * @param int $userid The user to search.
+     * @return contextlist $contextlist The contextlist containing the list of contexts used in this plugin.
      */
     public static function get_contexts_for_userid(int $userid) : contextlist {
         $contextlist = new contextlist();
@@ -120,15 +120,23 @@ class provider implements \core_privacy\local\metadata\provider,
             'userid1' => $userid,
             'userid2' => $userid
         ];
+
+        // User-created hotquestion entries.
         $sql = "
             SELECT c.id
               FROM {context} c
-              JOIN {course_modules} cm ON cm.id = c.instanceid AND c.contextlevel = :contextlevel
-              JOIN {modules} m ON m.id = cm.module and m.name = :modid
-              JOIN {hotquestion} h ON h.id = cm.instance
-              JOIN {hotquestion_questions} hq ON hq.hotquestion = h.id
-         LEFT JOIN {hotquestion_votes} hv ON hv.question = hq.id
-             WHERE (hq.userid = :userid1) OR (hv.voter = :userid2)";
+              JOIN {course_modules} cm
+                ON cm.id = c.instanceid
+               AND c.contextlevel = :contextlevel
+               AND cm.module = :modid
+              JOIN {hotquestion} h
+                ON h.id = cm.instance
+              JOIN {hotquestion_questions} hq
+                ON hq.hotquestion = h.id
+         LEFT JOIN {hotquestion_votes} hv
+                ON hv.question = hq.id
+             WHERE (hq.userid = :userid1)
+                OR (hv.voter = :userid2)";
 
         $contextlist->add_from_sql($sql, $params);
 
@@ -138,30 +146,38 @@ class provider implements \core_privacy\local\metadata\provider,
     /**
      * Get the list of users who have data within a context.
      *
-     * @param   userlist    $userlist   The userlist containing the list of users who have data in this context/plugin combination.
+     * @param userlist $userlist The userlist containing the list of users who have data in this context/plugin combination.
      */
     public static function get_users_in_context(userlist $userlist) {
         $context = $userlist->get_context();
+
         if (!is_a($context, \context_module::class)) {
             return;
         }
+
         $modid = self::get_modid();
         if (!$modid) {
             return; // HotQuestion module not installed.
         }
+
         $params = [
             'modid' => $modid,
             'contextlevel' => CONTEXT_MODULE,
             'contextid'    => $context->id,
         ];
 
-        // User-created entry in hotquestion_question.
+        // Find users with hotquestion_question entries.
         $sql = "
             SELECT hqq.userid
-              FROM {hotquestion_questions} hqq
-              JOIN {hotquestion} hq ON hq.id = hqq.hotquestion
-              JOIN {course_modules} cm ON cm.instance = hq.id AND cm.module = :modid
-              JOIN {context} ctx ON ctx.instanceid = cm.id AND ctx.contextlevel = :contextlevel
+              FROM {hotquestion_questions} hq
+              JOIN {hotquestion} h
+                ON h.id = hq.hotquestion
+              JOIN {course_modules} cm
+                ON cm.instance = h.id
+               AND cm.module = :modid
+              JOIN {context} ctx
+                ON ctx.instanceid = cm.id
+               AND ctx.contextlevel = :contextlevel
              WHERE ctx.id = :contextid
         ";
         $userlist->add_from_sql('userid', $sql, $params);
@@ -186,31 +202,48 @@ class provider implements \core_privacy\local\metadata\provider,
         // Export the votes.
         $sql = "SELECT cm.id AS cmid,
                        hq.hotquestion AS hotquestion,
+                       hv.id AS id,
                        hv.question AS question,
                        hv.voter AS voter
                   FROM {context} c
-            INNER JOIN {course_modules} cm ON cm.id = c.instanceid
-             LEFT JOIN {hotquestion_questions} hq ON hq.hotquestion = cm.instance
-             LEFT JOIN {hotquestion_votes} hv ON hv.question = hq.id
-                 WHERE (c.id {$contextsql} AND hv.voter = :userid2)
-              ORDER BY cm.id";
+            INNER JOIN {course_modules} cm
+                    ON cm.id = c.instanceid
+             LEFT JOIN {hotquestion_questions} hq
+                    ON hq.hotquestion = cm.instance
+             LEFT JOIN {hotquestion_votes} hv
+                    ON hv.question = hq.id
+                 WHERE c.id $contextsql
+                   AND hv.voter = :userid2
+              ORDER BY cm.id, hq.id DESC";
 
         $params = [
             'userid1' => $user->id,
             'userid2' => $user->id,
         ] + $contextparams;
-        $recordset = $DB->get_recordset_sql($sql, $params);
+        $lastcmid = null;
+        $itemdata = [];
 
-        static::_recordset_loop_and_export($recordset, 'hotquestion', [], function($carry, $record) {
-            $carry[] = (object) [
-                'question' => $record->question,
-                'voter' => $record->voter,
+        $votes = $DB->get_recordset_sql($sql, $params);
+
+        foreach ($votes as $vote) {
+            if ($lastcmid !== $vote->cmid) {
+                if ($itemdata) {
+                    self::export_hqvote_data_for_user($itemdata, $lastcmid, $user);
+                }
+                $itemdata = [];
+                $lastcmid = $vote->cmid;
+            }
+            $itemdata[] = (object)[
+                'id' => $vote->id,
+                'question' => $vote->question,
+                'voter' => $vote->voter,
             ];
-            return $carry;
-        }, function($hotquestionid, $data) use ($hotquestionidstocmids) {
-            $context = context_module::instance($hotquestionidstocmids[$hotquestionid]);
-            writer::with_context($context)->export_related_data([], 'votes', (object) ['votes' => $data]);
-        });
+        }
+
+        $votes->close();
+        if ($itemdata) {
+            self::export_hotquestion_data_for_user($itemdata, $lastcmid, $user);
+        }
 
         // Export the questions.
         $sql = "SELECT cm.id AS cmid,
@@ -221,29 +254,39 @@ class provider implements \core_privacy\local\metadata\provider,
                        hq.approved as approved,
                        hq.tpriority as tpriority
                   FROM {context} c
-            INNER JOIN {course_modules} cm ON cm.id = c.instanceid
-            INNER JOIN {hotquestion_questions} hq ON hq.hotquestion = cm.instance
-                 WHERE c.id {$contextsql}
-                       AND hq.userid = :userid
+            INNER JOIN {course_modules} cm
+                    ON cm.id = c.instanceid
+            INNER JOIN {hotquestion_questions} hq
+                    ON hq.hotquestion = cm.instance
+                 WHERE c.id $contextsql
+                   AND hq.userid = :userid
               ORDER BY cm.id";
 
         $params = ['userid' => $user->id] + $contextparams;
-        $recordset = $DB->get_recordset_sql($sql, $params);
+        $questions = $DB->get_recordset_sql($sql, $params);
 
-        static::_recordset_loop_and_export($recordset, 'hotquestion', [], function($carry, $record) {
-            $carry[] = (object) [
-                'hotquestion' => $record->hotquestion,
-                'content' => $record->content,
-                'time' => transform::datetime($record->time),
-                'anonymous' => transform::yesno($record->anonymous),
-                'approved' => transform::yesno($record->approved),
-                'tpriority' => $record->tpriority
+        foreach ($questions as $question) {
+            if ($lastcmid !== $question->cmid) {
+                if ($itemdata) {
+                    self::export_hotquestion_data_for_user($itemdata, $lastcmid, $user);
+                }
+                $itemdata = [];
+                $lastcmid = $question->cmid;
+            }
+
+            $itemdata[] = (object)[
+                'hotquestion' => $question->hotquestion,
+                'content' => $question->content,
+                'time' => transform::datetime($question->time),
+                'anonymous' => transform::yesno($question->anonymous),
+                'approved' => transform::yesno($question->approved),
+                'tpriority' => $question->tpriority
             ];
-            return $carry;
-        }, function($hotquestionid, $data) use ($hotquestionidstocmids) {
-            $context = context_module::instance($hotquestionidstocmids[$hotquestionid]);
-            writer::with_context($context)->export_related_data([], 'questions', (object) ['questions' => $data]);
-        });
+        }
+        $questions->close();
+        if ($itemdata) {
+            self::export_hotquestion_data_for_user($itemdata, $lastcmid, $user);
+        }
     }
 
     /**
@@ -254,15 +297,15 @@ class provider implements \core_privacy\local\metadata\provider,
      * @param array $subcontext the subcontext personal data to export for the hotquestion.
      * @param \stdClass $user the user record
      */
-    public static function export_hotquestion_data_for_user(array $hotquestiondata, \context_module $context,
-                                                            array $subcontext, \stdClass $user) {
+    public static function export_hotquestion_data_for_user(array $items, int $cmid, \stdClass $user) {
 
         // Fetch the generic module data for the hotquestion.
+        $context = \context_module::instance($cmid);
         $contextdata = helper::get_context_data($context, $user);
 
         // Merge with hotquestion data and write it.
-        $contextdata = (object)array_merge((array)$contextdata, $hotquestiondata);
-        writer::with_context($context)->export_data($subcontext, $contextdata);
+        $contextdata = (object)array_merge((array)$contextdata, ['items' => $items]);
+        writer::with_context($context)->export_data([], $contextdata);
 
         // Write generic module intro files.
         helper::export_context_files($context, $user);
@@ -276,15 +319,20 @@ class provider implements \core_privacy\local\metadata\provider,
      */
     public static function delete_data_for_all_users_in_context(\context $context) {
         global $DB;
+
         if (!$context) {
             return;
         }
+
+        // This should not happen, but just in case.
         if ($context->contextlevel != CONTEXT_MODULE) {
             return;
         }
         if (!$cm = get_coursemodule_from_id('hotquestion', $context->instanceid)) {
             return;
         }
+
+        // Delete the hotquestion entries.
         $itemids = $DB->get_fieldset_select('hotquestion_questions', 'id', 'hotquestion = ?', [$cm->instance]);
         if ($itemids) {
             $DB->delete_records('hotquestion_questions', ['hotquestionid' => $cm->instance]);
@@ -304,6 +352,7 @@ class provider implements \core_privacy\local\metadata\provider,
         }
 
         $userid = $contextlist->get_user()->id;
+
         foreach ($contextlist->get_contexts() as $context) {
             if ($context->contextlevel != CONTEXT_MODULE) {
                 continue;
@@ -361,5 +410,4 @@ class provider implements \core_privacy\local\metadata\provider,
             array_merge($inparams, $itparams)
         );
     }
-
 }
