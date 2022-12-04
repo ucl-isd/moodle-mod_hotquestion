@@ -706,7 +706,9 @@ class mod_hotquestion {
                 $comment = '';
                 // 20220818 If there are any, get the comments for each question to add in the export file.
                 // 20221124 Modified to include the component.
-                if ($cmts = $DB->get_records('comments', ['itemid' => $q->question, 'component' => 'mod_hotquestion'], 'userid, content, timecreated')) {
+                if ($cmts = $DB->get_records('comments', ['itemid' => $q->question,
+                                             'component' => 'mod_hotquestion'],
+                                             'userid, content, timecreated')) {
                     $temp = count($cmts);
                     $comment .= '('.$temp.' '.get_string('comments').') ';
                     foreach ($cmts as $cmt) {
@@ -925,7 +927,7 @@ class mod_hotquestion {
     /**
      * Update completion state.
      *
-     * @param $user
+     * @param int $user
      * @return void
      */
     public function update_completion_state($user = null) {

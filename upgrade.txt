@@ -11,7 +11,7 @@ This files describes changes in the Hot Question code.
 
 
 
-=== 4.1.3 === pending Only for M3.11 and above.
+=== 4.1.3 === 20221204 Only for M3.11 and above.
 20220601 HotQuestion_870v - Default settings to allow comments, is not being picked
     up when creating activity. Works now, but need to verify in a new install.
 20221023 HotQuestion_798v - Need to create new icons, monologo.svg and monologo.png

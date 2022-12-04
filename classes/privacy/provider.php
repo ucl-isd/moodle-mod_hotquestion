@@ -292,10 +292,9 @@ class provider implements \core_privacy\local\metadata\provider,
     /**
      * Export the supplied personal data for a single hotquestion activity, along with any generic data or area files.
      *
-     * @param array $hotquestiondata the personal data to export for the hotquestion.
-     * @param \context_module $context the context of the hotquestion.
-     * @param array $subcontext the subcontext personal data to export for the hotquestion.
-     * @param \stdClass $user the user record
+     * @param array $items The data for each of the items in the hot question.
+     * @param int $cmid
+     * @param \stdClass $user The user record.
      */
     public static function export_hotquestion_data_for_user(array $items, int $cmid, \stdClass $user) {
 

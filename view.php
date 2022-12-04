@@ -70,15 +70,17 @@ if (! $cw = $DB->get_record("course_sections", array("id" => $cm->section))) {
     throw new moodle_exception(get_string('incorrectmodule', 'hotquestion'));
 }
 
-                // Set a preference and then retrieve it.
-                $seeunapprovedpreference = optional_param('seeunapprovedpreference', get_user_preferences('hotquestion_seeunapproved', get_config('mod_hotquestion', 'approval')), PARAM_INT);
+// Set a preference and then retrieve it.
+$seeunapprovedpreference = optional_param('seeunapprovedpreference',
+                           get_user_preferences('hotquestion_seeunapproved',
+                           get_config('mod_hotquestion', 'approval')),
+                           PARAM_INT);
 
-                if ($seeunapprovedpreference == 1 || $seeunapprovedpreference == 'ON') {
-                    set_user_preference('hotquestion_seeunapproved', 'OFF');
-                } else {
-                    set_user_preference('hotquestion_seeunapproved', 'ON');
-                }
-
+if ($seeunapprovedpreference == 1 || $seeunapprovedpreference == 'ON') {
+    set_user_preference('hotquestion_seeunapproved', 'OFF');
+} else {
+    set_user_preference('hotquestion_seeunapproved', 'ON');
+}
 
 // Trigger module viewed event.
 if ($CFG->version > 2014051200) { // Moodle 2.7+.
@@ -251,7 +253,6 @@ if (!$ajax) {
     }
 
     // 20211219 Added link to all HotQuestion activities. 20221031 Added link to hide unapproved questions.
-    //if ($entriesmanager && $canask) {
         echo '<span style="float:right"><a href="index.php?id='
              .$course->id
              .'">'
@@ -260,13 +261,6 @@ if (!$ajax) {
              .'">'.get_string('seeunapproved', 'hotquestion', $seeunapprovedpreference)
              .' Currently set to '.get_user_preferences('hotquestion_seeunapproved', get_config('mod_hotquestion', 'approval')).'.'
              .'</a></span><br>';
-    //} else {
-    //    echo '<span style="float:right"><a href="index.php?id='
-    //         .$course->id
-    //         .'">'
-    //         .get_string('viewallhotquestions', 'hotquestion')
-    //         .'</a></span><br>';
-    //}
 
     // Print group information (A drop down box will be displayed if the user
     // is a member of more than one group, or has access to all groups).
