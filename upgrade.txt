@@ -11,26 +11,32 @@ This files describes changes in the Hot Question code.
 
 
 
-=== 4.1.3 === pending
-20220601 HotQuestion_870 - Default settings to allow comments, is not being picked
+=== 4.1.3 === pending Only for M3.11 and above.
+20220601 HotQuestion_870v - Default settings to allow comments, is not being picked
     up when creating activity. Works now, but need to verify in a new install.
-20221023 HotQuestion_798 - Need to create new icons, monologo.svg and monologo.png
+20221023 HotQuestion_798v - Need to create new icons, monologo.svg and monologo.png
     for Moodle 4.0. Decided it was better to actually have the correct files for
     the icon. Changed the ticket title and created both icons and they are being
     used in this Moodle 4.x.x site.
-20221029 HotQuestion_945 - In locallib.php line 850 is returning the question ID
+20221029 HotQuestion_945v - In locallib.php line 850 is returning the question ID
     instead of the voter ID. Made the suggested change and verified the correct
     deletions are being done.
-20221031 HotQuestion_946 - Feature request #62 - sort unapproved questions to bottom
+20221031 HotQuestion_946v - Feature request #62 - sort unapproved questions to bottom
     of, or hide them from the list.20221101 I think I have things working so that it
     is doing both requests. Unapproved questions are sorted to the bottom of the
     question list, AND there is a toggle link to show or hide unapproved questions.
     When there ARE unapproved questions and the toggle is off, a teacher can see them
     like always and change the approval status. A student in the same situation, sees
     the same old message, This entry is not currently approved for viewing.
+20221204 HotQuestion_973v - Branch check in lib.php at line 258 probably not needed anymore.
+    I need to remove line 258, 261, 262, and 263. Then set the indent for the remaining
+    lines, 259 and 260. THis will leave only the new core_user\fields code. 20221204 While
+    testing this, I discovered I seem to have made a typo error in line 260. I had
+    'duserid' where it should be just 'userid'. I also took the opportunity to redo
+    the indents for the $sql variable.
 
 
-=== 4.1.2.01 === 2022082100
+=== 4.1.2.01 === 2022082100 Only for M3.11 and above.
 20220410 HotQuestion_840v - Need to add comments to question downloads. See ticket
     for details. Have gotten working for teachers, managers and admins.
 20220718 HotQuestion_894v - Need to cleanup/change code in upgrade.php. Made changes
@@ -41,7 +47,7 @@ This files describes changes in the Hot Question code.
     a check to see if it is an admin or a regular teacher/manager doing the download. 
 20220821 Ran code checker and fixed errors reported errors.
 
-===4.1.2.00 === 2022081700
+===4.1.2.00 === 2022081700 Only for M3.11 and above.
 20220817 Ran Code checker and Moodle PHPdoc check. Fixed as needed.
 20220810 Hot Question_907v - Issue #65 at github regarding undefined variable. Added
     a code snippet at line 166 and 167, in the, function reset_instance($hotquestionid),
