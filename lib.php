@@ -254,23 +254,26 @@ function hotquestion_print_recent_activity($course, $viewfullnames, $timestart) 
     global $CFG, $USER, $DB, $OUTPUT;
 
     $dbparams = array($timestart, $course->id, 'hotquestion');
+    $userfieldsapi = \core_user\fields::for_userpic();
+    $namefields = $userfieldsapi->get_sql('u', false, '', 'userid', false)->selects;
 
-    if ($CFG->branch > 30) { // If Moodle less than version 3.1 skip this.
-        $userfieldsapi = \core_user\fields::for_userpic();
-        $namefields = $userfieldsapi->get_sql('u', false, '', 'duserid', false)->selects;
-    } else {
-        $namefields = user_picture::fields('u', null, 'userid');
-    }
-    $sql = "SELECT hqq.id, hqq.time, cm.id AS cmid, $namefields
-         FROM {hotquestion_questions} hqq
-              JOIN {hotquestion} hq         ON hq.id = hqq.hotquestion
-              JOIN {course_modules} cm ON cm.instance = hq.id
-              JOIN {modules} md        ON md.id = cm.module
-              JOIN {user} u            ON u.id = hqq.userid
-         WHERE hqq.time > ? AND
-               hq.course = ? AND
-               md.name = ?
-         ORDER BY hqq.time ASC
+    $sql = "SELECT hqq.id,
+                   hqq.time,
+                   cm.id AS cmid,
+                   $namefields
+              FROM {hotquestion_questions} hqq
+              JOIN {hotquestion} hq
+                ON hq.id = hqq.hotquestion
+              JOIN {course_modules} cm
+                ON cm.instance = hq.id
+              JOIN {modules} md
+                ON md.id = cm.module
+              JOIN {user} u
+                ON u.id = hqq.userid
+             WHERE hqq.time > ?
+               AND hq.course = ?
+               AND md.name = ?
+          ORDER BY hqq.time ASC
     ";
 
     $newentries = $DB->get_records_sql($sql, $dbparams);
@@ -281,7 +284,6 @@ function hotquestion_print_recent_activity($course, $viewfullnames, $timestart) 
     $showrecententries = get_config('hotquestion', 'showrecentactivity');
 
     foreach ($newentries as $anentry) {
-
         if (!array_key_exists($anentry->cmid, $modinfo->get_cms())) {
             continue;
         }
@@ -336,7 +338,7 @@ function hotquestion_print_recent_activity($course, $viewfullnames, $timestart) 
         return false;
     }
 
-    echo $OUTPUT->heading(get_string('modulenameplural', 'hotquestion').':', 3);
+    echo $OUTPUT->heading(get_string('modulenameplural', 'hotquestion').':', 6);
 
     foreach ($show as $submission) {
         $cm = $modinfo->get_cm($submission->cmid);
