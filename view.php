@@ -254,13 +254,16 @@ if (!$ajax) {
 
     // 20211219 Added link to all HotQuestion activities. 20221031 Added link to hide unapproved questions.
         echo '<span style="float:right"><a href="index.php?id='
-             .$course->id
-             .'">'
-             .get_string('viewallhotquestions', 'hotquestion')
-             .'</a> | <a href="view.php?id='.$cm->id
-             .'">'.get_string('seeunapproved', 'hotquestion', $seeunapprovedpreference)
-             .' Currently set to '.get_user_preferences('hotquestion_seeunapproved', get_config('mod_hotquestion', 'approval')).'.'
-             .'</a></span><br>';
+            .$course->id
+            .'">'
+            .get_string('viewallhotquestions', 'hotquestion')
+            .'</a> | <a href="view.php?id='.$cm->id
+            .'">'
+            .get_string('seeunapproved', 'hotquestion', $seeunapprovedpreference)
+            .get_string('seeunapprovedsetting', 'hotquestion',
+                get_user_preferences('hotquestion_seeunapproved',
+                get_config('mod_hotquestion', 'approval')))
+            .'</a></span><br>';
 
     // Print group information (A drop down box will be displayed if the user
     // is a member of more than one group, or has access to all groups).
