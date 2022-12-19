@@ -208,9 +208,8 @@ $string['requireapproval_descr'] = 'If enabled, questions require approval by a 
 $string['resethotquestion'] = 'Delete all questions and votes';
 $string['returnto'] = 'Return to {$a}';
 $string['round'] = 'Round {$a}';
-
 $string['seeunapproved'] = 'Toggle unapproved {$a}.';
-
+$string['seeunapprovedsetting'] = ' Currently set to {$a}.';
 $string['showrecentactivity'] = 'Show recent activity';
 $string['showrecentactivityconfig'] = 'Everyone can see notifications in recent activity reports.';
 $string['teacherpriority'] = 'Priority';
