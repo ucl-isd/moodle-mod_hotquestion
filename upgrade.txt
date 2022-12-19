@@ -11,6 +11,21 @@ This files describes changes in the Hot Question code.
 
 
 
+=== 4.1.4 === pending Only for M3.11 and above.
+20221126 HotQuestion_959 - Need to make sure the new rating data is being added to
+    the GDPR provider.php file. 20221219 Have finally had the time to do this. The
+    system is including Hot Question grades in data requests.
+20221211 HotQuestion_975 - Issue #72 New toggle text is hard coded. 20221205 Modified
+    line 263 in view.php to show the new string that I added to the language file.
+20221217 HotQuestion_976 - Issue #73 at github, Exception when adding a new question
+    to existing instance. This happens only when the activity is set to manual mark
+    for view. In the locallib.php file, change line 938. From this:
+        $completion = new completion_info($course);
+    To this:
+        $completion->set_module_viewed($cm);
+
+
+
 === 4.1.3 === 20221204 Only for M3.11 and above.
 20220601 HotQuestion_870v - Default settings to allow comments, is not being picked
     up when creating activity. Works now, but need to verify in a new install.
@@ -28,6 +43,13 @@ This files describes changes in the Hot Question code.
     When there ARE unapproved questions and the toggle is off, a teacher can see them
     like always and change the approval status. A student in the same situation, sees
     the same old message, This entry is not currently approved for viewing.
+20221102 HotQuestion_947v - Issue #69#70 Completion state never updated for vote and submit
+    actions. 20220102 Completed the pull request in issue #69 and #70. I have also merged
+    locally on 10.0.6.136/moodle401 to see how it works with my new approval sort and
+    show/hide code.
+20221124 HotQuestion_961v - CSV export includes comments from other Moodle components #71.
+    In locallib.php, down around line 708/709, I made a small addition that seems to fix
+    the problem. Added 'component' => 'mod_hotquestion' to the get_records() syntax.
 20221204 HotQuestion_973v - Branch check in lib.php at line 258 probably not needed anymore.
     I need to remove line 258, 261, 262, and 263. Then set the indent for the remaining
     lines, 259 and 260. THis will leave only the new core_user\fields code. 20221204 While
