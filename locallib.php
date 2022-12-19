@@ -935,6 +935,6 @@ class mod_hotquestion {
         if (!$completion->is_enabled($this->cm)) {
             return;
         }
-        $completion->update_state($this->cm, COMPLETION_UNKNOWN, $user);
+        $completion->set_module_viewed($cm);
     }
 }
