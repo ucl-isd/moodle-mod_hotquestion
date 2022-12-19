@@ -416,7 +416,6 @@ class results {
             // Update completion state for current user.
             $hq->update_completion_state();
             // Contrib by ecastro ULPGC update grades for question author.
-            // ...$newentry->update_users_grades([$USER->id]);...
             $hq->update_users_grades([$USER->id]);
             return true;
         } else {
