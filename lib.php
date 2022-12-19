@@ -437,68 +437,39 @@ function hotquestion_reset_course_form_definition(&$mform) {
  */
 function hotquestion_supports($feature) {
     global $CFG;
-    if ($CFG->branch > 311) {
-        switch($feature) {
-            case FEATURE_MOD_PURPOSE:
-                return MOD_PURPOSE_COLLABORATION;
-            case FEATURE_BACKUP_MOODLE2:
-                return true;
-            case FEATURE_COMMENT:
-                return true;
-            case FEATURE_COMPLETION_HAS_RULES:
-                return true;
-            case FEATURE_COMPLETION_TRACKS_VIEWS:
-                return true;
-            case FEATURE_GRADE_HAS_GRADE:
-                return true;
-            case FEATURE_GRADE_OUTCOMES:
-                return false;
-            case FEATURE_GROUPS:
-                return true;
-            case FEATURE_GROUPINGS:
-                return true;
-            case FEATURE_GROUPMEMBERSONLY:
-                return true;
-            case FEATURE_MOD_INTRO:
-                return true;
-            case FEATURE_RATE:
-                return false;
-            case FEATURE_SHOW_DESCRIPTION:
-                return true;
-
-            default:
-                return null;
+    if ((int)$CFG->branch > 311) {
+        if ($feature === FEATURE_MOD_PURPOSE) {
+            return MOD_PURPOSE_COLLABORATION;
         }
-    } else {
-        switch($feature) {
-            case FEATURE_BACKUP_MOODLE2:
-                return true;
-            case FEATURE_COMMENT:
-                return true;
-            case FEATURE_COMPLETION_HAS_RULES:
-                return true;
-            case FEATURE_COMPLETION_TRACKS_VIEWS:
-                return true;
-            case FEATURE_GRADE_HAS_GRADE:
-                return true;
-            case FEATURE_GRADE_OUTCOMES:
-                return false;
-            case FEATURE_GROUPS:
-                return true;
-            case FEATURE_GROUPINGS:
-                return true;
-            case FEATURE_GROUPMEMBERSONLY:
-                return true;
-            case FEATURE_MOD_INTRO:
-                return true;
-            case FEATURE_RATE:
-                return false;
-            case FEATURE_SHOW_DESCRIPTION:
-                return true;
+    }
+    switch($feature) {
+        case FEATURE_BACKUP_MOODLE2:
+            return true;
+        case FEATURE_COMMENT:
+            return true;
+        case FEATURE_COMPLETION_HAS_RULES:
+            return true;
+        case FEATURE_COMPLETION_TRACKS_VIEWS:
+            return true;
+        case FEATURE_GRADE_HAS_GRADE:
+            return true;
+        case FEATURE_GRADE_OUTCOMES:
+            return false;
+        case FEATURE_GROUPS:
+            return true;
+        case FEATURE_GROUPINGS:
+            return true;
+        case FEATURE_GROUPMEMBERSONLY:
+            return true;
+        case FEATURE_MOD_INTRO:
+            return true;
+        case FEATURE_RATE:
+            return false;
+        case FEATURE_SHOW_DESCRIPTION:
+            return true;
 
-            default:
-                return null;
-        }
+        default:
+            return null;
     }
 }
     /**
