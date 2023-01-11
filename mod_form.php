@@ -207,6 +207,10 @@ class mod_hotquestion_mod_form extends moodleform_mod {
         $mform->addElement('date_time_selector', 'timeclose',
                            get_string('hotquestionclosetime', 'hotquestion'),
                            array('optional' => true, 'step' => 1));
+        $mform->addElement('selectyesno', 'viewaftertimeclose',
+                            get_string('viewaftertimeclose', 'hotquestion'));
+        $mform->addHelpButton('viewaftertimeclose', 'viewaftertimeclose', 'hotquestion');
+        $mform->disabledIf('viewaftertimeclose', 'timeclose[enabled]');
 
         // Contrib by ecastro ULPGC.
         // Add standard grading elements, common to all modules.
