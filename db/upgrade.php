@@ -554,5 +554,20 @@ function xmldb_hotquestion_upgrade($oldversion=0) {
         // Hotquestion savepoint reached.
         upgrade_mod_savepoint(true, 2022070701, 'hotquestion');
     }
+    // 4.1.0  Upgrade starts here.
+    if ($oldversion < 2022122300) {
+
+        // Redefine field comments to be added to hotquestion.
+        $table = new xmldb_table('hotquestion');
+        $field = new xmldb_field('viewaftertimeclose', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '0', 'timeclose');
+
+        // Conditionally launch add field assessedtimestart.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Hotquestion savepoint reached.
+        upgrade_mod_savepoint(true, 2022122300, 'hotquestion');
+    }
     return true;
 }

@@ -227,20 +227,23 @@ if (!$ajax) {
         echo $OUTPUT->heading($hotquestionname);
     }
     // Allow access at any time to manager and editing teacher but prevent access to students.
-    if (!(has_capability('mod/hotquestion:manage', $context))) {
-        // Check availability timeopen and timeclose. Added 10/2/16.
-        if (!(results::hq_available($hotquestion))) {  // Availability restrictions.
-            if ($hotquestion->timeclose != 0 && time() > $hotquestion->timeclose) {
-                echo $output->hotquestion_inaccessible(get_string('hotquestionclosed',
-                    'hotquestion', userdate($hotquestion->timeclose)));
-            } else {
-                echo $output->hotquestion_inaccessible(get_string('hotquestionopen',
-                    'hotquestion', userdate($hotquestion->timeopen)));
-            }
+    // Check availability timeopen and timeclose. Added 10/2/16.
+    if (!(has_capability('mod/hotquestion:manage', $context)) && !$hq->is_hotquestion_active()) {  // Availability restrictions.
+        $inaccessible = '';
+        if ($hq->is_hotquestion_ended() && !$hotquestion->viewaftertimeclose) {
+            $inaccessible = $output->hotquestion_inaccessible(get_string('hotquestionclosed',
+                'hotquestion', userdate($hotquestion->timeclose)));
+        }
+        if ($hq->is_hotquestion_yet_to_start()) {
+            $inaccessible = $output->hotquestion_inaccessible(get_string('hotquestionopen',
+                'hotquestion', userdate($hotquestion->timeopen)));
+        }
+        if ($inaccessible !== '') {
+            echo $inaccessible;
             echo $OUTPUT->footer();
             exit();
-            // Password code can go here. e.g. // } else if {.
         }
+        // Password code can go here. e.g. // } else if {.
     }
     // 20220301 Added activity completion to the hotquestion description.
     $cminfo = cm_info::create($cm);
@@ -270,10 +273,13 @@ if (!$ajax) {
     echo groups_print_activity_menu($cm, $CFG->wwwroot.'/mod/hotquestion/view.php?id='.$cm->id);
 
     // Print the textarea box for typing submissions in.
-    if (has_capability('mod/hotquestion:ask', $context)) {
+    if (has_capability('mod/hotquestion:ask', $context) &&
+        $hq->is_hotquestion_active()) {
         $mform->display();
     }
 }
+
+//die("EDDIE");
 
 echo $output->container_start(null, 'questions_list');
 // Print toolbar.
