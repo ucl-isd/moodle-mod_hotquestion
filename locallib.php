@@ -89,31 +89,6 @@ class mod_hotquestion {
     }
 
     /**
-     * Return whether the hotquestion is available due to open time and close time
-     *
-     * @return bool
-     */
-    public function is_hotquestion_active() {
-        $open = ($this->instance->timeopen !== '0' && time() > $this->instance->timeopen) || $this->instance->timeopen === '0';
-        $close = ($this->instance->timeclose !== '0' && time() < $this->instance->timeclose) || $this->instance->timeclose === '0';
-        return $open && $close;
-    }
-
-    /**
-     * @return bool
-     */
-    public function is_hotquestion_ended() {
-        return $this->instance->timeclose !== 0 && time() > $this->instance->timeclose;
-    }
-
-    /**
-     * @return bool
-     */
-    public function is_hotquestion_yet_to_start() {
-        return $this->instance->timeopen !== 0 && time() < $this->instance->timeopen;
-    }
-
-    /**
      * Return whether the user has voted on specified question.
      *
      * Called from function vote_on($question).
@@ -162,7 +137,7 @@ class mod_hotquestion {
             } else {
                 $DB->delete_records('hotquestion_votes', array('question' => $question->id, 'voter' => $USER->id));
             }
-            // Update completion state for current user.
+            // Update viewed completion state for current user.
             $this->update_completion_state();
         }
         // Contrib by ecastro ULPGC, update grades for questions author and voters.
@@ -203,7 +178,7 @@ class mod_hotquestion {
             } else {
                 $DB->delete_records('hotquestion_votes', array('question' => $question->id, 'voter' => $USER->id));
             }
-            // Update completion state for current user.
+            // Update viewed completion state for current user.
             $this->update_completion_state();
             // Contrib by ecastro ULPGC, update grades for question author and voters.
             $this->update_users_grades([$question->userid, $USER->id]);

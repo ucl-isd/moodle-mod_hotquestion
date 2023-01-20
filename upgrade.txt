@@ -8,23 +8,25 @@ This files describes changes in the Hot Question code.
     Activity completion should reflect that. See the ticket for details.
 20220821 HotQuestion_911 - Need to see about including grades in the Export tool.
 
+=== 4.1.5 === pending
+20230119 HotQuestion_977 - Non-unique names for database fields #56. The fields assessed,
+    assestimestart and assesstimefinish are required for ratings, but assessedtimefinish
+    and assessedtimestart are not used at all, so I need to see about dropping them.
+    I have included code in upgrade.php that will drop the fields, if they exist.
 
 
-
-=== 4.1.4 === pending Only for M3.11 and above.
-20221126 HotQuestion_959 - Need to make sure the new rating data is being added to
+=== 4.1.4 === 20221219 Only for M3.11 and above.
+20221126 HotQuestion_959v - Need to make sure the new rating data is being added to
     the GDPR provider.php file. 20221219 Have finally had the time to do this. The
     system is including Hot Question grades in data requests.
-20221211 HotQuestion_975 - Issue #72 New toggle text is hard coded. 20221205 Modified
+20221211 HotQuestion_975v - Issue #72 New toggle text is hard coded. 20221205 Modified
     line 263 in view.php to show the new string that I added to the language file.
-20221217 HotQuestion_976 - Issue #73 at github, Exception when adding a new question
+20221217 HotQuestion_976v - Issue #73 at github, Exception when adding a new question
     to existing instance. This happens only when the activity is set to manual mark
     for view. In the locallib.php file, change line 938. From this:
         $completion = new completion_info($course);
     To this:
         $completion->set_module_viewed($cm);
-
-
 
 === 4.1.3 === 20221204 Only for M3.11 and above.
 20220601 HotQuestion_870v - Default settings to allow comments, is not being picked

@@ -152,6 +152,19 @@ class results {
     }
 
     /**
+     * Returns availability status.
+     *
+     * Added 10/2/16. Called from view.php file.
+     * Moved 20210226.
+     * @param var $hotquestion
+     */
+    public static function hq_available($hotquestion) {
+        $timeopen = $hotquestion->timeopen;
+        $timeclose = $hotquestion->timeclose;
+        return (($timeopen == 0 || time() >= $timeopen) && ($timeclose == 0 || time() < $timeclose));
+    }
+
+    /**
      * Returns the hotquestion instance course_module id
      *
      * Moved 20210226. Called from this results.php file, function hotquestion_count_entries().

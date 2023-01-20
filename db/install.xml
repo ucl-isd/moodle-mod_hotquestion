@@ -16,7 +16,6 @@
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="timeopen" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Date HQ opens."/>
         <FIELD NAME="timeclose" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Date HQ closes."/>
-        <FIELD NAME="viewaftertimeclose" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="questionlabel" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="Questions" SEQUENCE="false" COMMENT="Change default heading label as desired."/>
         <FIELD NAME="teacherpriorityvisibility" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Teacher priority column visibility."/>
         <FIELD NAME="teacherprioritylabel" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="Priority" SEQUENCE="false" COMMENT="Change the default heading label as desired."/>
