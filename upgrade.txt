@@ -13,7 +13,18 @@ This files describes changes in the Hot Question code.
     assestimestart and assesstimefinish are required for ratings, but assessedtimefinish
     and assessedtimestart are not used at all, so I need to see about dropping them.
     I have included code in upgrade.php that will drop the fields, if they exist.
-
+20230122 HotQuestion_989 - Issue #68 at github, Let students view questions after "close time."
+    I have all the contributed code integrated, but it needs more work.  WIll need to hide the
+    capability for students to change votes when the activity is closed. Right now a studet
+    can still change their votes after the activity has closed.
+20230123 HotQuestion_997 - When set, open and close times should show on the view.php page. 
+    I have added code that will show the open and/or close times, if either one of them is
+    set and being used. The code is down around line 285 of the view.php file.
+20230124 HotQuestion_999 - Need to prevent students from changing vote when viewing after
+    close time. Modified the case 'vote" and case 'remove' in the view.php file. Student
+    clicks on the heat vote icon are ignored. Clicks by anyone with manage capabilities
+    can change and/or remove their votes, as I can see a case for teachers catching up
+    with grading, after the activity has closed.
 
 === 4.1.4 === 20221219 Only for M3.11 and above.
 20221126 HotQuestion_959v - Need to make sure the new rating data is being added to

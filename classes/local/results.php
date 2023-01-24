@@ -158,12 +158,17 @@ class results {
      * Moved 20210226.
      * @param var $hotquestion
      */
+    // Temporary disable for testing new contributed code for viewing after time close.
+    /*
     public static function hq_available($hotquestion) {
         $timeopen = $hotquestion->timeopen;
         $timeclose = $hotquestion->timeclose;
-        return (($timeopen == 0 || time() >= $timeopen) && ($timeclose == 0 || time() < $timeclose));
+        $viewwochanging = $hotquestion->viewaftertimeclose;
+        return (($timeopen == 0 || time() >= $timeopen) &&
+               ($timeclose == 0 || time() < $timeclose) ||
+               (time() < $timeclose && $viewwochanging));
     }
-
+    */
     /**
      * Returns the hotquestion instance course_module id
      *

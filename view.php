@@ -160,16 +160,24 @@ if (!empty($action)) {
             break;
         case 'vote':
             if (has_capability('mod/hotquestion:vote', $context)) {
-                $q = required_param('q',  PARAM_INT);  // Question id to vote.
-                $hq->vote_on($q);
-                redirect('view.php?id='.$hq->cm->id, null); // Needed to prevent heat toggle on page reload.
+                // 20230122 Prevent voting when closed.
+                if (($hq->is_hotquestion_ended() && !$hotquestion->viewaftertimeclose) ||
+                    (has_capability('mod/hotquestion:manageentries', $context))) {
+                    $q = required_param('q',  PARAM_INT);  // Question id to vote.
+                    $hq->vote_on($q);
+                    redirect('view.php?id='.$hq->cm->id, null); // Needed to prevent heat toggle on page reload.
+                }
             }
             break;
         case 'removevote':
             if (has_capability('mod/hotquestion:vote', $context)) {
-                $q = required_param('q',  PARAM_INT);  // Question id to vote.
-                $hq->remove_vote($q);
-                redirect('view.php?id='.$hq->cm->id, null); // Needed to prevent heat toggle on page reload.
+                // 20230122 Prevent vote remove when closed.
+                if (($hq->is_hotquestion_ended() && !$hotquestion->viewaftertimeclose) ||
+                    (has_capability('mod/hotquestion:manageentries', $context))) {
+                    $q = required_param('q',  PARAM_INT);  // Question id to vote.
+                    $hq->remove_vote($q);
+                    redirect('view.php?id='.$hq->cm->id, null); // Needed to prevent heat toggle on page reload.
+                }
             }
             break;
         case 'newround':
@@ -226,22 +234,27 @@ if (!$ajax) {
     if ($CFG->branch < 400) {
         echo $OUTPUT->heading($hotquestionname);
     }
+
     // Allow access at any time to manager and editing teacher but prevent access to students.
-    if (!(has_capability('mod/hotquestion:manage', $context))) {
-        // Check availability timeopen and timeclose. Added 10/2/16.
-        if (!(results::hq_available($hotquestion))) {  // Availability restrictions.
-            if ($hotquestion->timeclose != 0 && time() > $hotquestion->timeclose) {
-                echo $output->hotquestion_inaccessible(get_string('hotquestionclosed',
-                    'hotquestion', userdate($hotquestion->timeclose)));
-            } else {
-                echo $output->hotquestion_inaccessible(get_string('hotquestionopen',
-                    'hotquestion', userdate($hotquestion->timeopen)));
-            }
+    // Check availability timeopen and timeclose. Added 10/2/16. Modified 20230120.
+    if (!(has_capability('mod/hotquestion:manage', $context)) && !$hq->is_hotquestion_active()) {  // Availability restrictions.
+        $inaccessible = '';
+        if ($hq->is_hotquestion_ended() && !$hotquestion->viewaftertimeclose) {
+            $inaccessible = $output->hotquestion_inaccessible(get_string('hotquestionclosed',
+                'hotquestion', userdate($hotquestion->timeclose)));
+        }
+        if ($hq->is_hotquestion_yet_to_start()) {
+            $inaccessible = $output->hotquestion_inaccessible(get_string('hotquestionopen',
+                'hotquestion', userdate($hotquestion->timeopen)));
+        }
+        if ($inaccessible !== '') {
+            echo $inaccessible;
             echo $OUTPUT->footer();
             exit();
-            // Password code can go here. e.g. // } else if {.
         }
+        // Password code can go here. e.g. // } else if {.
     }
+
     // 20220301 Added activity completion to the hotquestion description.
     $cminfo = cm_info::create($cm);
     $completiondetails = \core_completion\cm_completion_details::get_instance($cminfo, $USER->id);
@@ -250,6 +263,22 @@ if (!$ajax) {
     // 20220706 HQ_882 Skip intro for Moodle 4.0 and higher as it seems to be automatic.
     if ($CFG->branch < 400) {
         echo $output->introduction($cminfo, $completiondetails, $activitydates);
+    }
+
+    // 20230123 Added open and close times, if set.
+    if (($hotquestion->timeopen) && (($hotquestion->timeopen) > time())) {
+        echo '<strong>'.get_string('hotquestionopen', 'hotquestion', date("l, d M Y, G:i A", $hotquestion->timeopen)).
+             '</strong><br>';
+    } else if ($hotquestion->timeopen) {
+        echo '<strong>'.get_string('hotquestionopentime', 'hotquestion').
+             ':</strong> '.date("l, d M Y, G:i A", $hotquestion->timeopen).'<br>';
+    }
+    if (($hotquestion->timeclose) && (($hotquestion->timeclose) < time())) {
+        echo '<strong>'.get_string('hotquestionclosed', 'hotquestion', date("l, d M Y, G:i A", $hotquestion->timeclose)).
+             '</strong>';
+    } else if ($hotquestion->timeclose) {
+        echo '<strong>'.get_string('hotquestionclosetime', 'hotquestion').
+             ':</strong> '.date("l, d M Y, G:i A", $hotquestion->timeclose);
     }
 
     // 20211219 Added link to all HotQuestion activities. 20221031 Added link to hide unapproved questions.
@@ -270,7 +299,9 @@ if (!$ajax) {
     echo groups_print_activity_menu($cm, $CFG->wwwroot.'/mod/hotquestion/view.php?id='.$cm->id);
 
     // Print the textarea box for typing submissions in.
-    if (has_capability('mod/hotquestion:ask', $context)) {
+    if (has_capability('mod/hotquestion:manage', $context) ||
+        (has_capability('mod/hotquestion:ask', $context) &&
+        $hq->is_hotquestion_active())) {
         $mform->display();
     }
 }

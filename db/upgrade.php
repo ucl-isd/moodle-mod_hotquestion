@@ -556,7 +556,7 @@ function xmldb_hotquestion_upgrade($oldversion=0) {
     }
 
     // 4.1.5  Upgrade starts here.
-    if ($oldversion < 2023011900) {
+    if ($oldversion < 2023012000) {
         // If they exist, need code to drop two fields, assessedtimefinish and assessedtimestart.
         // Define field assessedtimefinish to be dropped from hotquestion.
         $table = new xmldb_table('hotquestion');
@@ -575,8 +575,17 @@ function xmldb_hotquestion_upgrade($oldversion=0) {
             $dbman->drop_field($table, $field);
         }
 
+        // Define field viewaftertimeclose to be added to hotquestion.
+        $table = new xmldb_table('hotquestion');
+        $field = new xmldb_field('viewaftertimeclose', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '0', 'timeclose');
+
+        // Conditionally launch add field viewaftertimeclose.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
         // Hotquestion savepoint reached.
-        upgrade_mod_savepoint(true, XXXXXXXXXX, 'hotquestion');
+        upgrade_mod_savepoint(true, 2023012000, 'hotquestion');
     }
     return true;
 }
