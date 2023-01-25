@@ -25,6 +25,10 @@ This files describes changes in the Hot Question code.
     clicks on the heat vote icon are ignored. Clicks by anyone with manage capabilities
     can change and/or remove their votes, as I can see a case for teachers catching up
     with grading, after the activity has closed.
+20200522 Hot Question_479 - Need to move locallib.php functions to .../classes/... I have
+    slowly been doing this and have placed 12 into class files, so far. I am going to
+    close this ticket, and start doing individual tickets for the rest of them.
+
 
 === 4.1.4 === 20221219 Only for M3.11 and above.
 20221126 HotQuestion_959v - Need to make sure the new rating data is being added to
