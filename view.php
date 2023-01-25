@@ -26,6 +26,7 @@
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 use mod_hotquestion\local\results;
+use mod_hotquestion\local\hqavailable;
 use \mod_hotquestion\event\course_module_viewed;
 
 require_once("../../config.php");
@@ -161,7 +162,8 @@ if (!empty($action)) {
         case 'vote':
             if (has_capability('mod/hotquestion:vote', $context)) {
                 // 20230122 Prevent voting when closed.
-                if (($hq->is_hotquestion_ended() && !$hotquestion->viewaftertimeclose) ||
+                //if (($hq->is_hotquestion_ended() && !$hotquestion->viewaftertimeclose) ||
+                if ((hqavailable::is_hotquestion_ended($hq) && !$hotquestion->viewaftertimeclose) ||
                     (has_capability('mod/hotquestion:manageentries', $context))) {
                     $q = required_param('q',  PARAM_INT);  // Question id to vote.
                     $hq->vote_on($q);
@@ -172,7 +174,8 @@ if (!empty($action)) {
         case 'removevote':
             if (has_capability('mod/hotquestion:vote', $context)) {
                 // 20230122 Prevent vote remove when closed.
-                if (($hq->is_hotquestion_ended() && !$hotquestion->viewaftertimeclose) ||
+                //if (($hq->is_hotquestion_ended() && !$hotquestion->viewaftertimeclose) ||
+                if ((hqavailable::is_hotquestion_ended($hq) && !$hotquestion->viewaftertimeclose) ||
                     (has_capability('mod/hotquestion:manageentries', $context))) {
                     $q = required_param('q',  PARAM_INT);  // Question id to vote.
                     $hq->remove_vote($q);
@@ -236,14 +239,15 @@ if (!$ajax) {
     }
 
     // Allow access at any time to manager and editing teacher but prevent access to students.
-    // Check availability timeopen and timeclose. Added 10/2/16. Modified 20230120.
-    if (!(has_capability('mod/hotquestion:manage', $context)) && !$hq->is_hotquestion_active()) {  // Availability restrictions.
+    // Check availability timeopen and timeclose. Added 10/2/16. Modified 20230120 to add viewaftertimeclose.
+    // Modified 20230125 to create hqavailable class.
+    if (!(has_capability('mod/hotquestion:manage', $context)) && !hqavailable::is_hotquestion_active($hq)) {  // Availability restrictions.
         $inaccessible = '';
-        if ($hq->is_hotquestion_ended() && !$hotquestion->viewaftertimeclose) {
+        if (hqavailable::is_hotquestion_ended($hq) && !$hotquestion->viewaftertimeclose) {
             $inaccessible = $output->hotquestion_inaccessible(get_string('hotquestionclosed',
                 'hotquestion', userdate($hotquestion->timeclose)));
         }
-        if ($hq->is_hotquestion_yet_to_start()) {
+        if (hqavailable::is_hotquestion_yet_to_start($hq)) {
             $inaccessible = $output->hotquestion_inaccessible(get_string('hotquestionopen',
                 'hotquestion', userdate($hotquestion->timeopen)));
         }
@@ -301,7 +305,8 @@ if (!$ajax) {
     // Print the textarea box for typing submissions in.
     if (has_capability('mod/hotquestion:manage', $context) ||
         (has_capability('mod/hotquestion:ask', $context) &&
-        $hq->is_hotquestion_active())) {
+        hqavailable::is_hotquestion_active($hq))) {
+        //$hq->is_hotquestion_active())) {
         $mform->display();
     }
 }
