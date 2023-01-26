@@ -43,6 +43,7 @@ class hqavailable {
     /**
      * Return whether the hotquestion is available due to open time and close time.
      *
+     * @param array $hq
      * @return bool
      */
     public static function is_hotquestion_active($hq) {
@@ -52,6 +53,9 @@ class hqavailable {
     }
 
     /**
+     * Return whether the hotquestion is ended due to close time.
+     *
+     * @param array $hq
      * @return bool
      */
     public static function is_hotquestion_ended($hq) {
@@ -59,6 +63,9 @@ class hqavailable {
     }
 
     /**
+     * Return whether the hotquestion is available yet due to open time.
+     *
+     * @param array $hq
      * @return bool
      */
     public static function is_hotquestion_yet_to_start($hq) {
