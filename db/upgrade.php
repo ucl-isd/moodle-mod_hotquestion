@@ -555,8 +555,8 @@ function xmldb_hotquestion_upgrade($oldversion=0) {
         upgrade_mod_savepoint(true, 2022070701, 'hotquestion');
     }
 
-    // 4.1.5  Upgrade starts here.
-    if ($oldversion < 2023012000) {
+    // 4.1.5 20230126 Upgrade starts here.
+    if ($oldversion < 2023012600) {
         // If they exist, need code to drop two fields, assessedtimefinish and assessedtimestart.
         // Define field assessedtimefinish to be dropped from hotquestion.
         $table = new xmldb_table('hotquestion');
@@ -585,7 +585,7 @@ function xmldb_hotquestion_upgrade($oldversion=0) {
         }
 
         // Hotquestion savepoint reached.
-        upgrade_mod_savepoint(true, 2023012000, 'hotquestion');
+        upgrade_mod_savepoint(true, 2023012600, 'hotquestion');
     }
     return true;
 }
