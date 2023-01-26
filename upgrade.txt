@@ -8,7 +8,7 @@ This files describes changes in the Hot Question code.
     Activity completion should reflect that. See the ticket for details.
 20220821 HotQuestion_911 - Need to see about including grades in the Export tool.
 
-=== 4.1.5 === pending
+=== 4.1.5 === 20230126 Only for M3.11 and above.
 20230119 HotQuestion_977 - Non-unique names for database fields #56. The fields assessed,
     assestimestart and assesstimefinish are required for ratings, but assessedtimefinish
     and assessedtimestart are not used at all, so I need to see about dropping them.
