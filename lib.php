@@ -759,11 +759,11 @@ function hotquestion_grade_item_update($hotquestion, $grades=null) {
     $item['itemname'] = clean_param($hotquestion->name, PARAM_NOTAGS);
     $item['gradetype'] = GRADE_TYPE_VALUE;
 
-    if ($hotquestion->grade > 0) {
+    if (isset($hotquestion->grade) && $hotquestion->grade > 0) {
         $item['gradetype'] = GRADE_TYPE_VALUE;
         $item['grademax']  = $hotquestion->grade;
         $item['grademin']  = 0;
-    } else if ($hotquestion->grade < 0) {
+    } else if (isset($hotquestion->grade) && $hotquestion->grade < 0) {
         $item['gradetype'] = GRADE_TYPE_SCALE;
         $item['scaleid'] = -$hotquestion->grade;
 
