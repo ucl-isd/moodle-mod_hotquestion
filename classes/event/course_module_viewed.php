@@ -54,14 +54,4 @@ class course_module_viewed extends \core\event\course_module_viewed {
     public function get_url() {
         return new \moodle_url('/mod/hotquestion/view.php', array('f' => $this->objectid));
     }
-
-    /**
-     * Return the legacy event log data.
-     *
-     * @return array|null
-     */
-    protected function get_legacy_logdata() {
-        return array($this->courseid, 'hotquestion', 'view hotquestion', 'view.php?f=' . $this->objectid,
-            $this->objectid, $this->contextinstanceid);
-    }
 }

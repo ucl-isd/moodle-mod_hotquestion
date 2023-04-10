@@ -7,6 +7,14 @@ This files describes changes in the Hot Question code.
 20220706 HotQuestion_881 - When Whole Hot Question grading is NOT enabled, the
     Activity completion should reflect that. See the ticket for details.
 20220821 HotQuestion_911 - Need to see about including grades in the Export tool.
+20230120 HotQuestion_995 - The grade table needs more info included in the download. 
+
+=== 4.1.6 === pending release of Moodle 4.1.6
+20230407 HotQuestion_1031v - Invalid event functions defined in
+    \mod_hotquestion\event\course_module_viewed. Searched all the HQ files and
+    deleted all the deprecated add_to_log code.
+
+
 
 === 4.1.5 === 20230126 Only for M3.11 and above.
 20230119 HotQuestion_977 - Non-unique names for database fields #56. The fields assessed,

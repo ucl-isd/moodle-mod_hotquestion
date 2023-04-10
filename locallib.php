@@ -118,17 +118,12 @@ class mod_hotquestion {
 
         if ($question && $this->can_vote_on($question)) {
             // Trigger and log a vote event.
-            if ($CFG->version > 2014051200) { // If newer than Moodle 2.7+ use new event logging.
-                $params = array(
-                    'objectid' => $this->cm->id,
-                    'context' => $context,
-                );
-                $event = update_vote::create($params);
-                $event->trigger();
-            } else {
-                add_to_log($this->course->id, 'hotquestion', 'update vote'
-                    , "view.php?id={$this->cm->id}", $question->id, $this->cm->id);
-            }
+            $params = array(
+                'objectid' => $this->cm->id,
+                'context' => $context,
+            );
+            $event = update_vote::create($params);
+            $event->trigger();
 
             if (!$this->has_voted($question->id)) {
                 $votes->question = $question->id;
@@ -159,17 +154,12 @@ class mod_hotquestion {
         if ($question && $this->can_vote_on($question)) {
 
             // Trigger and log a remove_vote event.
-            if ($CFG->version > 2014051200) { // If newer than Moodle 2.7+ use new event logging.
-                $params = array(
-                    'objectid' => $this->cm->id,
-                    'context' => $context,
-                );
-                $event = remove_vote::create($params);
-                $event->trigger();
-            } else {
-                add_to_log($this->course->id, 'hotquestion', 'remove vote'
-                    , "view.php?id={$this->cm->id}", $question->id, $this->cm->id);
-            }
+            $params = array(
+                'objectid' => $this->cm->id,
+                'context' => $context,
+            );
+            $event = remove_vote::create($params);
+            $event->trigger();
 
             if (!$this->has_voted($question->id)) {
                 $votes->question = $question->id;
@@ -272,17 +262,13 @@ class mod_hotquestion {
         $context = context_module::instance($this->cm->id);
         $rid = $DB->insert_record('hotquestion_rounds', $new);
 
-        if ($CFG->version > 2014051200) { // If newer than Moodle 2.7+ use new event logging.
-            $params = array(
-                'objectid' => $this->cm->id,
-                'context' => $context,
-            );
-            $event = add_round::create($params);
-            $event->trigger();
-        } else {
-            add_to_log($this->course->id, 'hotquestion', 'add round',
-                "view.php?id={$this->cm->id}&round=$rid", $rid, $this->cm->id);
-        }
+        // Trigger add new round event.
+        $params = array(
+            'objectid' => $this->cm->id,
+            'context' => $context,
+        );
+        $event = add_round::create($params);
+        $event->trigger();
     }
 
     /**
@@ -423,17 +409,12 @@ class mod_hotquestion {
         $data->hotquestion = $this->instance->id;
         $context = context_module::instance($this->cm->id);
         // Trigger remove_question event.
-        if ($CFG->version > 2014051200) { // If newer than Moodle 2.7+ use new event logging.
-            $params = array(
-                'objectid' => $this->cm->id,
-                'context' => $context,
-            );
-            $event = remove_question::create($params);
-            $event->trigger();
-        } else {
-            add_to_log($this->course->id, 'hotquestion', 'remove question',
-                "view.php?id={$this->cm->id}&round=$rid", $rid, $this->cm->id);
-        }
+        $params = array(
+            'objectid' => $this->cm->id,
+            'context' => $context,
+        );
+        $event = remove_question::create($params);
+        $event->trigger();
 
         if (null !== (required_param('q', PARAM_INT))) {
             $questionid = required_param('q', PARAM_INT);
@@ -477,17 +458,12 @@ class mod_hotquestion {
         $data->hotquestion = $this->instance->id;
         $context = context_module::instance($this->cm->id);
         // Trigger remove_question event.
-        if ($CFG->version > 2014051200) { // If newer than Moodle 2.7+ use new event logging.
-            $params = array(
-                'objectid' => $this->cm->id,
-                'context' => $context,
-            );
-            $event = remove_round::create($params);
-            $event->trigger();
-        } else {
-            add_to_log($this->course->id, 'hotquestion', 'remove round',
-                "view.php?id={$this->cm->id}&round=$rid", $rid, $this->cm->id);
-        }
+        $params = array(
+            'objectid' => $this->cm->id,
+            'context' => $context,
+        );
+        $event = remove_round::create($params);
+        $event->trigger();
 
         $roundid = required_param('round', PARAM_INT);
         if ($this->currentround->endtime == 0) {
@@ -571,17 +547,12 @@ class mod_hotquestion {
         $context = context_module::instance($this->cm->id);
 
         // Trigger download_questions event.
-        if ($CFG->version > 2014051200) { // If newer than Moodle 2.7+ use new event logging.
-            $params = array(
-                'objectid' => $this->cm->id,
-                'context' => $context,
-            );
-            $event = download_questions::create($params);
-            $event->trigger();
-        } else {
-            add_to_log($this->course->id, 'hotquestion', 'download questions',
-                "view.php?id={$this->cm->id}&round=$rid", $rid, $this->cm->id);
-        }
+        $params = array(
+            'objectid' => $this->cm->id,
+            'context' => $context,
+        );
+        $event = download_questions::create($params);
+        $event->trigger();
 
         // Construct sql query and filename based on admin or teacher/manager.
         // Add filename details based on course and HQ activity name.

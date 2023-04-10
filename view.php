@@ -84,13 +84,10 @@ if ($seeunapprovedpreference == 1 || $seeunapprovedpreference == 'ON') {
 }
 
 // Trigger module viewed event.
-if ($CFG->version > 2014051200) { // Moodle 2.7+.
-    $params = array('objectid' => $hq->cm->id, 'context' => $context);
-    $event = course_module_viewed::create($params);
-    $event->trigger();
-} else {
-    add_to_log($hq->course->id, 'hotquestion', 'view', "view.php?id={$hq->cm->id}", $hq->instance->name, $hq->cm->id);
-}
+$params = array('objectid' => $hq->cm->id, 'context' => $context);
+$event = course_module_viewed::create($params);
+$event->trigger();
+
 
 $completion = new completion_info($course);
 $completion->set_module_viewed($cm);
