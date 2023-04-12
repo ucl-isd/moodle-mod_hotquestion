@@ -542,6 +542,21 @@ function xmldb_hotquestion_upgrade($oldversion=0) {
         $dbman->change_field_notnull($table, $field);
         $dbman->change_field_default($table, $field);
 
+        // The tpriority should always be 0 or higher. We want to find all records where this is not the case.
+        // Get all the hotquestion_question records.
+        $sql = "SELECT hqq.*
+                  FROM {hotquestion_questions} AS hqq
+                 WHERE hqq.id > 0";
+        $tprioritystofix = $DB->get_records_sql($sql, null);
+        // Find all the records with null for each hotquestion teacher priority.
+        foreach ($tprioritystofix as $tprioritytofix) {
+            if (!isset($tprioritytofix->tpriority)) {
+                // Replace the null with 0 so the redefine will not fail.
+                $tprioritytofix->tpriority = 0;
+                $DB->update_record('hotquestion_questions', $tprioritytofix);
+            };
+        };
+
         // Redefine field tpriority to be added to hotquestion_questions.
         $table = new xmldb_table('hotquestion_questions');
         $field = new xmldb_field('tpriority', XMLDB_TYPE_INTEGER, '2', null, XMLDB_NOTNULL, null, '0', 'approved');
