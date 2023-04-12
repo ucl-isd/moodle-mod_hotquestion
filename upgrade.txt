@@ -10,6 +10,9 @@ This files describes changes in the Hot Question code.
 20230120 HotQuestion_995 - The grade table needs more info included in the download. 
 
 === 4.1.6 === pending release of Moodle 4.1.6
+20221027 Hot Question_943 - Feature request #58 - 4.0 hotquestion upgrade fails. The
+    fix is to search for any hotquestion_question teacher priority of null, and change
+    it to 0, then proceed with the upgrade. 
 20230407 HotQuestion_1031v - Invalid event functions defined in
     \mod_hotquestion\event\course_module_viewed. Searched all the HQ files and
     deleted all the deprecated add_to_log code.
