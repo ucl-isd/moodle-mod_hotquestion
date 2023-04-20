@@ -163,7 +163,7 @@ class provider implements \core_privacy\local\metadata\provider,
         $params = [
             'modid' => $modid,
             'contextlevel' => CONTEXT_MODULE,
-            'contextid'    => $context->id,
+            'contextid' => $context->id,
         ];
 
         // Find users with hotquestion_question entries.

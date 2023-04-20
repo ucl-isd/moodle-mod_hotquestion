@@ -78,9 +78,9 @@ class mod_hotquestion {
      */
     public function __construct($cmid, $roundid = -1) {
         global $DB;
-        $this->cm        = get_coursemodule_from_id('hotquestion', $cmid, 0, false, MUST_EXIST);
-        $this->course    = $DB->get_record('course', array('id' => $this->cm->course), '*', MUST_EXIST);
-        $this->instance  = $DB->get_record('hotquestion', array('id' => $this->cm->instance), '*', MUST_EXIST);
+        $this->cm = get_coursemodule_from_id('hotquestion', $cmid, 0, false, MUST_EXIST);
+        $this->course = $DB->get_record('course', array('id' => $this->cm->course), '*', MUST_EXIST);
+        $this->instance = $DB->get_record('hotquestion', array('id' => $this->cm->instance), '*', MUST_EXIST);
         $this->set_currentround($roundid);
 
         // Contrib by ecastro ULPGC, for grades callbacks.
