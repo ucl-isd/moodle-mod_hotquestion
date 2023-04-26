@@ -297,11 +297,11 @@ class results {
             $context = context_module::instance($cm->id);
             $cmt = new stdClass();
             $cmt->component = 'mod_hotquestion';
-            $cmt->context = $context;
-            $cmt->course = $course;
-            $cmt->cm = $cm;
-            $cmt->area = 'hotquestion_questions';
-            $cmt->itemid = $question->id;
+            $cmt->context   = $context;
+            $cmt->course    = $course;
+            $cmt->cm        = $cm;
+            $cmt->area      = 'hotquestion_questions';
+            $cmt->itemid    = $question->id;
             $cmt->showcount = true;
             $comment = new comment($cmt);
             $html = $comment->output(true);
