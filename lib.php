@@ -86,9 +86,9 @@ function hotquestion_update_instance($hotquestion) {
         $hotquestion->timeclose = 0;
     }
 
-    $cmid = $hotquestion->coursemodule;
+    $cmid       = $hotquestion->coursemodule;
     $cmidnumber = $hotquestion->cmidnumber;
-    $courseid = $hotquestion->course;
+    $courseid   = $hotquestion->course;
 
     $hotquestion->id = $hotquestion->instance;
 
@@ -279,8 +279,8 @@ function hotquestion_print_recent_activity($course, $viewfullnames, $timestart) 
     $newentries = $DB->get_records_sql($sql, $dbparams);
 
     $modinfo = get_fast_modinfo($course);
-    $show = array();
-    $grader = array();
+    $show    = array();
+    $grader  = array();
     $showrecententries = get_config('hotquestion', 'showrecentactivity');
 
     foreach ($newentries as $anentry) {
@@ -733,7 +733,7 @@ function hotquestion_update_grades($hotquestion, $userid=0, $nullifnone=true) {
 
     } else if ($userid && $nullifnone) {
         $grade = new stdClass();
-        $grade->userid = $userid;
+        $grade->userid   = $userid;
         $grade->rawgrade = null;
         hotquestion_grade_item_update($hotquestion, $grade);
 
@@ -761,8 +761,8 @@ function hotquestion_grade_item_update($hotquestion, $grades=null) {
 
     if (isset($hotquestion->grade) && $hotquestion->grade > 0) {
         $item['gradetype'] = GRADE_TYPE_VALUE;
-        $item['grademax'] = $hotquestion->grade;
-        $item['grademin'] = 0;
+        $item['grademax']  = $hotquestion->grade;
+        $item['grademin']  = 0;
     } else if (isset($hotquestion->grade) && $hotquestion->grade < 0) {
         $item['gradetype'] = GRADE_TYPE_SCALE;
         $item['scaleid'] = -$hotquestion->grade;
