@@ -531,7 +531,7 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
      */
     public function hotquestion_inaccessible($message) {
         global $CFG;
-        $output = $this->output->box_start('generalbox boxaligncenter');
+        $output  = $this->output->box_start('generalbox boxaligncenter');
         $output .= $this->output->box_start('center');
         $output .= (get_string('notavailable', 'hotquestion'));
         $output .= $message;
