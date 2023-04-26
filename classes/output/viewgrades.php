@@ -399,7 +399,7 @@ class viewgrades extends table_sql {
                 $this->sql->where .= ' AND '.$wsql;
                 $this->sql->params = array_merge($this->sql->params, $wparams);
 
-                $this->totalrows = $DB->count_records_sql($this->countsql, $this->countparams);
+                $this->totalrows  = $DB->count_records_sql($this->countsql, $this->countparams);
             }
 
             if ($this->totalrows > $pagesize) {
