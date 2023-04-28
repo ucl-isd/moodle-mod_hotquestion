@@ -84,7 +84,7 @@ function xmldb_hotquestion_upgrade($oldversion=0) {
         $rec->module = 'hotquestion';
         $rec->action = 'add';
         $rec->mtable = 'hotquestion';
-        $rec->filed  = 'name';
+        $rec->filed = 'name';
         // Insert the add action in log_display.
         $result = $DB->insert_record('log_display', $rec);
         // Now the update action.
@@ -545,7 +545,7 @@ function xmldb_hotquestion_upgrade($oldversion=0) {
         // The tpriority should always be 0 or higher. We want to find all records where this is not the case.
         // Get all the hotquestion_question records.
         $sql = "SELECT hqq.*
-                  FROM {hotquestion_questions} AS hqq
+                  FROM {hotquestion_questions} hqq
                  WHERE hqq.id > 0";
         $tprioritystofix = $DB->get_records_sql($sql, null);
         // Find all the records with null for each hotquestion teacher priority.
