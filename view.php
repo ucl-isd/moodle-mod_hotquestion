@@ -71,17 +71,27 @@ if (! $cw = $DB->get_record("course_sections", array("id" => $cm->section))) {
     throw new moodle_exception(get_string('incorrectmodule', 'hotquestion'));
 }
 
-// Set a preference and then retrieve it.
-$seeunapprovedpreference = optional_param('seeunapprovedpreference',
-                           get_user_preferences('hotquestion_seeunapproved',
-                           get_config('mod_hotquestion', 'approval')),
-                           PARAM_INT);
+// 20230519 Set a preference and then retrieve it.
+//$seeunapprovedpreference = optional_param('seeunapprovedpreference',
+//                           get_user_preferences('hotquestion_seeunapproved',
+//                           get_config('mod_hotquestion', 'approval')),
+//                           PARAM_INT);
 
-if ($seeunapprovedpreference == 1 || $seeunapprovedpreference == 'ON') {
-    set_user_preference('hotquestion_seeunapproved', 'OFF');
-} else {
-    set_user_preference('hotquestion_seeunapproved', 'ON');
+////////////////////////////////////////////////////////////////////////////////////
+$oldvispreference = get_user_preferences('hotquestion_seeunapproved'.$hotquestion->id, 0);
+$vispreference = optional_param('vispreference', $oldvispreference, PARAM_INT);
+
+// 20230517 Added selector for visibility view. Default is ON.
+if ($vispreference != $oldvispreference) {
+    set_user_preference('hotquestion_seeunapproved'.$hotquestion->id, $vispreference);
 }
+/////////////////////////////////////////////////////////////////////////////////////////////////
+
+//if ($seeunapprovedpreference == 1 || $seeunapprovedpreference == 'ON') {
+//    set_user_preference('hotquestion_seeunapproved', 'OFF');
+//} else {
+//    set_user_preference('hotquestion_seeunapproved', 'ON');
+//}
 
 // Trigger module viewed event.
 $params = array('objectid' => $hq->cm->id, 'context' => $context);
@@ -101,6 +111,8 @@ if (!$ajax) {
     $PAGE->set_cm($hq->cm);
     $PAGE->add_body_class('hotquestion');
 }
+
+echo '<form method="post">';
 
 require_capability('mod/hotquestion:view', $context);
 
@@ -211,9 +223,6 @@ if (!empty($action)) {
             break;
         case 'approve':
             if (has_capability('mod/hotquestion:manageentries', $context)) {
-
-
-
                 $q = required_param('q',  PARAM_INT);  // Question id to approve.
                 // Call approve question function in locallib.
                 $hq->approve_question($q);
@@ -281,22 +290,55 @@ if (!$ajax) {
              ':</strong> '.date("l, d M Y, G:i A", $hotquestion->timeclose);
     }
 
-    // 20211219 Added link to all HotQuestion activities. 20221031 Added link to hide unapproved questions.
-        echo '<span style="float:right"><a href="index.php?id='
-            .$course->id
-            .'">'
-            .get_string('viewallhotquestions', 'hotquestion')
-            .'</a> | <a href="view.php?id='.$cm->id
-            .'">'
-            .get_string('seeunapproved', 'hotquestion', $seeunapprovedpreference)
-            .get_string('seeunapprovedsetting', 'hotquestion',
-                get_user_preferences('hotquestion_seeunapproved',
-                get_config('mod_hotquestion', 'approval')))
-            .'</a></span><br>';
-
+    //echo '<form method="post">';
     // Print group information (A drop down box will be displayed if the user
     // is a member of more than one group, or has access to all groups).
     echo groups_print_activity_menu($cm, $CFG->wwwroot.'/mod/hotquestion/view.php?id='.$cm->id);
+
+/////////////////////////////////////////////////////////////////////////////
+
+    $listoptions = array(
+        1 => get_string('unapprovedquestionsee', 'hotquestion'),
+        2 => get_string('unapprovedquestionhide', 'hotquestion')
+    );
+
+    // This creates the dropdown list for visibility of approved/unapproved questions on the page.
+    $selection = html_writer::select($listoptions, 'vispreference', $vispreference, false, array(
+        'id' => 'pref_visibility',
+        'class' => 'custom-select'
+    ));
+    echo '   '.get_string('unapprovedquestionvisibility', 'hotquestion').' <select onchange="this.form.submit()" name="vispreference">';
+    echo '<option selected="true" value="'.$selection.'</option>';
+    echo '</select>';
+
+////////////////////////////
+
+
+
+    // 20230519 This creates the link button for all HotQuestions in this course.
+    $url2 = '<a href="'.$CFG->wwwroot . '/mod/hotquestion/index.php?id='.$course->id
+        .'"class="btn btn-primary" style="border-radius: 8px">'
+        .get_string('viewallhotquestions', 'hotquestion', $hotquestion->name)
+        .'</a>';
+    echo '<span style="float:right">'.$url2.'</span><br>';
+;
+//echo '</form>';
+
+///////////////////////////////////////////////////////////////////////////////
+/*
+    // 20211219 Added link to all HotQuestion activities. 20221031 Added link to hide unapproved questions.
+    echo '<span style="float:right"><a href="index.php?id='
+        .$course->id
+        .'">'
+        .get_string('viewallhotquestions', 'hotquestion')
+        .'</a> | <a href="view.php?id='.$cm->id
+        .'">'
+        .get_string('seeunapproved', 'hotquestion', $seeunapprovedpreference)
+        .get_string('seeunapprovedsetting', 'hotquestion',
+            get_user_preferences('hotquestion_seeunapproved',
+            get_config('mod_hotquestion', 'approval')))
+        .'</a></span><br>';
+*/
 
     // Print the textarea box for typing submissions in.
     if (has_capability('mod/hotquestion:manage', $context) ||
@@ -326,6 +368,8 @@ echo $output->container_end();
 // Print questions list from the current round, function questions is in renderer.php file.
 echo $output->questions(has_capability('mod/hotquestion:vote', $context));
 echo $output->container_end();
+
+echo '</form>';
 
 // Finish the page.
 if (!$ajax) {

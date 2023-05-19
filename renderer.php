@@ -325,6 +325,7 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
             // 20200528 Added variable for remaining votes to use as a test for showing vote icon for current user.
             $remaining = ($this->hotquestion->heat_tally($hq, $USER->id));
 
+
             foreach ($questions as $question) {
                 $line = array();
                 $formatoptions->para = false;
@@ -335,12 +336,12 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
                     // Process the question part of the row entry.
                     // If not a teacher and question is not approved, skip over it and do not show it.
                     if ((($question->approved)
-                            && (get_user_preferences('hotquestion_seeunapproved', null, $USER->id) == 'OFF'))
+                            && (get_user_preferences('hotquestion_seeunapproved'.$question->hotquestion) == 2))
                         || ((has_capability('mod/hotquestion:manageentries', $context))
-                            && (get_user_preferences('hotquestion_seeunapproved', null, $USER->id) == 'ON'))
+                            && (get_user_preferences('hotquestion_seeunapproved'.$question->hotquestion) == 1))
                         || (($question->approved)
                             && (!has_capability('mod/hotquestion:manageentries', $context))
-                            && (get_user_preferences('hotquestion_seeunapproved', null, $USER->id) == 'ON'))) {
+                            && (get_user_preferences('hotquestion_seeunapproved'.$question->hotquestion) == 1))) {
 
                         if ($question->anonymous) {
                             $a->user = get_string('anonymous', 'hotquestion');
@@ -508,9 +509,7 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
                         }
                         $table->data[] = $line;
                     } else if ((!$question->approved)
-                              && (get_user_preferences('hotquestion_seeunapproved',
-                                  null,
-                                  $USER->id) == 'ON')) {
+                              && (get_user_preferences('hotquestion_seeunapproved'.$question->hotquestion) == 1)) {
                         $line[] = get_string('notapproved', 'hotquestion');
                         $table->data[] = $line;
                     }

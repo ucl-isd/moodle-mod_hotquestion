@@ -208,8 +208,11 @@ $string['requireapproval_descr'] = 'If enabled, questions require approval by a 
 $string['resethotquestion'] = 'Delete all questions and votes';
 $string['returnto'] = 'Return to {$a}';
 $string['round'] = 'Round {$a}';
+
+// These next two are deprecated.
 $string['seeunapproved'] = 'Toggle unapproved {$a}.';
 $string['seeunapprovedsetting'] = ' Currently set to {$a}.';
+
 $string['showrecentactivity'] = 'Show recent activity';
 $string['showrecentactivityconfig'] = 'Everyone can see notifications in recent activity reports.';
 $string['teacherpriority'] = 'Priority';
@@ -218,6 +221,12 @@ $string['teacherpriorityvisibility_help'] = 'If enabled, the Teacher priority co
 $string['teacherpriorityvisibility_descr'] = 'If enabled, the Teacher priority column is visible, otherwise it is hidden.';
 $string['time'] = 'Time';
 $string['totalcomments'] = 'Total comments';
+
+$string['unapprovedquestionhide'] = 'Hide unapproved questions';
+$string['unapprovedquestionsee'] = 'See unapproved questions';
+$string['unapprovedquestionvisibility'] = 'Unapproved question visibility';
+
+
 $string['userid'] = 'Userid';
 $string['valueinterror'] = 'The factor must be a positive integer number';
 $string['viewaftertimeclose'] = 'View after close time';
