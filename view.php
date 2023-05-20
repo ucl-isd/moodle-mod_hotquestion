@@ -304,7 +304,7 @@ if (!$ajax) {
         .'"class="btn btn-link">'
         .get_string('viewallhotquestions', 'hotquestion', $hotquestion->name)
         .'</a>';
-    echo '<span style="float:right">'.$url2.'</span><br>';
+    echo '<span style="float: inline-end">'.$url2.'</span><br>';
 
     // Print the textarea box for typing submissions in.
     if (has_capability('mod/hotquestion:manage', $context) ||
