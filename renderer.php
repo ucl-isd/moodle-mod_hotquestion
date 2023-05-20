@@ -325,7 +325,7 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
             // 20200528 Added variable for remaining votes to use as a test for showing vote icon for current user.
             $remaining = ($this->hotquestion->heat_tally($hq, $USER->id));
 
-
+            // 20230519 Process all questions based on new seeunapproved question preference.
             foreach ($questions as $question) {
                 $line = array();
                 $formatoptions->para = false;
@@ -508,6 +508,7 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
                             $line[] = $approve;
                         }
                         $table->data[] = $line;
+                        // 20230519 Use new seeunapproved question preference.
                     } else if ((!$question->approved)
                               && (get_user_preferences('hotquestion_seeunapproved'.$question->hotquestion) == 1)) {
                         $line[] = get_string('notapproved', 'hotquestion');
