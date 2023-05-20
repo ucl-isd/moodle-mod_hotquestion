@@ -111,7 +111,8 @@ $output->init($hq);
 // Process submitted question.
 if (has_capability('mod/hotquestion:ask', $context)) {
     $mform = new hotquestion_form(null, array($hq->instance->anonymouspost, $hq->cm));
-    if ($fromform = $mform->get_data()) {
+    // 20230520 Needed isset so changing unapproved question views do not cause an error.
+    if (($fromform = $mform->get_data()) && (isset($fromform->submitbutton))) {
         // If there is a post, $fromform will contain text, format, id, and submitbutton.
         // 20210314 Prevent CSFR.
         confirm_sesskey();
