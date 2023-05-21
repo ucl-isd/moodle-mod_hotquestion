@@ -100,7 +100,7 @@ if (!$ajax) {
 }
 
 // 20230519 Added for preference selector
-echo '<form method="post">';
+//echo '<form method="post">';
 
 require_capability('mod/hotquestion:view', $context);
 
@@ -145,6 +145,9 @@ if (has_capability('mod/hotquestion:ask', $context)) {
         die;
     }
 }
+
+// 20230519 Added for preference selector.
+echo '<form method="post">';
 
 // Handle priority, vote, newround, removeround, remove question, download questions, and approve question.
 if (!empty($action)) {
