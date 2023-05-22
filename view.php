@@ -99,9 +99,6 @@ if (!$ajax) {
     $PAGE->add_body_class('hotquestion');
 }
 
-// 20230519 Added for preference selector
-//echo '<form method="post">';
-
 require_capability('mod/hotquestion:view', $context);
 
 // Get local renderer.
