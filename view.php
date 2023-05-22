@@ -105,8 +105,9 @@ require_capability('mod/hotquestion:view', $context);
 $output = $PAGE->get_renderer('mod_hotquestion');
 $output->init($hq);
 
-// Process submitted question.
-if (has_capability('mod/hotquestion:ask', $context)) {
+// 20230522 Changed to $canask. Process submitted question.
+//if (has_capability('mod/hotquestion:ask', $context)) {
+if ($canask) {
     $mform = new hotquestion_form(null, array($hq->instance->anonymouspost, $hq->cm));
     // 20230520 Needed isset so changing unapproved question views do not cause an error.
     if (($fromform = $mform->get_data()) && (isset($fromform->submitbutton))) {
@@ -144,7 +145,7 @@ if (has_capability('mod/hotquestion:ask', $context)) {
 }
 
 // 20230519 Added for preference selector.
-echo '<form method="post">';
+//echo '<form method="post">';
 
 // Handle priority, vote, newround, removeround, remove question, download questions, and approve question.
 if (!empty($action)) {
@@ -273,15 +274,22 @@ if (!$ajax) {
     }
     if (($hotquestion->timeclose) && (($hotquestion->timeclose) < time())) {
         echo '<strong>'.get_string('hotquestionclosed', 'hotquestion', date("l, d M Y, G:i A", $hotquestion->timeclose)).
-             '</strong>';
+             '</strong><br>';
     } else if ($hotquestion->timeclose) {
         echo '<strong>'.get_string('hotquestionclosetime', 'hotquestion').
-             ':</strong> '.date("l, d M Y, G:i A", $hotquestion->timeclose);
+             ':</strong> '.date("l, d M Y, G:i A", $hotquestion->timeclose).'<br>';
     }
+
+    echo '<table><tr><td>';
 
     // Print group information (A drop down box will be displayed if the user
     // is a member of more than one group, or has access to all groups).
     echo groups_print_activity_menu($cm, $CFG->wwwroot.'/mod/hotquestion/view.php?id='.$cm->id);
+
+    echo '</td>';
+
+    // 20230519 Added for preference selector.
+    echo '<td><form method="post">';
 
     // 20230519 Create list for preference selector.
     $listoptions = array(
@@ -299,6 +307,8 @@ if (!$ajax) {
         .' <select onchange="this.form.submit()" name="vispreference">'
         .'<option selected="true" value="'.$selection.'</option>'
         .'</select>';
+    echo '</td>';
+    echo '<td>';
 
     // 20230519 This creates the URL link button for all HotQuestions in this course.
     $url2 = '<a href="'.$CFG->wwwroot . '/mod/hotquestion/index.php?id='.$course->id
@@ -306,6 +316,8 @@ if (!$ajax) {
         .get_string('viewallhotquestions', 'hotquestion', $hotquestion->name)
         .'</a>';
     echo '<span style="float: inline-end">'.$url2.'</span><br>';
+
+    echo '</td></tr></table>';
 
     // Print the textarea box for typing submissions in.
     if (has_capability('mod/hotquestion:manage', $context) ||
