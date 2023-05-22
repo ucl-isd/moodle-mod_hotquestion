@@ -217,6 +217,7 @@ $string['teacherpriorityvisibility_descr'] = 'If enabled, the Teacher priority c
 $string['time'] = 'Time';
 $string['totalcomments'] = 'Total comments';
 $string['unapprovedquestionhide'] = 'Hide unapproved questions';
+$string['unapprovedquestionnotset'] = 'Preference not set';
 $string['unapprovedquestionsee'] = 'See unapproved questions';
 $string['unapprovedquestionvisibility'] = 'Unapproved question visibility';
 $string['userid'] = 'Userid';

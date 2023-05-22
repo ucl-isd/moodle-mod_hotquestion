@@ -288,6 +288,7 @@ if (!$ajax) {
 
     // 20230519 Create list for preference selector.
     $listoptions = array(
+        0 => get_string('unapprovedquestionnotset', 'hotquestion'),
         1 => get_string('unapprovedquestionsee', 'hotquestion'),
         2 => get_string('unapprovedquestionhide', 'hotquestion')
     );
