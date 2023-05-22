@@ -14,7 +14,8 @@ This files describes changes in the Hot Question code.
     when using PostgreSQL. The issue affects MariaDB and MySQL databases too. I have
     added code to both view.php and renderer.php that give a selector to show/hide
     unapproved questions and also change the index.php call to a class="btn btn-link"
-    instead of a plain URL link.
+    instead of a plain URL link. 20230522 Added string for another list option of,
+    Preference not set.
 
 === 4.1.6 === 20230407 Release for M3.11 and above.
 === 4.1.6+ === 20230428 Code cleanup.
