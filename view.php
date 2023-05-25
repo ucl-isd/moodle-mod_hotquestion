@@ -106,7 +106,6 @@ $output = $PAGE->get_renderer('mod_hotquestion');
 $output->init($hq);
 
 // 20230522 Changed to $canask. Process submitted question.
-//if (has_capability('mod/hotquestion:ask', $context)) {
 if ($canask) {
     $mform = new hotquestion_form(null, array($hq->instance->anonymouspost, $hq->cm));
     // 20230520 Needed isset so changing unapproved question views do not cause an error.
@@ -143,9 +142,6 @@ if ($canask) {
         die;
     }
 }
-
-// 20230519 Added for preference selector.
-//echo '<form method="post">';
 
 // Handle priority, vote, newround, removeround, remove question, download questions, and approve question.
 if (!empty($action)) {
@@ -280,6 +276,7 @@ if (!$ajax) {
              ':</strong> '.date("l, d M Y, G:i A", $hotquestion->timeclose).'<br>';
     }
 
+    // 20230522 Added a single row table to make both group and viewunapproved preference drop down menus work.
     echo '<table><tr><td>';
 
     // Print group information (A drop down box will be displayed if the user
@@ -307,10 +304,11 @@ if (!$ajax) {
         .' <select onchange="this.form.submit()" name="vispreference">'
         .'<option selected="true" value="'.$selection.'</option>'
         .'</select>';
-    echo '</td>';
-    echo '<td>';
+    // 20230522 Limit the form to this one row/cell of the table.
+    echo '</form></td>';
 
     // 20230519 This creates the URL link button for all HotQuestions in this course.
+    echo '<td>';
     $url2 = '<a href="'.$CFG->wwwroot . '/mod/hotquestion/index.php?id='.$course->id
         .'"class="btn btn-link">'
         .get_string('viewallhotquestions', 'hotquestion', $hotquestion->name)
@@ -348,8 +346,7 @@ echo $output->container_end();
 echo $output->questions(has_capability('mod/hotquestion:vote', $context));
 echo $output->container_end();
 
-// 20230519 Complete the form for this page.
-echo '</form>';
+
 
 // Finish the page.
 if (!$ajax) {
