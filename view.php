@@ -75,11 +75,13 @@ if (! $cw = $DB->get_record("course_sections", array("id" => $cm->section))) {
 $oldvispreference = get_user_preferences('hotquestion_seeunapproved'.$hotquestion->id, 0);
 $vispreference = optional_param('vispreference', $oldvispreference, PARAM_INT);
 
-// 20230517 Added selector for visibility view. Default is ON.
-if ($vispreference != $oldvispreference) {
+// 20230517 Added selector for visibility view. 20230531 First time access will default to,
+// Preference not set, and show the list of questions anyway.
+if (!($oldvispreference)) {
+    set_user_preference('hotquestion_seeunapproved'.$hotquestion->id, 1);
+} else {
     set_user_preference('hotquestion_seeunapproved'.$hotquestion->id, $vispreference);
 }
-
 // Trigger module viewed event.
 $params = array('objectid' => $hq->cm->id, 'context' => $context);
 $event = course_module_viewed::create($params);
