@@ -168,7 +168,7 @@ class provider implements \core_privacy\local\metadata\provider,
 
         // Find users with hotquestion_question entries.
         $sql = "
-            SELECT hqq.userid
+            SELECT hq.userid
               FROM {hotquestion_questions} hq
               JOIN {hotquestion} h
                 ON h.id = hq.hotquestion
