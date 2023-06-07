@@ -325,6 +325,19 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
             // 20200528 Added variable for remaining votes to use as a test for showing vote icon for current user.
             $remaining = ($this->hotquestion->heat_tally($hq, $USER->id));
 
+            // 20230519 Get a user preference, set to zero if it does not already exist.
+            // 20230607 Moved partial copy of preference to here from view.php.
+            $oldvispreference = get_user_preferences('hotquestion_seeunapproved'.$this->hotquestion->instance->id, 0);
+            $vispreference = optional_param('vispreference', $oldvispreference, PARAM_INT);
+
+            // 20230517 Added selector for visibility view. 20230531 First time access will default to,
+            // Preference not set, and show the list of questions anyway.
+            if (!($oldvispreference)) {
+                set_user_preference('hotquestion_seeunapproved'.$this->hotquestion->instance->id, 0);
+            } else {
+                set_user_preference('hotquestion_seeunapproved'.$this->hotquestion->instance->id, $vispreference);
+            }
+
             // 20230519 Process all questions based on new seeunapproved question preference.
             foreach ($questions as $question) {
                 $line = array();
@@ -335,13 +348,23 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
                 if ((! $groups) || (groups_is_member($groups, $user->id))) {
                     // Process the question part of the row entry.
                     // If not a teacher and question is not approved, skip over it and do not show it.
-                    if ((($question->approved)
+                    if (
+                        // Question is approved and user preference is set to hide unapproved questions.
+                        (($question->approved)
                             && (get_user_preferences('hotquestion_seeunapproved'.$question->hotquestion) == 2))
+                        // OR User is a manager and user preference is set to see unapproved questions.
                         || ((has_capability('mod/hotquestion:manageentries', $context))
                             && (get_user_preferences('hotquestion_seeunapproved'.$question->hotquestion) == 1))
+                        // OR Question is approved and user is NOT a manager and user preference is set to see unapproved questions.
                         || (($question->approved)
                             && (!has_capability('mod/hotquestion:manageentries', $context))
-                            && (get_user_preferences('hotquestion_seeunapproved'.$question->hotquestion) == 1))) {
+                            && (get_user_preferences('hotquestion_seeunapproved'.$question->hotquestion) == 1))
+                        // OR First time in HQ actvity, Question exists, User exists and User preference is NULL.
+                        || (($question->approved)
+                            && ((has_capability('mod/hotquestion:ask', $context))
+                            && (($oldvispreference !== null)
+                                && ($vispreference !== 0))))
+                        ) {
 
                         if ($question->anonymous) {
                             $a->user = get_string('anonymous', 'hotquestion');
@@ -510,9 +533,10 @@ class mod_hotquestion_renderer extends plugin_renderer_base {
                         $table->data[] = $line;
                         // 20230519 Use new seeunapproved question preference.
                     } else if ((!$question->approved)
-                              && (get_user_preferences('hotquestion_seeunapproved'.$question->hotquestion) == 1)) {
+                                  && (get_user_preferences('hotquestion_seeunapproved'.$question->hotquestion) == 1)) {
                         $line[] = get_string('notapproved', 'hotquestion');
                         $table->data[] = $line;
+
                     }
                 }
             }

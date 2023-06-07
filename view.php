@@ -82,6 +82,7 @@ if (!($oldvispreference)) {
 } else {
     set_user_preference('hotquestion_seeunapproved'.$hotquestion->id, $vispreference);
 }
+
 // Trigger module viewed event.
 $params = array('objectid' => $hq->cm->id, 'context' => $context);
 $event = course_module_viewed::create($params);
@@ -290,28 +291,35 @@ if (!$ajax) {
     // 20230519 Added for preference selector.
     echo '<td><form method="post">';
 
-    // 20230519 Create list for preference selector.
-    $listoptions = array(
-        0 => get_string('unapprovedquestionnotset', 'hotquestion'),
-        1 => get_string('unapprovedquestionsee', 'hotquestion'),
-        2 => get_string('unapprovedquestionhide', 'hotquestion')
-    );
+    // Add a selector for unapproved question visibility preference.
+    $listoptions = array(get_string('unapprovedquestionnotset', 'hotquestion'),
+                         get_string('unapprovedquestionsee', 'hotquestion'),
+                         get_string('unapprovedquestionhide', 'hotquestion'));
+    $htmlout = '';
+    $htmlout .= '   '.get_string('unapprovedquestionvisibility', 'hotquestion')
+                     .' <select onchange="this.form.submit()" id="pref_visibility" name="vispreference">';
+    // Get the ID and name of each preference in the DB.
+    foreach ($listoptions as $akey => $aval) {
+        // The first if is executed ONLY when the drop down menu is clicked to change the preference.
+        if ($akey == $vispreference) {
+            // This part of the if is reached when going to setup with an
+            // preference already selected and it is the one already in use.
+            $htmlout .= '<option value="'.$akey.'" selected="true">'.$aval.'</option>';
+        } else {
+            // This part of the if is reached the most and its when a preference option
+            // is not the one currently selected in the dropdown list.
+            $htmlout .= '<option value="'.$akey.'">'.$aval.'</option>';
+        }
+    }
+    set_user_preference('hotquestion_seeunapproved'.$hotquestion->id, $vispreference);
+    echo $htmlout;
 
-    // 20230519 This creates the dropdown list for visibility of approved/unapproved questions on the page.
-    $selection = html_writer::select($listoptions, 'vispreference', $vispreference, false, array(
-        'id' => 'pref_visibility',
-        'class' => 'custom-select'
-    ));
-    echo '   '.get_string('unapprovedquestionvisibility', 'hotquestion')
-        .' <select onchange="this.form.submit()" name="vispreference">'
-        .'<option selected="true" value="'.$selection.'</option>'
-        .'</select>';
     // 20230522 Limit the form to this one row/cell of the table.
     echo '</form></td>';
 
     // 20230519 This creates the URL link button for all HotQuestions in this course.
     echo '<td>';
-    $url2 = '<a href="'.$CFG->wwwroot . '/mod/hotquestion/index.php?id='.$course->id
+    $url2 = '<a href="'.$CFG->wwwroot.'/mod/hotquestion/index.php?id='.$course->id
         .'"class="btn btn-link">'
         .get_string('viewallhotquestions', 'hotquestion', $hotquestion->name)
         .'</a>';
