@@ -18,8 +18,8 @@ This files describes changes in the Hot Question code.
     unapproved questions and also change the index.php call to a class="btn btn-link"
     instead of a plain URL link. 20230522 Added string for another list option of,
     Preference not set. 20230531 Added code to go ahead and populate the listing
-    and setting the drop down menu to, Preference not set. 20230607 Made a lot changes
-    to get rid of the blank option at the top of the list.
+    and setting the drop down menu to, Preference not set. 20230607 Made a lot of
+    changes to get rid of the blank option at the top of the list.
 
 === 4.1.6 === 20230407 Release for M3.11 and above.
 === 4.1.6+ === 20230428 Code cleanup.
